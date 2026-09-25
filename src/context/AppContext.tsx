@@ -110,7 +110,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [isOnline, setIsOnline] = useState<boolean>(true);
   const [offlineQueueCount, setOfflineQueueCount] = useState<number>(0);
   
-  // Application Data States
+  // Application Data States (Clean initialization, synced with localStorage)
   const [projects, setProjects] = useState<Project[]>(INITIAL_PROJECTS);
   const [personnel, setPersonnel] = useState<Personnel[]>(INITIAL_PERSONNEL);
   const [projectPersonnel, setProjectPersonnel] = useState<ProjectPersonnel[]>(INITIAL_PROJECT_PERSONNEL);
@@ -119,23 +119,138 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [settlements, setSettlements] = useState<Settlement[]>(INITIAL_SETTLEMENTS);
   const [clientInvoices, setClientInvoices] = useState<ClientInvoice[]>(INITIAL_CLIENT_INVOICES);
 
-  // Auto-login from localStorage (Remember session on device / browser / IP)
+  // Sync state with localStorage on mount & wipe outdated demo mock caches
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
     try {
+      const DATA_VERSION_KEY = 'orion_clean_data_v3';
+      const isCleaned = localStorage.getItem(DATA_VERSION_KEY);
+
+      if (!isCleaned) {
+        // Clean out old mock data from previous sessions
+        localStorage.removeItem('orion_projects');
+        localStorage.removeItem('orion_personnel');
+        localStorage.removeItem('orion_project_personnel');
+        localStorage.removeItem('orion_expenses');
+        localStorage.removeItem('orion_advances');
+        localStorage.removeItem('orion_settlements');
+        localStorage.removeItem('orion_client_invoices');
+        localStorage.setItem(DATA_VERSION_KEY, 'true');
+
+        setProjects([]);
+        setPersonnel([]);
+        setProjectPersonnel([]);
+        setExpenses([]);
+        setAdvances([]);
+        setSettlements([]);
+        setClientInvoices([]);
+      } else {
+        // Load user-created persisted data if present
+        const savedProjects = localStorage.getItem('orion_projects');
+        if (savedProjects) setProjects(JSON.parse(savedProjects));
+
+        const savedPersonnel = localStorage.getItem('orion_personnel');
+        if (savedPersonnel) setPersonnel(JSON.parse(savedPersonnel));
+
+        const savedProjectPersonnel = localStorage.getItem('orion_project_personnel');
+        if (savedProjectPersonnel) setProjectPersonnel(JSON.parse(savedProjectPersonnel));
+
+        const savedExpenses = localStorage.getItem('orion_expenses');
+        if (savedExpenses) setExpenses(JSON.parse(savedExpenses));
+
+        const savedAdvances = localStorage.getItem('orion_advances');
+        if (savedAdvances) setAdvances(JSON.parse(savedAdvances));
+
+        const savedSettlements = localStorage.getItem('orion_settlements');
+        if (savedSettlements) setSettlements(JSON.parse(savedSettlements));
+
+        const savedInvoices = localStorage.getItem('orion_client_invoices');
+        if (savedInvoices) setClientInvoices(JSON.parse(savedInvoices));
+      }
+
+      // Auto-login from localStorage
       const savedUserJson = localStorage.getItem('orion_persistent_user');
       if (savedUserJson) {
         const parsed = JSON.parse(savedUserJson);
         const matched = users.find(u => u.id === parsed.id || u.username === parsed.username || u.email === parsed.email);
         if (matched) {
           setCurrentUserState(matched);
+        } else {
+          // Default to first user (Fatih Sakar - Müdür)
+          setCurrentUserState(users[0]);
         }
+      } else {
+        setCurrentUserState(users[0]);
       }
     } catch (e) {
-      console.error('Auto login check error:', e);
+      console.error('Storage sync error:', e);
     }
   }, [users]);
+
+  // Persist user changes to localStorage
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      localStorage.setItem('orion_projects', JSON.stringify(projects));
+    } catch (e) {
+      console.error(e);
+    }
+  }, [projects]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      localStorage.setItem('orion_personnel', JSON.stringify(personnel));
+    } catch (e) {
+      console.error(e);
+    }
+  }, [personnel]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      localStorage.setItem('orion_project_personnel', JSON.stringify(projectPersonnel));
+    } catch (e) {
+      console.error(e);
+    }
+  }, [projectPersonnel]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      localStorage.setItem('orion_expenses', JSON.stringify(expenses));
+    } catch (e) {
+      console.error(e);
+    }
+  }, [expenses]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      localStorage.setItem('orion_advances', JSON.stringify(advances));
+    } catch (e) {
+      console.error(e);
+    }
+  }, [advances]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      localStorage.setItem('orion_settlements', JSON.stringify(settlements));
+    } catch (e) {
+      console.error(e);
+    }
+  }, [settlements]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      localStorage.setItem('orion_client_invoices', JSON.stringify(clientInvoices));
+    } catch (e) {
+      console.error(e);
+    }
+  }, [clientInvoices]);
 
   const setCurrentUser = (user: UserProfile | null) => {
     setCurrentUserState(user);

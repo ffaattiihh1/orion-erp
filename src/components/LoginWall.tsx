@@ -130,25 +130,35 @@ export default function LoginWall() {
           </button>
         </form>
 
-        {/* Quick Demo Credentials */}
+        {/* Quick Credentials */}
         <div className="mt-7 pt-5 border-t border-slate-800">
           <p className="text-[11px] font-semibold text-slate-400 text-center uppercase tracking-wider mb-2.5">
-            Kullanıcı Hesapları (Hızlı Seçim)
+            Yetkili Hesaplar (Hızlı Seçim)
           </p>
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-3 gap-2">
             <button
+              type="button"
               onClick={() => handleQuickDemo('fatih.sakar')}
-              className="px-3 py-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-xs text-emerald-300 font-bold flex flex-col items-center justify-center gap-0.5 transition-all cursor-pointer text-center"
+              className="p-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-xs text-sky-300 font-bold flex flex-col items-center justify-center gap-0.5 transition-all cursor-pointer text-center"
             >
-              <span>Fatih Sakar (SPV)</span>
-              <span className="text-[10px] text-slate-400 font-normal">fatih.sakar / 123</span>
+              <span>Fatih Sakar</span>
+              <span className="text-[10px] text-emerald-400 font-semibold">(Müdür)</span>
             </button>
             <button
-              onClick={() => handleQuickDemo('admin')}
-              className="px-3 py-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-xs text-sky-300 font-bold flex flex-col items-center justify-center gap-0.5 transition-all cursor-pointer text-center"
+              type="button"
+              onClick={() => handleQuickDemo('emrah.gundeyer')}
+              className="p-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-xs text-amber-300 font-bold flex flex-col items-center justify-center gap-0.5 transition-all cursor-pointer text-center"
             >
-              <span>Burak Yılmaz (Müdür)</span>
-              <span className="text-[10px] text-slate-400 font-normal">admin / 123</span>
+              <span>Emrah G.</span>
+              <span className="text-[10px] text-amber-400 font-semibold">(SPV)</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => handleQuickDemo('kazim.senol')}
+              className="p-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-xs text-sky-300 font-bold flex flex-col items-center justify-center gap-0.5 transition-all cursor-pointer text-center"
+            >
+              <span>Kazım Şenol</span>
+              <span className="text-[10px] text-emerald-400 font-semibold">(Müdür)</span>
             </button>
           </div>
         </div>
