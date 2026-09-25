@@ -156,8 +156,8 @@ export default function FeasibilitySimulatorModal({ isOpen, onClose }: Feasibili
                       : 'bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700'
                   }`}
                 >
-                  <p className="text-xs font-bold text-sky-300">Model B: Öz Ekip (Mikro)</p>
-                  <p className="text-[11px] text-slate-400 mt-1">Avanslar, SPV günlüğü, fişli masraflar ve net operasyon.</p>
+                  <p className="text-xs font-bold text-sky-300">Model B: İstanbul Ekip</p>
+                  <p className="text-[11px] text-slate-400 mt-1">Avanslar, SPV günlüğü, fişli masraflar ve operasyon.</p>
                 </button>
 
                 <button
@@ -169,8 +169,8 @@ export default function FeasibilitySimulatorModal({ isOpen, onClose }: Feasibili
                       : 'bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700'
                   }`}
                 >
-                  <p className="text-xs font-bold text-indigo-300">Model A: Taşeron (Makro)</p>
-                  <p className="text-[11px] text-slate-400 mt-1">Dış iller tek birim fiyat. Masraf detayı tutulmaz.</p>
+                  <p className="text-xs font-bold text-indigo-300">Model A: İller</p>
+                  <p className="text-[11px] text-slate-400 mt-1">İller / Dış ekip tek birim fiyat. Masraf detayı tutulmaz.</p>
                 </button>
               </div>
             </div>
@@ -234,11 +234,11 @@ export default function FeasibilitySimulatorModal({ isOpen, onClose }: Feasibili
             {businessModel === 'model_a_macro' ? (
               <div className="p-3.5 rounded-xl bg-indigo-950/20 border border-indigo-900/40 space-y-3">
                 <span className="text-xs font-semibold text-indigo-300 uppercase tracking-wider block">
-                  Model A: Taşeron Parametreleri
+                  Model A: İller Parametreleri
                 </span>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs text-slate-400 mb-1">Taşeron Firma Adı</label>
+                    <label className="block text-xs text-slate-400 mb-1">İl / Dış Ekip / Firma Adı</label>
                     <input
                       type="text"
                       value={subcontractorName}
@@ -247,7 +247,7 @@ export default function FeasibilitySimulatorModal({ isOpen, onClose }: Feasibili
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-slate-400 mb-1">Taşeron Anket Başı Fiyat (TL)</label>
+                    <label className="block text-xs text-slate-400 mb-1">Anket Başı Birim Fiyat (TL)</label>
                     <input
                       type="number"
                       min="1"
@@ -261,7 +261,7 @@ export default function FeasibilitySimulatorModal({ isOpen, onClose }: Feasibili
             ) : (
               <div className="p-3.5 rounded-xl bg-slate-950/60 border border-slate-800 space-y-3">
                 <span className="text-xs font-semibold text-sky-400 uppercase tracking-wider block">
-                  Model B: Öz Ekip & Sabit Gider Dağıtımı
+                  Model B: İstanbul Ekip & Sabit Gider Dağıtımı
                 </span>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
@@ -354,7 +354,7 @@ export default function FeasibilitySimulatorModal({ isOpen, onClose }: Feasibili
                   )}
                   {businessModel === 'model_a_macro' && (
                     <div className="flex justify-between text-[11px] text-slate-500">
-                      <span>• Taşeron Toplam Hakedişi:</span>
+                      <span>• İller Toplam Hakedişi:</span>
                       <span className="font-mono">₺{personnelCost.toLocaleString('tr-TR')}</span>
                     </div>
                   )}

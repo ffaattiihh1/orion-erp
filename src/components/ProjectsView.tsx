@@ -152,24 +152,24 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
 
           <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800">
             <div className="flex items-center justify-between text-slate-400 mb-2">
-              <span className="text-xs font-semibold uppercase tracking-wider">Model A (Taşeron)</span>
+              <span className="text-xs font-semibold uppercase tracking-wider">Model A (İller)</span>
               <Building2 className="w-4 h-4 text-indigo-400" />
             </div>
             <p className="text-2xl font-black text-indigo-400 font-mono">
               {projects.filter(p => p.businessModel === 'model_a_macro').length} Proje
             </p>
-            <p className="text-[11px] text-slate-500 mt-1">Dış iller makro hakedişli projeler</p>
+            <p className="text-[11px] text-slate-500 mt-1">İller / Dış bölge projeleri</p>
           </div>
 
           <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800">
             <div className="flex items-center justify-between text-slate-400 mb-2">
-              <span className="text-xs font-semibold uppercase tracking-wider">Model B (Öz Ekip)</span>
+              <span className="text-xs font-semibold uppercase tracking-wider">Model B (İstanbul Ekip)</span>
               <Briefcase className="w-4 h-4 text-sky-400" />
             </div>
             <p className="text-2xl font-black text-sky-400 font-mono">
               {projects.filter(p => p.businessModel === 'model_b_micro').length} Proje
             </p>
-            <p className="text-[11px] text-slate-500 mt-1">Avans ve saha operasyonu</p>
+            <p className="text-[11px] text-slate-500 mt-1">İstanbul saha ekibi ve avans operasyonu</p>
           </div>
         </div>
       ) : (
@@ -212,8 +212,8 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
               className="px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-700 text-xs text-slate-200"
             >
               <option value="all">Tüm İş Modelleri</option>
-              <option value="model_a_macro">Model A: Taşeron (Makro)</option>
-              <option value="model_b_micro">Model B: Öz Ekip (Mikro)</option>
+              <option value="model_a_macro">Model A: İller</option>
+              <option value="model_b_micro">Model B: İstanbul Ekip</option>
             </select>
           )}
         </div>

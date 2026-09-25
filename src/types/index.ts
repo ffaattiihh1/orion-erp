@@ -119,7 +119,7 @@ export interface Project {
   clientName: string;
   title: string;
   projectType: ProjectType;
-  businessModel: BusinessModel; // Model A (Macro) or Model B (Micro)
+  businessModel: BusinessModel; // Model A (İller) or Model B (İstanbul Ekip)
   status: ProjectStatus;
   startDate: string;
   endDate: string;
@@ -128,11 +128,11 @@ export interface Project {
   clientUnitPrice: number;
   clientTotalBudget: number; // targetSurveys * clientUnitPrice
   
-  // Model A (Taşeron / Dış İller)
+  // Model A (İller / Dış İller)
   subcontractorName?: string;
   subcontractorUnitPrice?: number;
   
-  // Model B (Öz Ekip / Mikro)
+  // Model B (İstanbul Ekip / Öz Ekip)
   assignedSpvId?: string;
   assignedSpvName?: string;
   dailyOverheadRate: number; // e.g. 2000 TL / day
