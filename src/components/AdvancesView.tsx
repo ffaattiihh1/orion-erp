@@ -15,7 +15,7 @@ export default function AdvancesView() {
     const exportData = advances.map(a => ({
       'Proje Kodu': a.projectCode,
       'Personel Adı': a.personnelName,
-      'Avansı Veren SPV': a.spvName,
+      'İşlemi Yapan (Veren Kişi)': a.spvName,
       'Tutar (TL)': a.amount,
       'Ödeme Yöntemi': a.paymentMethod.toUpperCase(),
       'Not': a.note || '-',
@@ -63,7 +63,7 @@ export default function AdvancesView() {
             <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
-              placeholder="Personel veya SPV ara..."
+              placeholder="Personel veya işlemi yapan kişiyi ara..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-8 pr-3 py-1.5 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
@@ -96,7 +96,7 @@ export default function AdvancesView() {
                 <th className="py-3 px-4 font-semibold">Tarih</th>
                 <th className="py-3 px-4 font-semibold">Proje</th>
                 <th className="py-3 px-4 font-semibold">Personel</th>
-                <th className="py-3 px-4 font-semibold">Veren SPV</th>
+                <th className="py-3 px-4 font-semibold">İşlemi Yapan (Veren Kişi)</th>
                 <th className="py-3 px-4 font-semibold">Yöntem</th>
                 <th className="py-3 px-4 font-semibold">Açıklama / Not</th>
                 <th className="py-3 px-4 font-semibold text-right">Avans Tutarı</th>
@@ -124,8 +124,10 @@ export default function AdvancesView() {
                       {adv.personnelName}
                     </td>
 
-                    <td className="py-3.5 px-4 text-slate-300">
-                      {adv.spvName}
+                    <td className="py-3.5 px-4">
+                      <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-amber-500/10 text-amber-300 border border-amber-500/20 text-[11px] font-semibold">
+                        {adv.spvName || 'Fatih Sakar'}
+                      </span>
                     </td>
 
                     <td className="py-3.5 px-4">

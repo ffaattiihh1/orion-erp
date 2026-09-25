@@ -375,6 +375,12 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
                             Taslak
                           </span>
                         )}
+
+                        {project.createdByName && (
+                          <span className="text-[10px] font-medium px-2 py-0.5 rounded bg-slate-800/80 text-slate-300 border border-slate-700">
+                            Oluşturan: <strong className="text-white">{project.createdByName}</strong>
+                          </span>
+                        )}
                       </div>
 
                       <h3 className="text-base font-bold text-white tracking-tight group-hover:text-sky-300 transition-colors">

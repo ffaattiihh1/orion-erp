@@ -19,7 +19,7 @@ export default function ExpensesView() {
       'Gider Kategorisi': e.category.toUpperCase(),
       'Tutar (TL)': e.amount,
       'Açıklama': e.description,
-      'Kaydeden SPV': e.spvName,
+      'İşlemi Yapan (Kayıt Eden)': e.spvName,
       'Harcama Tarihi': e.expenseDate,
       'Fiş Görseli URL': e.receiptImageUrl || '-'
     }));
@@ -94,7 +94,7 @@ export default function ExpensesView() {
                 <th className="py-3 px-4 font-semibold">Proje</th>
                 <th className="py-3 px-4 font-semibold">Kategori</th>
                 <th className="py-3 px-4 font-semibold">Açıklama</th>
-                <th className="py-3 px-4 font-semibold">Sorumlu SPV</th>
+                <th className="py-3 px-4 font-semibold">İşlemi Yapan (Kayıt Eden)</th>
                 <th className="py-3 px-4 font-semibold text-right">Tutar</th>
                 <th className="py-3 px-4 font-semibold text-center">Fiş Görseli</th>
               </tr>
@@ -127,8 +127,10 @@ export default function ExpensesView() {
                       {exp.description}
                     </td>
 
-                    <td className="py-3.5 px-4 text-slate-400">
-                      {exp.spvName}
+                    <td className="py-3.5 px-4">
+                      <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 text-[11px] font-semibold">
+                        {exp.spvName || 'Fatih Sakar'}
+                      </span>
                     </td>
 
                     <td className="py-3.5 px-4 text-right font-mono font-bold text-white text-sm">

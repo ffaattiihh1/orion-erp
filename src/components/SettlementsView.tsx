@@ -70,6 +70,7 @@ export default function SettlementsView() {
         'KESİLEN AVANS': `₺${s.advancesDeducted.toLocaleString('tr-TR')}`,
         'NET ÖDENECEK': `₺${s.netPayable.toLocaleString('tr-TR')}`,
         'ÖDEME DURUMU': s.isPaid ? 'ÖDENDİ' : 'ÖDENMEDİ',
+        'İŞLEMİ YAPAN': s.createdByName || 'Fatih Sakar',
         'NOT': s.notes || '-'
       };
     });
@@ -90,6 +91,7 @@ export default function SettlementsView() {
         s.personnelName.toLowerCase().includes(term) ||
         (s.city && s.city.toLowerCase().includes(term)) ||
         (s.identityNumber && s.identityNumber.includes(term)) ||
+        (s.createdByName && s.createdByName.toLowerCase().includes(term)) ||
         (s.notes && s.notes.toLowerCase().includes(term))
       );
     }
@@ -285,13 +287,14 @@ export default function SettlementsView() {
                 <th className="py-3.5 px-4 font-bold text-right text-amber-400">KESİLEN AVANS</th>
                 <th className="py-3.5 px-4 font-bold text-right text-emerald-400">NET ÖDENECEK</th>
                 <th className="py-3.5 px-4 font-bold text-center">ÖDEME DURUMU</th>
+                <th className="py-3.5 px-4 font-bold">İŞLEMİ YAPAN</th>
                 <th className="py-3.5 px-4 font-bold">NOT</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800/80">
               {filteredSettlements.length === 0 ? (
                 <tr>
-                  <td colSpan={13} className="py-12 text-center text-slate-500">
+                  <td colSpan={14} className="py-12 text-center text-slate-500">
                     <p className="text-sm font-semibold">Bu projede kayıtlı hakediş bulunamadı.</p>
                     <p className="text-xs text-slate-600 mt-1">
                       Yukarıdaki <strong>"Excel'den Kopyala-Yapıştır"</strong> butonuna tıklayarak Excel tablonuzu doğrudan aktarabilirsiniz.
@@ -382,6 +385,13 @@ export default function SettlementsView() {
                             </>
                           )}
                         </button>
+                      </td>
+
+                      {/* İŞLEMİ YAPAN */}
+                      <td className="py-3 px-4">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-sky-500/10 text-sky-300 border border-sky-500/20 text-[11px] font-semibold">
+                          {s.createdByName || 'Fatih Sakar'}
+                        </span>
                       </td>
 
                       {/* NOT */}

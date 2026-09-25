@@ -79,6 +79,14 @@ export interface Advance {
   isOfflineQueued?: boolean;
 }
 
+export interface ProjectNoteItem {
+  id: string;
+  authorName: string;
+  authorRole: UserRole;
+  text: string;
+  createdAt: string;
+}
+
 export interface Settlement {
   id: string;
   projectId: string;
@@ -98,6 +106,9 @@ export interface Settlement {
   paidAt?: string;
   paymentReference?: string;
   notes?: string;
+  createdById?: string;
+  createdByName?: string; // e.g. Fatih Sakar, Kazım Şenol, Emrah Gündeyer
+  createdAt?: string;
 }
 
 export interface ClientInvoice {
@@ -154,6 +165,9 @@ export interface Project {
   simulatedMarginPercent?: number;
   
   notes?: string;
+  notesList?: ProjectNoteItem[];
+  createdById?: string;
+  createdByName?: string;
   createdAt: string;
   
   // Aggregated live stats

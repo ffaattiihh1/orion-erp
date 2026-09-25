@@ -10,7 +10,8 @@ import {
   Advance, 
   Settlement, 
   ClientInvoice,
-  OfflineSyncItem 
+  OfflineSyncItem,
+  ProjectNoteItem 
 } from '@/types';
 import { 
   INITIAL_USERS, 
@@ -100,6 +101,7 @@ interface AppContextType {
   addProject: (p: Omit<Project, 'id' | 'createdAt'>) => Project;
   updateProject: (id: string, p: Partial<Project>) => void;
   activateProjectFromFeasibility: (id: string) => void;
+  addProjectNote: (projectId: string, noteText: string) => void;
   
   addPersonnel: (p: Omit<Personnel, 'id' | 'isBlacklisted' | 'totalProjectsCompleted'>) => Personnel;
   toggleBlacklist: (id: string, reason?: string) => void;
@@ -457,6 +459,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const newProject: Project = {
       ...projectData,
       id: 'proj-' + Date.now(),
+      createdById: currentUser?.id,
+      createdByName: currentUser?.fullName || 'Fatih Sakar',
       createdAt: new Date().toISOString(),
       completedSurveys: 0,
       totalExpenses: 0,
@@ -485,6 +489,34 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const activateProjectFromFeasibility = (id: string) => {
     setProjects(prev => prev.map(p => (p.id === id ? { ...p, status: 'active' } : p)));
+  };
+
+  const addProjectNote = (projectId: string, noteText: string) => {
+    if (!noteText || !noteText.trim()) return;
+    const author = currentUser?.fullName || 'Fatih Sakar';
+    const role = currentUser?.role || 'admin';
+    const dateStr = new Date().toLocaleString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+    setProjects(prev => prev.map(p => {
+      if (p.id !== projectId) return p;
+      const newNoteItem: ProjectNoteItem = {
+        id: 'note-' + Date.now(),
+        authorName: author,
+        authorRole: role,
+        text: noteText.trim(),
+        createdAt: new Date().toISOString()
+      };
+      const existingList = p.notesList || [];
+      const updatedNotesText = p.notes 
+        ? `${p.notes}\n[${author} - ${dateStr}]: ${noteText.trim()}`
+        : `[${author} - ${dateStr}]: ${noteText.trim()}`;
+
+      return {
+        ...p,
+        notes: updatedNotesText,
+        notesList: [newNoteItem, ...existingList]
+      };
+    }));
   };
 
   // 2. PERSONNEL & BLACKLIST ACTIONS
@@ -555,8 +587,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   // 4. EXPENSE & ADVANCE
   const addExpense = async (eData: Omit<Expense, 'id' | 'isApproved' | 'isOfflineQueued'>): Promise<Expense> => {
+    const author = currentUser?.fullName || 'Fatih Sakar';
     const newExpense: Expense = {
       ...eData,
+      createdBySpvId: eData.createdBySpvId || currentUser?.id || 'user',
+      spvName: eData.spvName || author,
       id: 'exp-' + Date.now(),
       isApproved: true,
       isOfflineQueued: !isOnline
@@ -583,8 +618,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   };
 
   const addAdvance = async (aData: Omit<Advance, 'id' | 'isOfflineQueued'>): Promise<Advance> => {
+    const author = currentUser?.fullName || 'Fatih Sakar';
     const newAdvance: Advance = {
       ...aData,
+      issuedBySpvId: aData.issuedBySpvId || currentUser?.id || 'user',
+      spvName: aData.spvName || author,
       id: 'adv-' + Date.now(),
       isOfflineQueued: !isOnline
     };
@@ -640,6 +678,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     
     const totalAdvancesTaken = getPersonnelNetAdvance(projectId, personnelId);
     const netPayable = Math.max(0, grossAmount - totalAdvancesTaken);
+    const author = currentUser?.fullName || 'Fatih Sakar';
 
     const newSettlement: Settlement = {
       id: 'set-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6),
@@ -657,7 +696,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       advancesDeducted: totalAdvancesTaken,
       netPayable,
       isPaid: false,
-      notes: notes || ''
+      notes: notes || '',
+      createdById: currentUser?.id,
+      createdByName: author,
+      createdAt: new Date().toISOString()
     };
 
     setSettlements(prev => {
@@ -688,6 +730,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const newPersonnelToAdd: Personnel[] = [];
     const newSettlements: Settlement[] = [];
     const currentProject = projects.find(p => p.id === projectId);
+    const author = currentUser?.fullName || 'Fatih Sakar';
 
     rows.forEach(row => {
       if (!row.personnelName || !row.personnelName.trim()) return;
@@ -749,7 +792,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         advancesDeducted,
         netPayable,
         isPaid: false,
-        notes: row.notes || ''
+        notes: row.notes || '',
+        createdById: currentUser?.id,
+        createdByName: author,
+        createdAt: new Date().toISOString()
       });
 
       count++;
@@ -835,6 +881,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       addProject,
       updateProject,
       activateProjectFromFeasibility,
+      addProjectNote,
       addPersonnel,
       toggleBlacklist,
       assignPersonnelToProject,

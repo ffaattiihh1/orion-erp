@@ -47,7 +47,8 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
     toggleSettlementPaid, 
     assignPersonnelToProject, 
     getPersonnelNetAdvance,
-    updateProject 
+    updateProject,
+    addProjectNote
   } = useApp();
 
   const [activeTab, setActiveTab] = useState<'personnel' | 'expenses' | 'advances' | 'notes'>('personnel');
@@ -225,13 +226,9 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
   // Submit Note
   const handleNoteSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newNoteText) return;
+    if (!newNoteText.trim()) return;
 
-    const existingNotes = project.notes || '';
-    const dateStr = new Date().toLocaleDateString('tr-TR') + ' ' + new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
-    const updatedNotes = existingNotes ? `${existingNotes}\n[${dateStr} - ${currentUser?.fullName}]: ${newNoteText}` : `[${dateStr} - ${currentUser?.fullName}]: ${newNoteText}`;
-
-    updateProject(project.id, { notes: updatedNotes });
+    addProjectNote(project.id, newNoteText.trim());
     setIsNoteModalOpen(false);
     setNewNoteText('');
   };
@@ -261,6 +258,12 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
               <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
                 {project.status === 'active' ? 'Aktif Proje' : project.status === 'feasibility' ? 'Fizibilite' : 'Tamamlandı'}
               </span>
+
+              {project.createdByName && (
+                <span className="text-[10px] font-medium px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">
+                  Oluşturan: <strong className="text-white">{project.createdByName}</strong>
+                </span>
+              )}
             </div>
 
             <h1 className="text-xl font-black text-white tracking-tight">{project.title}</h1>
@@ -481,13 +484,14 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
                       <th className="py-2.5 px-3 text-right">Brüt Tutar</th>
                       <th className="py-2.5 px-3 text-right text-amber-400">Kesilen Avans</th>
                       <th className="py-2.5 px-3 text-right text-emerald-400">NET HAKEDİŞ</th>
+                      <th className="py-2.5 px-3 text-center">İşlemi Yapan</th>
                       <th className="py-2.5 px-3 text-center">Ödeme</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-800/80">
                     {projectAssigned.length === 0 ? (
                       <tr>
-                        <td colSpan={10} className="py-6 text-center text-slate-500">
+                        <td colSpan={11} className="py-6 text-center text-slate-500">
                           Bu projeye henüz personel atanmadı. Yukarıdaki <strong>"+ Personel Ata"</strong> butonunu kullanarak personel ekleyebilirsiniz.
                         </td>
                       </tr>
@@ -524,6 +528,13 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
                             </td>
                             <td className="py-2.5 px-3 text-right font-mono font-black text-emerald-400 bg-emerald-500/5">
                               {settlement ? `₺${settlement.netPayable.toLocaleString('tr-TR')}` : '-'}
+                            </td>
+                            <td className="py-2.5 px-3 text-center">
+                              {settlement ? (
+                                <span className="inline-block px-2 py-0.5 rounded bg-sky-500/10 text-sky-300 border border-sky-500/20 text-[10px] font-semibold">
+                                  {settlement.createdByName || 'Fatih Sakar'}
+                                </span>
+                              ) : '-'}
                             </td>
                             <td className="py-2.5 px-3 text-center">
                               {settlement ? (
@@ -577,7 +588,9 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
                         <span className="text-[10px] text-slate-500">{exp.expenseDate}</span>
                       </div>
                       <p className="font-bold text-white">{exp.description}</p>
-                      <p className="text-[11px] text-slate-400">SPV: {exp.spvName}</p>
+                      <p className="text-[11px] text-emerald-400 mt-0.5">
+                        İşlemi Yapan: <strong className="text-white">{exp.spvName || 'Fatih Sakar'}</strong>
+                      </p>
                     </div>
 
                     <div className="text-right flex flex-col items-end gap-1">
@@ -609,7 +622,9 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
                   <div key={adv.id} className="p-3 bg-slate-950 flex items-center justify-between text-xs">
                     <div>
                       <p className="font-bold text-white">{adv.personnelName}</p>
-                      <p className="text-[11px] text-slate-400">{adv.note || 'Avans'} • Veren: {adv.spvName}</p>
+                      <p className="text-[11px] text-slate-400">
+                        {adv.note || 'Avans'} • İşlemi Yapan: <strong className="text-amber-400">{adv.spvName || 'Fatih Sakar'}</strong>
+                      </p>
                     </div>
                     <div className="text-right">
                       <span className="font-mono font-bold text-amber-400 text-sm">₺{adv.amount.toLocaleString('tr-TR')}</span>
@@ -624,10 +639,49 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
 
         {/* Tab 4: NOTES & LOGS */}
         {activeTab === 'notes' && (
-          <div className="space-y-3">
-            <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 text-xs whitespace-pre-line text-slate-300 leading-relaxed font-mono">
-              {project.notes || 'Bu proje için henüz ek bir not girilmemiş.'}
-            </div>
+          <div className="space-y-4">
+            {/* Inline Fast Note Addition */}
+            <form onSubmit={handleNoteSubmit} className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 flex flex-col sm:flex-row gap-2">
+              <input
+                type="text"
+                required
+                value={newNoteText}
+                onChange={(e) => setNewNoteText(e.target.value)}
+                placeholder={`${currentUser?.fullName || 'Fatih Sakar'} olarak sahaya hızlı bir not ekleyin...`}
+                className="flex-1 px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+              />
+              <button
+                type="submit"
+                className="px-4 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-white font-bold text-xs shadow-md transition-all cursor-pointer whitespace-nowrap"
+              >
+                + Notu Kaydet
+              </button>
+            </form>
+
+            {/* Note History List */}
+            {project.notesList && project.notesList.length > 0 ? (
+              <div className="space-y-2.5">
+                {project.notesList.map((n) => (
+                  <div key={n.id} className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-sky-500/10 text-sky-400 border border-sky-500/20 font-bold text-[11px]">
+                        {n.authorName} {n.authorRole === 'admin' ? '(Müdür)' : '(SPV)'}
+                      </span>
+                      <span className="text-[10px] text-slate-500">
+                        {new Date(n.createdAt).toLocaleDateString('tr-TR')} {new Date(n.createdAt).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}
+                      </span>
+                    </div>
+                    <p className="text-slate-200 text-xs leading-relaxed font-sans">{n.text}</p>
+                  </div>
+                ))}
+              </div>
+            ) : project.notes ? (
+              <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 text-xs whitespace-pre-line text-slate-300 leading-relaxed font-mono">
+                {project.notes}
+              </div>
+            ) : (
+              <p className="text-center py-6 text-slate-500 text-xs">Bu proje için henüz saha notu girilmemiş.</p>
+            )}
           </div>
         )}
 
