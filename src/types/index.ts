@@ -113,6 +113,12 @@ export interface ClientInvoice {
   notes?: string;
 }
 
+export interface CityPricing {
+  city: string;
+  unitPrice: number;
+  targetSurveys?: number;
+}
+
 export interface Project {
   id: string;
   code: string;
@@ -127,6 +133,10 @@ export interface Project {
   targetSurveys: number;
   clientUnitPrice: number;
   clientTotalBudget: number; // targetSurveys * clientUnitPrice
+  
+  // İl Bazlı Fiyatlandırmalar & Çalışılan İller
+  cityPricing?: CityPricing[];
+  cities?: string[];
   
   // Model A (İller / Dış İller)
   subcontractorName?: string;

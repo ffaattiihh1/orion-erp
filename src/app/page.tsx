@@ -10,7 +10,6 @@ import PersonnelView from '@/components/PersonnelView';
 import ExpensesView from '@/components/ExpensesView';
 import AdvancesView from '@/components/AdvancesView';
 import InvoicesView from '@/components/InvoicesView';
-import MobileSpvView from '@/components/MobileSpvView';
 import FeasibilitySimulatorModal from '@/components/FeasibilitySimulatorModal';
 
 export default function HomePage() {
@@ -23,29 +22,25 @@ export default function HomePage() {
     return <LoginWall />;
   }
 
-  // 2. SPV Role -> Dedicated Mobile Field PWA Layout
-  if (currentUser.role === 'spv') {
-    return (
-      <div className="min-h-screen bg-slate-950 flex flex-col">
-        <Navbar activeTab={activeTab} setActiveTab={setActiveTab} />
-        <main className="flex-1">
-          <MobileSpvView />
-        </main>
-      </div>
-    );
-  }
-
-  // 3. Admin / Headquarters Role -> Full Dashboard
+  // 2. Full Unified Dashboard (SPV & Admin have the same clean layout, role-isolated metrics)
   return (
-    <div className="min-h-screen bg-slate-950 flex flex-col">
+    <div className="min-h-screen bg-slate-950 flex flex-col text-slate-100">
       <Navbar activeTab={activeTab} setActiveTab={setActiveTab} />
 
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         {activeTab === 'projects' && (
           <ProjectsView onOpenFeasibility={() => setIsFeasibilityOpen(true)} />
         )}
 
-        {activeTab === 'feasibility' && (
+        {activeTab === 'settlements' && <SettlementsView />}
+        {activeTab === 'personnel' && <PersonnelView />}
+        {activeTab === 'expenses' && <ExpensesView />}
+        {activeTab === 'advances' && <AdvancesView />}
+
+        {/* Manager/Admin Only Tabs */}
+        {currentUser.role === 'admin' && activeTab === 'invoices' && <InvoicesView />}
+
+        {currentUser.role === 'admin' && activeTab === 'feasibility' && (
           <div>
             <div className="mb-6 flex justify-between items-center">
               <div>
@@ -62,19 +57,15 @@ export default function HomePage() {
             <ProjectsView onOpenFeasibility={() => setIsFeasibilityOpen(true)} />
           </div>
         )}
-
-        {activeTab === 'personnel' && <PersonnelView />}
-        {activeTab === 'settlements' && <SettlementsView />}
-        {activeTab === 'expenses' && <ExpensesView />}
-        {activeTab === 'advances' && <AdvancesView />}
-        {activeTab === 'invoices' && <InvoicesView />}
       </main>
 
       {/* Feasibility Simulator Modal */}
-      <FeasibilitySimulatorModal 
-        isOpen={isFeasibilityOpen} 
-        onClose={() => setIsFeasibilityOpen(false)} 
-      />
+      {currentUser.role === 'admin' && (
+        <FeasibilitySimulatorModal 
+          isOpen={isFeasibilityOpen} 
+          onClose={() => setIsFeasibilityOpen(false)} 
+        />
+      )}
     </div>
   );
 }

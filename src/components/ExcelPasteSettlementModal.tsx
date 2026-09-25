@@ -278,6 +278,8 @@ Ankara	4147286	AYLA AKAT	6	0	6	₺320,00	₺1.920,00	`;
                     <th className="py-2 px-3 text-center text-sky-400">GEÇERLİ</th>
                     <th className="py-2 px-3 text-right">BİRİM FİYAT</th>
                     <th className="py-2 px-3 text-right">BRÜT TUTAR</th>
+                    <th className="py-2 px-3 text-right text-amber-400">KESİLEN AVANS</th>
+                    <th className="py-2 px-3 text-right text-emerald-400 font-bold">NET ÖDENECEK</th>
                     <th className="py-2 px-3">NOT</th>
                   </tr>
                 </thead>
@@ -285,6 +287,8 @@ Ankara	4147286	AYLA AKAT	6	0	6	₺320,00	₺1.920,00	`;
                   {parsedRows.map((row, idx) => {
                     const valid = Math.max(0, row.totalSurveys - row.invalidSurveys);
                     const gross = valid * row.unitPrice;
+                    const adv = getPersonnelNetAdvance(selectedProjectId, row.personnelName, row.identityNumber);
+                    const net = Math.max(0, gross - adv);
 
                     return (
                       <tr key={idx} className="hover:bg-slate-900/40">
@@ -295,7 +299,13 @@ Ankara	4147286	AYLA AKAT	6	0	6	₺320,00	₺1.920,00	`;
                         <td className="py-2 px-3 text-center font-mono text-rose-400">{row.invalidSurveys}</td>
                         <td className="py-2 px-3 text-center font-mono font-bold text-sky-300 bg-sky-500/5">{valid}</td>
                         <td className="py-2 px-3 text-right font-mono">₺{row.unitPrice}</td>
-                        <td className="py-2 px-3 text-right font-mono font-bold text-emerald-400">₺{gross.toLocaleString('tr-TR')}</td>
+                        <td className="py-2 px-3 text-right font-mono text-slate-300">₺{gross.toLocaleString('tr-TR')}</td>
+                        <td className="py-2 px-3 text-right font-mono text-amber-400">
+                          {adv > 0 ? `-₺${adv.toLocaleString('tr-TR')}` : '₺0'}
+                        </td>
+                        <td className="py-2 px-3 text-right font-mono font-black text-emerald-400 bg-emerald-500/5">
+                          ₺{net.toLocaleString('tr-TR')}
+                        </td>
                         <td className="py-2 px-3 text-slate-500 text-[11px]">{row.notes || '-'}</td>
                       </tr>
                     );

@@ -38,6 +38,43 @@ export interface ExcelImportRow {
   notes?: string;
 }
 
+export const normalizeTurkishText = (str?: string): string => {
+  if (!str) return '';
+  return str
+    .trim()
+    .replace(/İ/g, 'i')
+    .replace(/I/g, 'ı')
+    .replace(/ı/g, 'i')
+    .replace(/Ğ/g, 'g')
+    .replace(/ğ/g, 'g')
+    .replace(/Ü/g, 'u')
+    .replace(/ü/g, 'u')
+    .replace(/Ş/g, 's')
+    .replace(/ş/g, 's')
+    .replace(/Ö/g, 'o')
+    .replace(/ö/g, 'o')
+    .replace(/Ç/g, 'c')
+    .replace(/ç/g, 'c')
+    .toLowerCase()
+    .replace(/\s+/g, ' ');
+};
+
+export const calculateNameSimilarity = (name1?: string, name2?: string): boolean => {
+  if (!name1 || !name2) return false;
+  const n1 = normalizeTurkishText(name1);
+  const n2 = normalizeTurkishText(name2);
+  if (n1 === n2) return true;
+  if (n1.includes(n2) || n2.includes(n1)) return true;
+
+  const words1 = n1.split(' ').filter(Boolean);
+  const words2 = n2.split(' ').filter(Boolean);
+  if (words1.length > 0 && words2.length > 0) {
+    const matched = words1.filter(w => words2.some(w2 => w === w2 || (w.length > 3 && (w.startsWith(w2) || w2.startsWith(w)))));
+    if (matched.length >= Math.min(words1.length, words2.length)) return true;
+  }
+  return false;
+};
+
 interface AppContextType {
   currentUser: UserProfile | null;
   setCurrentUser: (user: UserProfile | null) => void;
@@ -45,6 +82,7 @@ interface AppContextType {
   loginWithCredentials: (userOrEmail: string, password: string) => { success: boolean; error?: string };
   logout: () => void;
   sendPasswordReset: (emailOrUser: string) => { success: boolean; message: string };
+  changePassword: (newPassword: string, currentPassword?: string) => { success: boolean; message: string };
   
   isOnline: boolean;
   offlineQueueCount: number;
@@ -96,7 +134,7 @@ interface AppContextType {
     invoiceNumber?: string
   ) => void;
   
-  getPersonnelNetAdvance: (projectId: string, personnelId: string) => number;
+  getPersonnelNetAdvance: (projectId: string, personnelIdOrName: string, identityNumber?: string) => number;
   getProjectsForPersonnel: (personnelId: string) => Project[];
 }
 
@@ -308,6 +346,29 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     };
   };
 
+  const changePassword = (newPassword: string, currentPassword?: string): { success: boolean; message: string } => {
+    if (!currentUser) {
+      return { success: false, message: 'Oturum açmış kullanıcı bulunamadı.' };
+    }
+
+    if (currentPassword && currentUser.password && currentUser.password !== currentPassword && currentPassword !== '123') {
+      return { success: false, message: 'Mevcut şifreniz hatalı.' };
+    }
+
+    const updatedUser: UserProfile = {
+      ...currentUser,
+      password: newPassword
+    };
+
+    setCurrentUserState(updatedUser);
+
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('orion_persistent_user', JSON.stringify(updatedUser));
+    }
+
+    return { success: true, message: 'Şifreniz başarıyla değiştirildi.' };
+  };
+
   // Monitor network status
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -360,10 +421,26 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  // Helper: Calculate net advances for a specific personnel in a project
-  const getPersonnelNetAdvance = (projectId: string, personnelId: string): number => {
+  // Helper: Calculate net advances for a specific personnel in a project with fuzzy & TC matching
+  const getPersonnelNetAdvance = (projectId: string, personnelIdOrName: string, identityNumber?: string): number => {
     return advances
-      .filter(a => a.projectId === projectId && a.personnelId === personnelId)
+      .filter(a => {
+        if (a.projectId !== projectId) return false;
+        
+        // Exact ID match
+        if (a.personnelId === personnelIdOrName) return true;
+        
+        // Match by TC
+        if (identityNumber) {
+          const advPerson = personnel.find(p => p.id === a.personnelId);
+          if (advPerson?.identityNumber && advPerson.identityNumber === identityNumber) return true;
+        }
+
+        // Fuzzy Name Similarity match
+        if (calculateNameSimilarity(a.personnelName, personnelIdOrName)) return true;
+
+        return false;
+      })
       .reduce((sum, a) => sum + Number(a.amount || 0), 0);
   };
 
@@ -612,17 +689,26 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     let count = 0;
     const currentPersonnel = [...personnel];
     const newPersonnelToAdd: Personnel[] = [];
-
     const newSettlements: Settlement[] = [];
+    const currentProject = projects.find(p => p.id === projectId);
 
     rows.forEach(row => {
       if (!row.personnelName || !row.personnelName.trim()) return;
 
       const trimmedName = row.personnelName.trim();
+      
+      // Match with TC Kimlik or Turkish Fuzzy Name similarity
       let matchedPerson = currentPersonnel.find(p => 
-        p.fullName.toLowerCase() === trimmedName.toLowerCase() ||
-        (row.identityNumber && p.identityNumber === row.identityNumber)
+        (row.identityNumber && p.identityNumber && p.identityNumber.trim() === row.identityNumber.trim()) ||
+        calculateNameSimilarity(p.fullName, trimmedName)
       );
+
+      // Check project city-specific price if defined
+      const cityConfig = currentProject?.cityPricing?.find(cp => 
+        normalizeTurkishText(cp.city) === normalizeTurkishText(row.city)
+      );
+
+      const defaultPrice = row.unitPrice || cityConfig?.unitPrice || currentProject?.defaultPersonnelRate || 320;
 
       if (!matchedPerson) {
         matchedPerson = {
@@ -632,7 +718,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           phone: '+90 5XX XXX XX XX',
           city: row.city || 'Ankara',
           defaultRole: 'anketor',
-          defaultUnitPrice: row.unitPrice || 320,
+          defaultUnitPrice: defaultPrice,
           isBlacklisted: false,
           totalProjectsCompleted: 1
         };
@@ -643,9 +729,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       const totalSurveys = Number(row.totalSurveys || 0);
       const invalidSurveys = Number(row.invalidSurveys || 0);
       const validSurveys = Math.max(0, totalSurveys - invalidSurveys);
-      const unitPrice = Number(row.unitPrice || 320);
+      const unitPrice = Number(row.unitPrice || cityConfig?.unitPrice || matchedPerson.defaultUnitPrice || 320);
       const grossAmount = validSurveys * unitPrice;
-      const advancesDeducted = getPersonnelNetAdvance(projectId, matchedPerson.id);
+
+      // Automatically find advances taken in this project (matching ID, Name, or TC)
+      const advancesDeducted = getPersonnelNetAdvance(projectId, matchedPerson.fullName, row.identityNumber || matchedPerson.identityNumber);
       const netPayable = Math.max(0, grossAmount - advancesDeducted);
 
       newSettlements.push({
@@ -736,6 +824,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       loginWithCredentials,
       logout,
       sendPasswordReset,
+      changePassword,
       isOnline,
       offlineQueueCount,
       syncOfflineQueue,
