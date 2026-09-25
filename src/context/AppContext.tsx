@@ -142,7 +142,7 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const [users] = useState<UserProfile[]>(INITIAL_USERS);
-  const [currentUser, setCurrentUserState] = useState<UserProfile | null>(INITIAL_USERS[0]); // Default to initial session
+  const [currentUser, setCurrentUserState] = useState<UserProfile | null>(null); // Start with null for login wall
   
   // Online / Offline tracking
   const [isOnline, setIsOnline] = useState<boolean>(true);
@@ -174,6 +174,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         localStorage.removeItem('orion_advances');
         localStorage.removeItem('orion_settlements');
         localStorage.removeItem('orion_client_invoices');
+        localStorage.removeItem('orion_persistent_user');
         localStorage.setItem(DATA_VERSION_KEY, 'true');
 
         setProjects([]);
@@ -183,6 +184,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         setAdvances([]);
         setSettlements([]);
         setClientInvoices([]);
+        setCurrentUserState(null);
       } else {
         // Load user-created persisted data if present
         const savedProjects = localStorage.getItem('orion_projects');
@@ -205,21 +207,16 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
         const savedInvoices = localStorage.getItem('orion_client_invoices');
         if (savedInvoices) setClientInvoices(JSON.parse(savedInvoices));
-      }
 
-      // Auto-login from localStorage
-      const savedUserJson = localStorage.getItem('orion_persistent_user');
-      if (savedUserJson) {
-        const parsed = JSON.parse(savedUserJson);
-        const matched = users.find(u => u.id === parsed.id || u.username === parsed.username || u.email === parsed.email);
-        if (matched) {
-          setCurrentUserState(matched);
-        } else {
-          // Default to first user (Fatih Sakar - Müdür)
-          setCurrentUserState(users[0]);
+        // Auto-login only if user explicitly logged in before
+        const savedUserJson = localStorage.getItem('orion_persistent_user');
+        if (savedUserJson) {
+          const parsed = JSON.parse(savedUserJson);
+          const matched = users.find(u => u.id === parsed.id || u.username === parsed.username || u.email === parsed.email);
+          if (matched) {
+            setCurrentUserState(matched);
+          }
         }
-      } else {
-        setCurrentUserState(users[0]);
       }
     } catch (e) {
       console.error('Storage sync error:', e);

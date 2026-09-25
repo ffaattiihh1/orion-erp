@@ -161,27 +161,27 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
       
       {/* Top Banner & KPI Metrics (Admin vs SPV) */}
       {isAdmin ? (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800">
-            <div className="flex items-center justify-between text-slate-400 mb-2">
-              <span className="text-xs font-semibold uppercase tracking-wider">Aktif Portföy Cirosu</span>
-              <TrendingUp className="w-4 h-4 text-emerald-400" />
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4">
+          <div className="p-3 sm:p-4.5 rounded-2xl bg-slate-900 border border-slate-800">
+            <div className="flex items-center justify-between text-slate-400 mb-1">
+              <span className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider truncate">Portföy Cirosu</span>
+              <TrendingUp className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-400 flex-shrink-0" />
             </div>
-            <p className="text-2xl font-black text-white font-mono">
+            <p className="text-base sm:text-2xl font-black text-white font-mono">
               ₺{totalActiveBudget.toLocaleString('tr-TR')}
             </p>
-            <p className="text-[11px] text-slate-500 mt-1">Müdür & Yönetim Canlı Finansı</p>
+            <p className="text-[10px] text-slate-500 mt-0.5 hidden sm:block">Müdür & Yönetim Canlı Finansı</p>
           </div>
 
-          <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800">
-            <div className="flex items-center justify-between text-slate-400 mb-2">
-              <span className="text-xs font-semibold uppercase tracking-wider">Saha İlerlemesi</span>
-              <Users className="w-4 h-4 text-sky-400" />
+          <div className="p-3 sm:p-4.5 rounded-2xl bg-slate-900 border border-slate-800">
+            <div className="flex items-center justify-between text-slate-400 mb-1">
+              <span className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider truncate">Saha İlerlemesi</span>
+              <Users className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-sky-400 flex-shrink-0" />
             </div>
-            <p className="text-2xl font-black text-white font-mono">
-              {totalCompletedSurveys} <span className="text-sm font-normal text-slate-500">/ {totalTargetSurveys} Anket</span>
+            <p className="text-base sm:text-2xl font-black text-white font-mono">
+              {totalCompletedSurveys} <span className="text-xs font-normal text-slate-500">/ {totalTargetSurveys}</span>
             </p>
-            <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden mt-2">
+            <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden mt-1.5">
               <div 
                 className="bg-sky-500 h-full rounded-full"
                 style={{ width: `${Math.min((totalCompletedSurveys / (totalTargetSurveys || 1)) * 100, 100)}%` }}
@@ -189,40 +189,40 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
             </div>
           </div>
 
-          <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800">
-            <div className="flex items-center justify-between text-slate-400 mb-2">
-              <span className="text-xs font-semibold uppercase tracking-wider">Model A (İller)</span>
-              <Building2 className="w-4 h-4 text-indigo-400" />
+          <div className="p-3 sm:p-4.5 rounded-2xl bg-slate-900 border border-slate-800">
+            <div className="flex items-center justify-between text-slate-400 mb-1">
+              <span className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider truncate">Model A (İller)</span>
+              <Building2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-indigo-400 flex-shrink-0" />
             </div>
-            <p className="text-2xl font-black text-indigo-400 font-mono">
+            <p className="text-base sm:text-2xl font-black text-indigo-400 font-mono">
               {projects.filter(p => p.businessModel === 'model_a_macro').length} Proje
             </p>
-            <p className="text-[11px] text-slate-500 mt-1">İller / Dış bölge projeleri</p>
+            <p className="text-[10px] text-slate-500 mt-0.5 hidden sm:block">İller dış bölge projeleri</p>
           </div>
 
-          <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800">
-            <div className="flex items-center justify-between text-slate-400 mb-2">
-              <span className="text-xs font-semibold uppercase tracking-wider">Model B (İstanbul Ekip)</span>
-              <Briefcase className="w-4 h-4 text-sky-400" />
+          <div className="p-3 sm:p-4.5 rounded-2xl bg-slate-900 border border-slate-800">
+            <div className="flex items-center justify-between text-slate-400 mb-1">
+              <span className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider truncate">Model B (İst. Ekip)</span>
+              <Briefcase className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-sky-400 flex-shrink-0" />
             </div>
-            <p className="text-2xl font-black text-sky-400 font-mono">
+            <p className="text-base sm:text-2xl font-black text-sky-400 font-mono">
               {projects.filter(p => p.businessModel === 'model_b_micro').length} Proje
             </p>
-            <p className="text-[11px] text-slate-500 mt-1">İstanbul saha ekibi ve avans operasyonu</p>
+            <p className="text-[10px] text-slate-500 mt-0.5 hidden sm:block">İstanbul ekip operasyonu</p>
           </div>
         </div>
       ) : (
         /* SPV Rich KPI Header (Shows Surveyor Gross Earnings, Advances, Expenses, Progress, ZERO company margins) */
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800">
-            <div className="flex items-center justify-between text-slate-400 mb-2">
-              <span className="text-xs font-semibold uppercase tracking-wider">Saha İlerlemesi</span>
-              <Users className="w-4 h-4 text-sky-400" />
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4">
+          <div className="p-3 sm:p-4.5 rounded-2xl bg-slate-900 border border-slate-800">
+            <div className="flex items-center justify-between text-slate-400 mb-1">
+              <span className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider truncate">Saha İlerlemesi</span>
+              <Users className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-sky-400 flex-shrink-0" />
             </div>
-            <p className="text-2xl font-black text-white font-mono">
-              {totalCompletedSurveys} <span className="text-sm font-normal text-slate-500">/ {totalTargetSurveys} Anket</span>
+            <p className="text-base sm:text-2xl font-black text-white font-mono">
+              {totalCompletedSurveys} <span className="text-xs font-normal text-slate-500">/ {totalTargetSurveys}</span>
             </p>
-            <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden mt-2">
+            <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden mt-1.5">
               <div 
                 className="bg-sky-500 h-full rounded-full"
                 style={{ width: `${Math.min((totalCompletedSurveys / (totalTargetSurveys || 1)) * 100, 100)}%` }}
@@ -230,44 +230,44 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
             </div>
           </div>
 
-          <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800">
-            <div className="flex items-center justify-between text-slate-400 mb-2">
-              <span className="text-xs font-semibold uppercase tracking-wider">Personele Hakediş / Kazanç</span>
-              <Banknote className="w-4 h-4 text-emerald-400" />
+          <div className="p-3 sm:p-4.5 rounded-2xl bg-slate-900 border border-slate-800">
+            <div className="flex items-center justify-between text-slate-400 mb-1">
+              <span className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider truncate">Personele Hakediş</span>
+              <Banknote className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-400 flex-shrink-0" />
             </div>
-            <p className="text-2xl font-black text-emerald-400 font-mono">
+            <p className="text-base sm:text-2xl font-black text-emerald-400 font-mono">
               ₺{totalPersonnelGrossPay.toLocaleString('tr-TR')}
             </p>
-            <p className="text-[11px] text-slate-500 mt-1">Personele tahakkuk eden kazanç</p>
+            <p className="text-[10px] text-slate-500 mt-0.5 hidden sm:block">Personele tahakkuk eden kazanç</p>
           </div>
 
-          <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800">
-            <div className="flex items-center justify-between text-slate-400 mb-2">
-              <span className="text-xs font-semibold uppercase tracking-wider">Verilen Toplam Avanslar</span>
-              <Banknote className="w-4 h-4 text-amber-400" />
+          <div className="p-3 sm:p-4.5 rounded-2xl bg-slate-900 border border-slate-800">
+            <div className="flex items-center justify-between text-slate-400 mb-1">
+              <span className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider truncate">Verilen Avanslar</span>
+              <Banknote className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-400 flex-shrink-0" />
             </div>
-            <p className="text-2xl font-black text-amber-400 font-mono">
+            <p className="text-base sm:text-2xl font-black text-amber-400 font-mono">
               ₺{totalAdvancesIssued.toLocaleString('tr-TR')}
             </p>
-            <p className="text-[11px] text-slate-500 mt-1">Hakedişlerden otomatik düşülür</p>
+            <p className="text-[10px] text-slate-500 mt-0.5 hidden sm:block">Hakedişten düşülecek</p>
           </div>
 
-          <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800">
-            <div className="flex items-center justify-between text-slate-400 mb-2">
-              <span className="text-xs font-semibold uppercase tracking-wider">Toplam Saha Masrafları</span>
-              <Receipt className="w-4 h-4 text-sky-400" />
+          <div className="p-3 sm:p-4.5 rounded-2xl bg-slate-900 border border-slate-800">
+            <div className="flex items-center justify-between text-slate-400 mb-1">
+              <span className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider truncate">Saha Masrafları</span>
+              <Receipt className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-sky-400 flex-shrink-0" />
             </div>
-            <p className="text-2xl font-black text-sky-400 font-mono">
+            <p className="text-base sm:text-2xl font-black text-sky-400 font-mono">
               ₺{totalFieldExpenses.toLocaleString('tr-TR')}
             </p>
-            <p className="text-[11px] text-slate-500 mt-1">Yakıt, yemek ve konaklama fişleri</p>
+            <p className="text-[10px] text-slate-500 mt-0.5 hidden sm:block">Yakıt, yemek fişleri</p>
           </div>
         </div>
       )}
 
       {/* Control Bar */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-4 rounded-2xl bg-slate-900 border border-slate-800">
-        <div className="flex flex-wrap items-center gap-2">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 p-3 sm:p-4 rounded-2xl bg-slate-900 border border-slate-800">
+        <div className="grid grid-cols-2 sm:flex sm:items-center gap-2">
           {/* Status Filter */}
           <select
             value={filterStatus}
