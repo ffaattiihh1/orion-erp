@@ -15,10 +15,11 @@ import {
   Clock, 
   Sparkles,
   ArrowRight,
-  PlusCircle
+  PlusCircle,
+  X
 } from 'lucide-react';
 import { exportToExcel } from '@/lib/excel-export';
-import { Project, BusinessModel } from '@/types';
+import { Project, BusinessModel, ProjectType } from '@/types';
 import ProjectDetailModal from './ProjectDetailModal';
 
 interface ProjectsViewProps {
@@ -26,10 +27,23 @@ interface ProjectsViewProps {
 }
 
 export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
-  const { projects, activateProjectFromFeasibility } = useApp();
+  const { currentUser, projects, addProject, activateProjectFromFeasibility } = useApp();
   const [filterModel, setFilterModel] = useState<string>('all');
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+
+  // New Project Modal State (For SPV & Admin)
+  const [isNewProjectModalOpen, setIsNewProjectModalOpen] = useState(false);
+  const [newCode, setNewCode] = useState('ORION-2026-' + Math.floor(100 + Math.random() * 900));
+  const [newTitle, setNewTitle] = useState('');
+  const [newClient, setNewClient] = useState('Ipsos Türkiye');
+  const [newType, setNewType] = useState<ProjectType>('saha');
+  const [newTargetSurveys, setNewTargetSurveys] = useState('500');
+  const [newUnitPrice, setNewUnitPrice] = useState('320');
+  const [newStartDate, setNewStartDate] = useState(new Date().toISOString().split('T')[0]);
+  const [newEndDate, setNewEndDate] = useState('');
+
+  const isAdmin = currentUser?.role === 'admin';
 
   // Excel Export
   const handleExport = () => {
@@ -37,19 +51,21 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
       'Proje Kodu': p.code,
       'Proje Başlığı': p.title,
       'Müşteri': p.clientName,
-      'İş Modeli': p.businessModel === 'model_a_macro' ? 'Model A: Taşeron (Makro)' : 'Model B: Öz Ekip (Mikro)',
+      'Proje Tipi': p.projectType.toUpperCase(),
       'Durum': p.status === 'active' ? 'Aktif' : p.status === 'feasibility' ? 'Fizibilite' : 'Tamamlandı',
       'Hedef Anket': p.targetSurveys,
       'Tamamlanan Anket': p.completedSurveys || 0,
-      'Müşteri Birim Fiyat (TL)': p.clientUnitPrice,
-      'Toplam Bütçe / Ciro (TL)': p.clientTotalBudget,
-      'Kâr Marjı (%)': p.simulatedMarginPercent ? `%${p.simulatedMarginPercent}` : '-',
+      'Anket Başı Birim Fiyat (TL)': p.clientUnitPrice,
+      ...(isAdmin ? {
+        'Toplam Bütçe / Ciro (TL)': p.clientTotalBudget,
+        'Kâr Marjı (%)': p.simulatedMarginPercent ? `%${p.simulatedMarginPercent}` : '-'
+      } : {}),
       'Sorumlu SPV / Taşeron': p.businessModel === 'model_a_macro' ? p.subcontractorName : p.assignedSpvName,
       'Başlangıç Tarihi': p.startDate,
       'Bitiş Tarihi': p.endDate
     }));
 
-    exportToExcel(exportData, 'Orion_Proje_Finans_Ozeti', 'Projeler');
+    exportToExcel(exportData, 'Orion_Proje_Listesi', 'Projeler');
   };
 
   // Filtered list
@@ -67,77 +83,115 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
   const totalCompletedSurveys = projects.reduce((sum, p) => sum + (p.completedSurveys || 0), 0);
   const totalTargetSurveys = projects.reduce((sum, p) => sum + p.targetSurveys, 0);
 
+  const handleCreateProjectSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newTitle || !newClient) return;
+
+    const count = Number(newTargetSurveys || 500);
+    const price = Number(newUnitPrice || 320);
+
+    const end = newEndDate || new Date(Date.now() + 20 * 86400000).toISOString().split('T')[0];
+
+    addProject({
+      code: newCode || ('ORION-' + Date.now().toString().slice(-4)),
+      clientName: newClient,
+      title: newTitle,
+      projectType: newType,
+      businessModel: 'model_b_micro',
+      status: 'active',
+      startDate: newStartDate,
+      endDate: end,
+      targetSurveys: count,
+      clientUnitPrice: price,
+      clientTotalBudget: count * price,
+      assignedSpvId: currentUser?.id,
+      assignedSpvName: currentUser?.fullName,
+      dailyOverheadRate: 2000,
+      defaultPersonnelRate: price,
+      simulatedMarginPercent: 30,
+      notes: 'Saha SPV tarafından tanımlandı.'
+    });
+
+    setIsNewProjectModalOpen(false);
+    setNewTitle('');
+    setNewCode('ORION-2026-' + Math.floor(100 + Math.random() * 900));
+  };
+
   return (
     <div className="space-y-6">
       
-      {/* Top Banner & KPI Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800">
-          <div className="flex items-center justify-between text-slate-400 mb-2">
-            <span className="text-xs font-semibold uppercase tracking-wider">Aktif Portföy Cirosu</span>
-            <TrendingUp className="w-4 h-4 text-emerald-400" />
+      {/* Top Banner & KPI Metrics (Only displayed for Admin / Managers) */}
+      {isAdmin ? (
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800">
+            <div className="flex items-center justify-between text-slate-400 mb-2">
+              <span className="text-xs font-semibold uppercase tracking-wider">Aktif Portföy Cirosu</span>
+              <TrendingUp className="w-4 h-4 text-emerald-400" />
+            </div>
+            <p className="text-2xl font-black text-white font-mono">
+              ₺{totalActiveBudget.toLocaleString('tr-TR')}
+            </p>
+            <p className="text-[11px] text-slate-500 mt-1">Müdür & Yönetim Canlı Finansı</p>
           </div>
-          <p className="text-2xl font-black text-white font-mono">
-            ₺{totalActiveBudget.toLocaleString('tr-TR')}
-          </p>
-          <p className="text-[11px] text-slate-500 mt-1">Aktif projelerin toplam sözleşme tutarı</p>
-        </div>
 
-        <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800">
-          <div className="flex items-center justify-between text-slate-400 mb-2">
-            <span className="text-xs font-semibold uppercase tracking-wider">Saha İlerlemesi</span>
-            <Users className="w-4 h-4 text-sky-400" />
+          <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800">
+            <div className="flex items-center justify-between text-slate-400 mb-2">
+              <span className="text-xs font-semibold uppercase tracking-wider">Saha İlerlemesi</span>
+              <Users className="w-4 h-4 text-sky-400" />
+            </div>
+            <p className="text-2xl font-black text-white font-mono">
+              {totalCompletedSurveys} <span className="text-sm font-normal text-slate-500">/ {totalTargetSurveys} Anket</span>
+            </p>
+            <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden mt-2">
+              <div 
+                className="bg-sky-500 h-full rounded-full"
+                style={{ width: `${Math.min((totalCompletedSurveys / (totalTargetSurveys || 1)) * 100, 100)}%` }}
+              />
+            </div>
           </div>
-          <p className="text-2xl font-black text-white font-mono">
-            {totalCompletedSurveys} <span className="text-sm font-normal text-slate-500">/ {totalTargetSurveys} Anket</span>
-          </p>
-          <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden mt-2">
-            <div 
-              className="bg-sky-500 h-full rounded-full"
-              style={{ width: `${Math.min((totalCompletedSurveys / (totalTargetSurveys || 1)) * 100, 100)}%` }}
-            />
+
+          <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800">
+            <div className="flex items-center justify-between text-slate-400 mb-2">
+              <span className="text-xs font-semibold uppercase tracking-wider">Model A (Taşeron)</span>
+              <Building2 className="w-4 h-4 text-indigo-400" />
+            </div>
+            <p className="text-2xl font-black text-indigo-400 font-mono">
+              {projects.filter(p => p.businessModel === 'model_a_macro').length} Proje
+            </p>
+            <p className="text-[11px] text-slate-500 mt-1">Dış iller makro hakedişli projeler</p>
+          </div>
+
+          <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800">
+            <div className="flex items-center justify-between text-slate-400 mb-2">
+              <span className="text-xs font-semibold uppercase tracking-wider">Model B (Öz Ekip)</span>
+              <Briefcase className="w-4 h-4 text-sky-400" />
+            </div>
+            <p className="text-2xl font-black text-sky-400 font-mono">
+              {projects.filter(p => p.businessModel === 'model_b_micro').length} Proje
+            </p>
+            <p className="text-[11px] text-slate-500 mt-1">Avans ve saha operasyonu</p>
           </div>
         </div>
-
-        <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800">
-          <div className="flex items-center justify-between text-slate-400 mb-2">
-            <span className="text-xs font-semibold uppercase tracking-wider">Model A (Taşeron)</span>
-            <Building2 className="w-4 h-4 text-indigo-400" />
+      ) : (
+        /* SPV Top Banner */
+        <div className="p-5 rounded-2xl bg-gradient-to-r from-slate-900 to-slate-950 border border-slate-800 flex justify-between items-center">
+          <div>
+            <h2 className="text-lg font-bold text-white">Saha Projelerim & Operasyon</h2>
+            <p className="text-xs text-slate-400">Projelerinizi seçip içinden avans, masraf fişi ve hakediş kapaması yapabilirsiniz</p>
           </div>
-          <p className="text-2xl font-black text-indigo-400 font-mono">
-            {projects.filter(p => p.businessModel === 'model_a_macro').length} Proje
-          </p>
-          <p className="text-[11px] text-slate-500 mt-1">Dış iller makro hakedişli projeler</p>
-        </div>
-
-        <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800">
-          <div className="flex items-center justify-between text-slate-400 mb-2">
-            <span className="text-xs font-semibold uppercase tracking-wider">Model B (Öz Ekip)</span>
-            <Briefcase className="w-4 h-4 text-sky-400" />
-          </div>
-          <p className="text-2xl font-black text-sky-400 font-mono">
-            {projects.filter(p => p.businessModel === 'model_b_micro').length} Proje
-          </p>
-          <p className="text-[11px] text-slate-500 mt-1">Avans ve SPV günlük giderli operasyon</p>
-        </div>
-      </div>
-
-      {/* Control Bar: Filters & Action Buttons */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-4 rounded-2xl bg-slate-900 border border-slate-800">
-        
-        {/* Filters */}
-        <div className="flex flex-wrap items-center gap-2">
-          {/* Model Filter */}
-          <select
-            value={filterModel}
-            onChange={(e) => setFilterModel(e.target.value)}
-            className="px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-700 text-xs text-slate-200"
+          <button
+            onClick={() => setIsNewProjectModalOpen(true)}
+            className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-white font-bold text-xs shadow-lg shadow-sky-500/20 transition-all cursor-pointer"
           >
-            <option value="all">Tüm İş Modelleri</option>
-            <option value="model_a_macro">Model A: Taşeron (Makro)</option>
-            <option value="model_b_micro">Model B: Öz Ekip (Mikro)</option>
-          </select>
+            <Plus className="w-4 h-4" />
+            <span>+ Yeni Proje Tanımla</span>
+          </button>
+        </div>
+      )}
 
+      {/* Control Bar */}
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-4 rounded-2xl bg-slate-900 border border-slate-800">
+        <div className="flex flex-wrap items-center gap-2">
           {/* Status Filter */}
           <select
             value={filterStatus}
@@ -146,14 +200,26 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
           >
             <option value="all">Tüm Durumlar</option>
             <option value="active">Aktif Projeler</option>
-            <option value="feasibility">Fizibilite / Taslak</option>
+            {isAdmin && <option value="feasibility">Fizibilite / Taslak</option>}
             <option value="completed">Tamamlananlar</option>
           </select>
+
+          {/* Model Filter (Admin only) */}
+          {isAdmin && (
+            <select
+              value={filterModel}
+              onChange={(e) => setFilterModel(e.target.value)}
+              className="px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-700 text-xs text-slate-200"
+            >
+              <option value="all">Tüm İş Modelleri</option>
+              <option value="model_a_macro">Model A: Taşeron (Makro)</option>
+              <option value="model_b_micro">Model B: Öz Ekip (Mikro)</option>
+            </select>
+          )}
         </div>
 
         {/* Action Buttons */}
         <div className="flex items-center gap-2">
-          {/* Excel Export Button */}
           <button
             onClick={handleExport}
             className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition-all border border-slate-700 cursor-pointer"
@@ -163,13 +229,22 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
             <span>Excel'e Aktar</span>
           </button>
 
-          {/* Feasibility Simulator Button */}
+          {isAdmin && (
+            <button
+              onClick={onOpenFeasibility}
+              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white text-xs font-bold shadow-lg shadow-sky-500/20 transition-all cursor-pointer"
+            >
+              <Sparkles className="w-4 h-4" />
+              <span>Fizibilite Simülatörü</span>
+            </button>
+          )}
+
           <button
-            onClick={onOpenFeasibility}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white text-xs font-bold shadow-lg shadow-sky-500/20 transition-all cursor-pointer"
+            onClick={() => setIsNewProjectModalOpen(true)}
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-white text-xs font-bold shadow-lg shadow-sky-500/20 transition-all cursor-pointer"
           >
-            <Sparkles className="w-4 h-4" />
-            <span>Fizibilite Simülatörü</span>
+            <Plus className="w-4 h-4" />
+            <span>+ Proje Ekle</span>
           </button>
         </div>
       </div>
@@ -193,25 +268,17 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
                     <div className="flex items-center gap-2 mb-1">
                       <span className="text-xs font-mono font-bold text-sky-400">{project.code}</span>
                       
-                      {/* Model Badge */}
-                      {isModelA ? (
-                        <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-300 border border-indigo-500/20">
-                          Model A • Taşeron (Makro)
-                        </span>
-                      ) : (
-                        <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-sky-500/10 text-sky-300 border border-sky-500/20">
-                          Model B • Öz Ekip (Mikro)
-                        </span>
-                      )}
+                      <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">
+                        {project.projectType.toUpperCase()}
+                      </span>
 
-                      {/* Status */}
                       {project.status === 'active' ? (
                         <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                           Aktif
                         </span>
                       ) : (
                         <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20">
-                          Fizibilite
+                          Taslak
                         </span>
                       )}
                     </div>
@@ -222,7 +289,7 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
                     <p className="text-xs text-slate-400 mt-0.5">Müşteri: <strong className="text-slate-300">{project.clientName}</strong></p>
                   </div>
 
-                  {project.simulatedMarginPercent && (
+                  {isAdmin && project.simulatedMarginPercent && (
                     <div className="text-right flex-shrink-0">
                       <span className="text-[10px] text-slate-400 block">Kâr Marjı</span>
                       <span className="text-base font-black font-mono text-emerald-400">
@@ -232,56 +299,17 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
                   )}
                 </div>
 
-                {/* Specific Model Highlights */}
-                <div className="mt-4 p-3 rounded-xl bg-slate-950/60 border border-slate-800/80 text-xs space-y-1.5">
-                  {isModelA ? (
-                    <>
-                      <div className="flex justify-between">
-                        <span className="text-slate-400">Atanan Taşeron:</span>
-                        <span className="font-semibold text-indigo-300">{project.subcontractorName}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-slate-400">Taşeron Anket Başı Fiyat:</span>
-                        <span className="font-mono text-slate-200">₺{project.subcontractorUnitPrice} / Anket</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-slate-400">Taşeron Toplam Hakedişi:</span>
-                        <span className="font-mono font-bold text-indigo-400">
-                          ₺{((project.targetSurveys) * (project.subcontractorUnitPrice || 0)).toLocaleString('tr-TR')}
-                        </span>
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      <div className="flex justify-between">
-                        <span className="text-slate-400">Sorumlu SPV:</span>
-                        <span className="font-semibold text-sky-300">{project.assignedSpvName || 'Atama Bekliyor'}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-slate-400">Günlük SPV / Sabit Gider:</span>
-                        <span className="font-mono text-slate-200">₺{project.dailyOverheadRate.toLocaleString('tr-TR')} / Gün</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-slate-400">Saha Harcamaları & Avans:</span>
-                        <span className="font-mono font-bold text-amber-400">
-                          ₺{((project.totalExpenses || 0) + (project.totalAdvances || 0)).toLocaleString('tr-TR')}
-                        </span>
-                      </div>
-                    </>
-                  )}
-                </div>
-
                 {/* Progress Bar */}
                 <div className="mt-4">
                   <div className="flex justify-between text-xs text-slate-400 mb-1">
                     <span>Saha İlerlemesi</span>
-                    <span className="font-mono text-slate-200">
+                    <span className="font-mono text-slate-200 font-bold">
                       {project.completedSurveys || 0} / {project.targetSurveys} Anket (%{progressPercent.toFixed(0)})
                     </span>
                   </div>
                   <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
                     <div 
-                      className={`h-full rounded-full transition-all ${isModelA ? 'bg-indigo-500' : 'bg-sky-500'}`}
+                      className="h-full rounded-full transition-all bg-sky-500"
                       style={{ width: `${progressPercent}%` }}
                     />
                   </div>
@@ -296,34 +324,145 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
                 </div>
 
                 <div className="flex items-center gap-2">
-                  {project.status === 'feasibility' ? (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        activateProjectFromFeasibility(project.id);
-                      }}
-                      className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow transition-all cursor-pointer"
-                    >
-                      Projeyi Aktif Et
-                    </button>
-                  ) : (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSelectedProject(project);
-                      }}
-                      className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-sky-500/15 hover:bg-sky-500/25 text-sky-400 font-bold text-xs border border-sky-500/30 transition-all cursor-pointer"
-                    >
-                      <span>Detay & İşlem Ekle</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
-                    </button>
-                  )}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedProject(project);
+                    }}
+                    className="flex items-center gap-1 px-3.5 py-1.5 rounded-xl bg-sky-500/15 hover:bg-sky-500/25 text-sky-400 font-bold text-xs border border-sky-500/30 transition-all cursor-pointer"
+                  >
+                    <span>Detay & İşlem Ekle</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
                 </div>
               </div>
             </div>
           );
         })}
       </div>
+
+      {/* NEW PROJECT DEFINITION MODAL */}
+      {isNewProjectModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+          <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-6 text-slate-100 shadow-2xl">
+            <div className="flex justify-between items-center pb-3 border-b border-slate-800">
+              <h3 className="text-base font-bold text-white flex items-center gap-2">
+                <Briefcase className="w-5 h-5 text-sky-400" />
+                <span>Yeni Proje Tanımla</span>
+              </h3>
+              <button onClick={() => setIsNewProjectModalOpen(false)} className="p-1 text-slate-400 hover:text-white">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateProjectSubmit} className="space-y-3.5 mt-4">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">Proje Kodu</label>
+                  <input
+                    type="text"
+                    required
+                    value={newCode}
+                    onChange={(e) => setNewCode(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs font-mono text-sky-400 font-bold"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">Müşteri Adı</label>
+                  <input
+                    type="text"
+                    required
+                    value={newClient}
+                    onChange={(e) => setNewClient(e.target.value)}
+                    placeholder="Örn: Ipsos, GfK"
+                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 mb-1">Proje Başlığı / Adı</label>
+                <input
+                  type="text"
+                  required
+                  value={newTitle}
+                  onChange={(e) => setNewTitle(e.target.value)}
+                  placeholder="Örn: Ankara Tüketici Saha Anketi"
+                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 mb-1">Proje Tipi</label>
+                <select
+                  value={newType}
+                  onChange={(e) => setNewType(e.target.value as ProjectType)}
+                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white"
+                >
+                  <option value="saha">Saha Araştırması (Yüz Yüze)</option>
+                  <option value="studyo">Stüdyo / Odak Grup</option>
+                  <option value="gizli_musteri">Gizli Müşteri</option>
+                  <option value="diger">Diğer</option>
+                </select>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">Hedef Anket Sayısı</label>
+                  <input
+                    type="number"
+                    required
+                    min="1"
+                    value={newTargetSurveys}
+                    onChange={(e) => setNewTargetSurveys(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white font-mono"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">Birim Fiyat (TL)</label>
+                  <input
+                    type="number"
+                    required
+                    min="1"
+                    value={newUnitPrice}
+                    onChange={(e) => setNewUnitPrice(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white font-mono"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">Başlangıç Tarihi</label>
+                  <input
+                    type="date"
+                    required
+                    value={newStartDate}
+                    onChange={(e) => setNewStartDate(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">Bitiş Tarihi</label>
+                  <input
+                    type="date"
+                    value={newEndDate}
+                    onChange={(e) => setNewEndDate(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white"
+                  />
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                className="w-full py-3 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-bold text-xs shadow-lg shadow-sky-500/20 transition-all cursor-pointer"
+              >
+                Projeyi Oluştur & Başlat
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Project Detail Modal */}
       <ProjectDetailModal

@@ -14,9 +14,11 @@ export type InvoiceStatus = 'not_invoiced' | 'invoiced' | 'collected';
 
 export interface UserProfile {
   id: string;
-  email: string;
+  username: string; // e.g. fatih.sakar
+  email: string; // e.g. fatihsakar@orionarastirma.com
   fullName: string;
   role: UserRole;
+  password?: string;
   phone?: string;
   avatarUrl?: string;
 }
@@ -83,6 +85,8 @@ export interface Settlement {
   personnelId: string;
   personnelName: string;
   personnelRole: PersonnelRole;
+  city?: string;
+  identityNumber?: string;
   totalSurveys: number;
   invalidSurveys: number;
   validSurveys: number; // totalSurveys - invalidSurveys
@@ -93,6 +97,7 @@ export interface Settlement {
   isPaid: boolean;
   paidAt?: string;
   paymentReference?: string;
+  notes?: string;
 }
 
 export interface ClientInvoice {
@@ -149,7 +154,7 @@ export interface Project {
 
 export interface OfflineSyncItem {
   id: string;
-  type: 'EXPENSE' | 'ADVANCE' | 'SURVEY_COUNT';
+  type: 'EXPENSE' | 'ADVANCE' | 'SURVEY_COUNT' | 'BATCH_SETTLEMENTS';
   payload: any;
   timestamp: number;
   status: 'PENDING' | 'SYNCED' | 'FAILED';

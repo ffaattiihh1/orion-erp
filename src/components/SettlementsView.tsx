@@ -9,57 +9,76 @@ import {
   Clock, 
   Search, 
   CheckCircle2, 
-  HelpCircle, 
   PlusCircle, 
   X, 
-  ArrowRight 
+  ClipboardPaste,
+  Building2,
+  FolderCheck,
+  ArrowRight,
+  TrendingUp,
+  MapPin,
+  FileText
 } from 'lucide-react';
 import { exportToExcel } from '@/lib/excel-export';
+import ExcelPasteSettlementModal from './ExcelPasteSettlementModal';
 
 export default function SettlementsView() {
   const { 
     settlements, 
     projects, 
     personnel, 
-    projectPersonnel, 
     toggleSettlementPaid, 
     closeSurveysAndCalculateSettlement, 
     getPersonnelNetAdvance 
   } = useApp();
 
+  const [selectedProjectId, setSelectedProjectId] = useState<string>(projects[0]?.id || 'all');
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedProjectId, setSelectedProjectId] = useState<string>('all');
+  
+  // Modals
   const [isNewSettlementModalOpen, setIsNewSettlementModalOpen] = useState(false);
+  const [isExcelPasteModalOpen, setIsExcelPasteModalOpen] = useState(false);
 
-  // Modal form states
+  // Single Modal form states
   const [modalProjectId, setModalProjectId] = useState(projects[0]?.id || '');
   const [modalPersonnelId, setModalPersonnelId] = useState('');
   const [modalTotal, setModalTotal] = useState('');
   const [modalInvalid, setModalInvalid] = useState('0');
+  const [modalPrice, setModalPrice] = useState('320');
+  const [modalNote, setModalNote] = useState('');
 
-  // Excel Export
+  const selectedProject = projects.find(p => p.id === selectedProjectId);
+
+  // Excel Export matching exact image format
   const handleExport = () => {
-    const exportData = settlements.map(s => {
+    const targetSettlements = selectedProjectId === 'all' 
+      ? settlements 
+      : settlements.filter(s => s.projectId === selectedProjectId);
+
+    const exportData = targetSettlements.map(s => {
       const proj = projects.find(p => p.id === s.projectId);
       return {
-        'Proje Kodu': proj?.code || s.projectId,
-        'Proje Adı': proj?.title || '-',
-        'Personel Adı': s.personnelName,
-        'Rol': s.personnelRole.toUpperCase(),
-        'Toplam Yapılan Anket': s.totalSurveys,
-        'İptal (Geçersiz) Anket': s.invalidSurveys,
-        'Geçerli Anket': s.validSurveys,
-        'Uygulanan Birim Fiyat (TL)': s.unitPriceApplied,
-        'Brüt Hakediş (TL)': s.grossAmount,
-        'Mahsup Edilen Avans (TL)': s.advancesDeducted,
-        'Net Ödenecek Hakediş (TL)': s.netPayable,
-        'Ödeme Durumu': s.isPaid ? 'ÖDENDİ' : 'BEKLİYOR',
-        'Ödeme Referansı': s.paymentReference || '-',
-        'Ödeme Tarihi': s.paidAt ? new Date(s.paidAt).toLocaleDateString('tr-TR') : '-'
+        'IL': s.city || 'Ankara',
+        'TC': s.identityNumber || '-',
+        'ANKETÖR': s.personnelName,
+        'PROJE': proj?.code || s.projectId,
+        'TOPLAM': s.totalSurveys,
+        'İPTAL': s.invalidSurveys,
+        'GEÇERLİ': s.validSurveys,
+        'VERİLEN (BİRİM FİYAT)': `₺${s.unitPriceApplied}`,
+        'BRÜT TUTAR': `₺${s.grossAmount.toLocaleString('tr-TR')}`,
+        'KESİLEN AVANS': `₺${s.advancesDeducted.toLocaleString('tr-TR')}`,
+        'NET ÖDENECEK': `₺${s.netPayable.toLocaleString('tr-TR')}`,
+        'ÖDEME DURUMU': s.isPaid ? 'ÖDENDİ' : 'ÖDENMEDİ',
+        'NOT': s.notes || '-'
       };
     });
 
-    exportToExcel(exportData, 'Orion_Personel_Hakedis_Listesi', 'Hakedişler');
+    const fileName = selectedProject 
+      ? `${selectedProject.code}_Hakedis_Proje_Kapama` 
+      : 'Tum_Projeler_Hakedis_Listesi';
+
+    exportToExcel(exportData, fileName, 'Hakedişler');
   };
 
   // Filtered settlements
@@ -67,22 +86,22 @@ export default function SettlementsView() {
     if (selectedProjectId !== 'all' && s.projectId !== selectedProjectId) return false;
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
-      return s.personnelName.toLowerCase().includes(term);
+      return (
+        s.personnelName.toLowerCase().includes(term) ||
+        (s.city && s.city.toLowerCase().includes(term)) ||
+        (s.identityNumber && s.identityNumber.includes(term)) ||
+        (s.notes && s.notes.toLowerCase().includes(term))
+      );
     }
     return true;
   });
 
-  // KPI aggregates
-  const totalGross = settlements.reduce((sum, s) => sum + s.grossAmount, 0);
-  const totalAdvancesDeducted = settlements.reduce((sum, s) => sum + s.advancesDeducted, 0);
-  const totalNetPayable = settlements.reduce((sum, s) => sum + s.netPayable, 0);
-  const totalPaidNet = settlements.filter(s => s.isPaid).reduce((sum, s) => sum + s.netPayable, 0);
-
-  // Available personnel for current selected modal project
-  const modalAssignedPersonnel = projectPersonnel
-    .filter(pp => pp.projectId === modalProjectId)
-    .map(pp => personnel.find(p => p.id === pp.personnelId))
-    .filter(Boolean) as typeof personnel;
+  // KPI calculations for currently displayed view
+  const currentTotalGross = filteredSettlements.reduce((sum, s) => sum + s.grossAmount, 0);
+  const currentTotalAdvances = filteredSettlements.reduce((sum, s) => sum + s.advancesDeducted, 0);
+  const currentTotalNet = filteredSettlements.reduce((sum, s) => sum + s.netPayable, 0);
+  const currentTotalPaid = filteredSettlements.filter(s => s.isPaid).reduce((sum, s) => sum + s.netPayable, 0);
+  const currentValidSurveys = filteredSettlements.reduce((sum, s) => sum + s.validSurveys, 0);
 
   const handleModalSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -92,127 +111,191 @@ export default function SettlementsView() {
       modalProjectId,
       modalPersonnelId,
       Number(modalTotal),
-      Number(modalInvalid || 0)
+      Number(modalInvalid || 0),
+      Number(modalPrice || 320),
+      modalNote
     );
 
     setIsNewSettlementModalOpen(false);
     setModalTotal('');
     setModalInvalid('0');
+    setModalNote('');
   };
 
   return (
     <div className="space-y-6">
       
-      {/* Formula Explanation Callout */}
-      <div className="p-4 rounded-2xl bg-gradient-to-r from-sky-950/40 to-indigo-950/40 border border-sky-800/40 text-xs text-slate-300 flex flex-col md:flex-row md:items-center justify-between gap-3">
+      {/* Top Header Banner */}
+      <div className="p-5 rounded-2xl bg-gradient-to-r from-slate-900 via-slate-900 to-slate-950 border border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="p-2.5 rounded-xl bg-sky-500/20 text-sky-400">
-            <Calculator className="w-5 h-5" />
+          <div className="p-3 rounded-2xl bg-sky-500/15 text-sky-400 border border-sky-500/25">
+            <FolderCheck className="w-6 h-6" />
           </div>
           <div>
-            <p className="font-bold text-white text-sm">Otomatik Hakediş & Avans Mahsuplaşma Formülü</p>
-            <p className="text-slate-400 mt-0.5">
-              (Toplam Anket − İptal Anket = <strong className="text-sky-300">Geçerli Anket</strong>) × <strong className="text-sky-300">Kişiye Özel Fiyat</strong> − <strong className="text-amber-400">Alınan Avanslar</strong> = <strong className="text-emerald-400">NET ÖDENECEK HAKEDİŞ</strong>
+            <h1 className="text-lg font-bold text-white tracking-tight">Hakediş Proje Kapama</h1>
+            <p className="text-xs text-slate-400">
+              Projeyi seçin, Excel'den anketör listesini tek tıkla yapıştırın veya manuel hakediş kapaması yapın
             </p>
           </div>
         </div>
-        <button
-          onClick={() => setIsNewSettlementModalOpen(true)}
-          className="flex-shrink-0 flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-white font-bold text-xs transition-all shadow-md shadow-sky-500/20 cursor-pointer"
-        >
-          <PlusCircle className="w-4 h-4" />
-          <span>Yeni Anket Kapama Yap</span>
-        </button>
-      </div>
 
-      {/* KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-        <div className="p-4 rounded-xl bg-slate-900 border border-slate-800">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Toplam Brüt Hakediş</p>
-          <p className="text-xl font-bold font-mono text-white mt-1">₺{totalGross.toLocaleString('tr-TR')}</p>
-          <p className="text-[11px] text-slate-500 mt-0.5">Geçerli anketlerin brüt karşılığı</p>
-        </div>
-
-        <div className="p-4 rounded-xl bg-slate-900 border border-slate-800">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Mahsup Edilen Avans</p>
-          <p className="text-xl font-bold font-mono text-amber-400 mt-1">− ₺{totalAdvancesDeducted.toLocaleString('tr-TR')}</p>
-          <p className="text-[11px] text-slate-500 mt-0.5">Hakedişlerden otomatik düşüldü</p>
-        </div>
-
-        <div className="p-4 rounded-xl bg-slate-900 border border-slate-800">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Net Ödenecek Toplam</p>
-          <p className="text-xl font-bold font-mono text-sky-400 mt-1">₺{totalNetPayable.toLocaleString('tr-TR')}</p>
-          <p className="text-[11px] text-slate-500 mt-0.5">Avans sonrası net ödenecek</p>
-        </div>
-
-        <div className="p-4 rounded-xl bg-slate-900 border border-slate-800">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Fiilen Ödenen Tutar</p>
-          <p className="text-xl font-bold font-mono text-emerald-400 mt-1">₺{totalPaidNet.toLocaleString('tr-TR')}</p>
-          <p className="text-[11px] text-slate-500 mt-0.5">Ödendi işaretlenen net hakedişler</p>
-        </div>
-      </div>
-
-      {/* Control Bar: Filters & Export */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-4 rounded-2xl bg-slate-900 border border-slate-800">
+        {/* Top Action Buttons */}
         <div className="flex flex-wrap items-center gap-2">
-          {/* Project Filter */}
-          <select
-            value={selectedProjectId}
-            onChange={(e) => setSelectedProjectId(e.target.value)}
-            className="px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-700 text-xs text-slate-200"
+          {/* Excel Paste Button */}
+          <button
+            onClick={() => setIsExcelPasteModalOpen(true)}
+            className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs shadow-lg shadow-emerald-600/20 transition-all cursor-pointer"
           >
-            <option value="all">Tüm Projeler</option>
-            {projects.map(p => (
-              <option key={p.id} value={p.id}>{p.code} - {p.clientName}</option>
-            ))}
-          </select>
+            <ClipboardPaste className="w-4 h-4" />
+            <span>Excel'den Kopyala-Yapıştır</span>
+          </button>
 
-          {/* Search Box */}
-          <div className="relative">
-            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              placeholder="Personel ara..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-8 pr-3 py-1.5 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
-            />
-          </div>
+          {/* Single Entry Button */}
+          <button
+            onClick={() => {
+              setModalProjectId(selectedProjectId !== 'all' ? selectedProjectId : projects[0]?.id || '');
+              setIsNewSettlementModalOpen(true);
+            }}
+            className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-sky-500/20 hover:bg-sky-500/30 text-sky-300 border border-sky-500/30 font-bold text-xs transition-all cursor-pointer"
+          >
+            <PlusCircle className="w-4 h-4" />
+            <span>+ Tekil Satır Ekle</span>
+          </button>
         </div>
-
-        {/* Universal Excel Export Button */}
-        <button
-          onClick={handleExport}
-          className="flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition-all border border-slate-700 cursor-pointer"
-        >
-          <FileSpreadsheet className="w-4 h-4 text-emerald-400" />
-          <span>Excel'e Aktar (.xlsx)</span>
-        </button>
       </div>
 
-      {/* Settlements Data Table */}
-      <div className="rounded-2xl bg-slate-900 border border-slate-800 overflow-hidden shadow-xl">
+      {/* Project Selector Tabs */}
+      <div className="space-y-2">
+        <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider block">
+          Proje Seçin:
+        </span>
+        <div className="flex space-x-2 overflow-x-auto pb-2 scrollbar-none">
+          <button
+            onClick={() => setSelectedProjectId('all')}
+            className={`px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all border cursor-pointer ${
+              selectedProjectId === 'all'
+                ? 'bg-sky-500 text-white border-sky-400 shadow-md shadow-sky-500/20'
+                : 'bg-slate-900 text-slate-400 border-slate-800 hover:border-slate-700 hover:text-slate-200'
+            }`}
+          >
+            Tüm Projeler ({settlements.length} Kayıt)
+          </button>
+
+          {projects.map(p => {
+            const count = settlements.filter(s => s.projectId === p.id).length;
+            const isSelected = selectedProjectId === p.id;
+
+            return (
+              <button
+                key={p.id}
+                onClick={() => setSelectedProjectId(p.id)}
+                className={`px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all border cursor-pointer flex items-center gap-2 ${
+                  isSelected
+                    ? 'bg-sky-500 text-white border-sky-400 shadow-md shadow-sky-500/20'
+                    : 'bg-slate-900 text-slate-400 border-slate-800 hover:border-slate-700 hover:text-slate-200'
+                }`}
+              >
+                <span>{p.code}</span>
+                <span className="opacity-70 font-normal max-w-[140px] truncate">{p.title}</span>
+                <span className={`px-1.5 py-0.2 rounded-full text-[10px] ${isSelected ? 'bg-white/20 text-white' : 'bg-slate-800 text-slate-400'}`}>
+                  {count}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* KPI Ribbon for Selected Project */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="p-3.5 rounded-2xl bg-slate-900 border border-slate-800">
+          <span className="text-[10px] uppercase font-semibold text-slate-400 block">Toplam Geçerli Anket</span>
+          <span className="text-xl font-black font-mono text-sky-400 mt-0.5 block">
+            {currentValidSurveys} <span className="text-xs font-normal text-slate-500">Adet</span>
+          </span>
+          <span className="text-[10px] text-slate-500">{filteredSettlements.length} Anketör Hakedişi</span>
+        </div>
+
+        <div className="p-3.5 rounded-2xl bg-slate-900 border border-slate-800">
+          <span className="text-[10px] uppercase font-semibold text-slate-400 block">Brüt Hakediş Tutarı</span>
+          <span className="text-xl font-black font-mono text-white mt-0.5 block">
+            ₺{currentTotalGross.toLocaleString('tr-TR')}
+          </span>
+          <span className="text-[10px] text-slate-500">Anket × Birim Fiyat</span>
+        </div>
+
+        <div className="p-3.5 rounded-2xl bg-slate-900 border border-slate-800">
+          <span className="text-[10px] uppercase font-semibold text-slate-400 block">Mahsup Edilen Avans</span>
+          <span className="text-xl font-black font-mono text-amber-400 mt-0.5 block">
+            − ₺{currentTotalAdvances.toLocaleString('tr-TR')}
+          </span>
+          <span className="text-[10px] text-slate-500">Hakedişten düşüldü</span>
+        </div>
+
+        <div className="p-3.5 rounded-2xl bg-slate-900 border border-slate-800">
+          <span className="text-[10px] uppercase font-semibold text-slate-400 block">NET ÖDENECEK TOPLAM</span>
+          <span className="text-xl font-black font-mono text-emerald-400 mt-0.5 block">
+            ₺{currentTotalNet.toLocaleString('tr-TR')}
+          </span>
+          <span className="text-[10px] text-emerald-300">Ödenen: ₺{currentTotalPaid.toLocaleString('tr-TR')}</span>
+        </div>
+      </div>
+
+      {/* Control Bar: Search & Universal Excel Export */}
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-4 rounded-2xl bg-slate-900 border border-slate-800">
+        <div className="relative flex-1 max-w-sm">
+          <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+          <input
+            type="text"
+            placeholder="Anketör adı, şehir, TC kimlik veya not ara..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-8 pr-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+          />
+        </div>
+
+        <div className="flex items-center gap-2">
+          {/* Excel Export Button */}
+          <button
+            onClick={handleExport}
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition-all border border-slate-700 cursor-pointer"
+            title="Şablona uygun Excel çıktısı alın"
+          >
+            <FileSpreadsheet className="w-4 h-4 text-emerald-400" />
+            <span>Excel'e İndir (.xlsx)</span>
+          </button>
+        </div>
+      </div>
+
+      {/* MAIN SETTLEMENT TABLE (MATCHING USER'S SCREENSHOTS) */}
+      <div className="rounded-3xl bg-slate-900 border border-slate-800 overflow-hidden shadow-2xl">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs text-slate-300">
-            <thead className="bg-slate-950/80 text-slate-400 uppercase tracking-wider text-[11px] border-b border-slate-800">
+            <thead className="bg-slate-950 text-slate-400 uppercase tracking-wider text-[11px] border-b border-slate-800">
               <tr>
-                <th className="py-3 px-4 font-semibold">Personel & Rol</th>
-                <th className="py-3 px-4 font-semibold">Proje</th>
-                <th className="py-3 px-4 font-semibold text-center">Toplam</th>
-                <th className="py-3 px-4 font-semibold text-center text-rose-400">İptal</th>
-                <th className="py-3 px-4 font-semibold text-center text-sky-400">Geçerli</th>
-                <th className="py-3 px-4 font-semibold text-right">Özel Fiyat</th>
-                <th className="py-3 px-4 font-semibold text-right">Brüt Tutar</th>
-                <th className="py-3 px-4 font-semibold text-right text-amber-400">Kesilen Avans</th>
-                <th className="py-3 px-4 font-semibold text-right text-emerald-400">NET ÖDENECEK</th>
-                <th className="py-3 px-4 font-semibold text-center">Ödeme Durumu</th>
+                <th className="py-3.5 px-4 font-bold">İL</th>
+                <th className="py-3.5 px-4 font-bold">TC</th>
+                <th className="py-3.5 px-4 font-bold">ANKETÖR</th>
+                <th className="py-3.5 px-4 font-bold">PROJE</th>
+                <th className="py-3.5 px-4 font-bold text-center">TOPLAM</th>
+                <th className="py-3.5 px-4 font-bold text-center text-rose-400">İPTAL</th>
+                <th className="py-3.5 px-4 font-bold text-center text-sky-400">GEÇERLİ</th>
+                <th className="py-3.5 px-4 font-bold text-right">BİRİM FİYAT</th>
+                <th className="py-3.5 px-4 font-bold text-right">BRÜT TUTAR</th>
+                <th className="py-3.5 px-4 font-bold text-right text-amber-400">KESİLEN AVANS</th>
+                <th className="py-3.5 px-4 font-bold text-right text-emerald-400">NET ÖDENECEK</th>
+                <th className="py-3.5 px-4 font-bold text-center">ÖDEME DURUMU</th>
+                <th className="py-3.5 px-4 font-bold">NOT</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800/80">
               {filteredSettlements.length === 0 ? (
                 <tr>
-                  <td colSpan={10} className="py-8 text-center text-slate-500">
-                    Kayıtlı hakediş bulunamadı.
+                  <td colSpan={13} className="py-12 text-center text-slate-500">
+                    <p className="text-sm font-semibold">Bu projede kayıtlı hakediş bulunamadı.</p>
+                    <p className="text-xs text-slate-600 mt-1">
+                      Yukarıdaki <strong>"Excel'den Kopyala-Yapıştır"</strong> butonuna tıklayarak Excel tablonuzu doğrudan aktarabilirsiniz.
+                    </p>
                   </td>
                 </tr>
               ) : (
@@ -221,57 +304,64 @@ export default function SettlementsView() {
 
                   return (
                     <tr key={s.id} className="hover:bg-slate-800/40 transition-colors">
-                      {/* Personnel */}
-                      <td className="py-3.5 px-4">
-                        <p className="font-bold text-white">{s.personnelName}</p>
-                        <span className="text-[10px] uppercase font-semibold text-slate-500">
-                          {s.personnelRole}
-                        </span>
+                      {/* IL */}
+                      <td className="py-3 px-4 font-semibold text-slate-300">
+                        {s.city || 'Ankara'}
                       </td>
 
-                      {/* Project */}
-                      <td className="py-3.5 px-4 font-mono text-[11px] text-slate-300">
-                        <span className="font-semibold text-sky-400">{proj?.code}</span>
-                        <p className="text-[10px] text-slate-500">{proj?.clientName}</p>
+                      {/* TC */}
+                      <td className="py-3 px-4 font-mono text-slate-400 text-[11px]">
+                        {s.identityNumber || '-'}
                       </td>
 
-                      {/* Total Surveys */}
-                      <td className="py-3.5 px-4 text-center font-mono font-medium">
+                      {/* ANKETÖR */}
+                      <td className="py-3 px-4">
+                        <p className="font-bold text-white tracking-wide">{s.personnelName}</p>
+                        <span className="text-[10px] uppercase text-slate-500">{s.personnelRole}</span>
+                      </td>
+
+                      {/* PROJE */}
+                      <td className="py-3 px-4 font-mono text-[11px] text-sky-400 font-semibold">
+                        {proj?.code}
+                      </td>
+
+                      {/* TOPLAM */}
+                      <td className="py-3 px-4 text-center font-mono font-medium text-slate-200">
                         {s.totalSurveys}
                       </td>
 
-                      {/* Invalid Surveys */}
-                      <td className="py-3.5 px-4 text-center font-mono text-rose-400 font-semibold">
+                      {/* İPTAL */}
+                      <td className="py-3 px-4 text-center font-mono font-bold text-rose-400">
                         {s.invalidSurveys > 0 ? `-${s.invalidSurveys}` : '0'}
                       </td>
 
-                      {/* Valid Surveys */}
-                      <td className="py-3.5 px-4 text-center font-mono font-bold text-sky-300 bg-sky-500/5">
+                      {/* GEÇERLİ */}
+                      <td className="py-3 px-4 text-center font-mono font-bold text-sky-300 bg-sky-500/5">
                         {s.validSurveys}
                       </td>
 
-                      {/* Applied Unit Price */}
-                      <td className="py-3.5 px-4 text-right font-mono">
-                        ₺{s.unitPriceApplied}
+                      {/* VERİLEN (BİRİM FİYAT) */}
+                      <td className="py-3 px-4 text-right font-mono text-slate-300">
+                        ₺{s.unitPriceApplied.toFixed(2).replace('.', ',')}
                       </td>
 
-                      {/* Gross Amount */}
-                      <td className="py-3.5 px-4 text-right font-mono font-semibold text-slate-200">
-                        ₺{s.grossAmount.toLocaleString('tr-TR')}
+                      {/* BRÜT TUTAR */}
+                      <td className="py-3 px-4 text-right font-mono font-semibold text-slate-100">
+                        ₺{s.grossAmount.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}
                       </td>
 
-                      {/* Advances Deducted */}
-                      <td className="py-3.5 px-4 text-right font-mono font-semibold text-amber-400">
-                        {s.advancesDeducted > 0 ? `− ₺${s.advancesDeducted.toLocaleString('tr-TR')}` : '₺0'}
+                      {/* KESİLEN AVANS */}
+                      <td className="py-3 px-4 text-right font-mono font-semibold text-amber-400">
+                        {s.advancesDeducted > 0 ? `− ₺${s.advancesDeducted.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}` : '₺0,00'}
                       </td>
 
-                      {/* Net Payable */}
-                      <td className="py-3.5 px-4 text-right font-mono font-black text-emerald-400 text-sm bg-emerald-500/5">
-                        ₺{s.netPayable.toLocaleString('tr-TR')}
+                      {/* NET ÖDENECEK */}
+                      <td className="py-3 px-4 text-right font-mono font-black text-emerald-400 text-sm bg-emerald-500/5">
+                        ₺{s.netPayable.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}
                       </td>
 
-                      {/* Payment Toggle Status Bar */}
-                      <td className="py-3.5 px-4 text-center">
+                      {/* ÖDEME DURUMU (ÖDENDİ / ÖDENMEDİ BUTONU) */}
+                      <td className="py-3 px-4 text-center">
                         <button
                           onClick={() => toggleSettlementPaid(s.id)}
                           className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold transition-all border cursor-pointer ${
@@ -293,6 +383,11 @@ export default function SettlementsView() {
                           )}
                         </button>
                       </td>
+
+                      {/* NOT */}
+                      <td className="py-3 px-4 text-slate-400 max-w-[150px] truncate text-[11px]">
+                        {s.notes || '-'}
+                      </td>
                     </tr>
                   );
                 })
@@ -302,14 +397,14 @@ export default function SettlementsView() {
         </div>
       </div>
 
-      {/* MODAL: ADMIN CLOSE SURVEYS & CALCULATE */}
+      {/* SINGLE MANUAL SETTLEMENT ENTRY MODAL */}
       {isNewSettlementModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
-          <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-2xl p-6 text-slate-100 shadow-2xl">
+          <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-6 text-slate-100 shadow-2xl">
             <div className="flex justify-between items-center pb-3 border-b border-slate-800">
               <h3 className="text-base font-bold text-white flex items-center gap-2">
                 <Calculator className="w-5 h-5 text-sky-400" />
-                <span>Anket Kapama & Otomatik Hakediş</span>
+                <span>Tekil Hakediş / Anket Kapama</span>
               </h3>
               <button onClick={() => setIsNewSettlementModalOpen(false)} className="p-1 text-slate-400 hover:text-white">
                 <X className="w-5 h-5" />
@@ -321,20 +416,17 @@ export default function SettlementsView() {
                 <label className="block text-xs font-semibold text-slate-300 mb-1">Proje</label>
                 <select
                   value={modalProjectId}
-                  onChange={(e) => {
-                    setModalProjectId(e.target.value);
-                    setModalPersonnelId('');
-                  }}
-                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white"
+                  onChange={(e) => setModalProjectId(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white font-medium"
                 >
-                  {projects.filter(p => p.businessModel === 'model_b_micro').map(p => (
+                  {projects.map(p => (
                     <option key={p.id} value={p.id}>{p.code} - {p.title}</option>
                   ))}
                 </select>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">Personel Seçin</label>
+                <label className="block text-xs font-semibold text-slate-300 mb-1">Anketör Seçin</label>
                 <select
                   value={modalPersonnelId}
                   onChange={(e) => setModalPersonnelId(e.target.value)}
@@ -342,8 +434,8 @@ export default function SettlementsView() {
                   className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white"
                 >
                   <option value="">-- Personel Seçiniz --</option>
-                  {modalAssignedPersonnel.map(p => (
-                    <option key={p.id} value={p.id}>{p.fullName} ({p.defaultRole})</option>
+                  {personnel.map(p => (
+                    <option key={p.id} value={p.id}>{p.fullName} ({p.city || 'Ankara'})</option>
                   ))}
                 </select>
               </div>
@@ -357,7 +449,7 @@ export default function SettlementsView() {
                     min="1"
                     value={modalTotal}
                     onChange={(e) => setModalTotal(e.target.value)}
-                    placeholder="Örn: 180"
+                    placeholder="Örn: 7"
                     className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-sm font-mono text-white font-bold"
                   />
                 </div>
@@ -368,8 +460,32 @@ export default function SettlementsView() {
                     min="0"
                     value={modalInvalid}
                     onChange={(e) => setModalInvalid(e.target.value)}
-                    placeholder="Örn: 8"
+                    placeholder="0"
                     className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-sm font-mono text-rose-400 font-bold"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">Birim Fiyat (TL)</label>
+                  <input
+                    type="number"
+                    required
+                    min="1"
+                    value={modalPrice}
+                    onChange={(e) => setModalPrice(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-sm font-mono text-slate-200"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">Not / Açıklama</label>
+                  <input
+                    type="text"
+                    value={modalNote}
+                    onChange={(e) => setModalNote(e.target.value)}
+                    placeholder="Opsiyonel not"
+                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white"
                   />
                 </div>
               </div>
@@ -401,6 +517,13 @@ export default function SettlementsView() {
           </div>
         </div>
       )}
+
+      {/* EXCEL PASTE IMPORT MODAL */}
+      <ExcelPasteSettlementModal
+        projectId={selectedProjectId !== 'all' ? selectedProjectId : projects[0]?.id}
+        isOpen={isExcelPasteModalOpen}
+        onClose={() => setIsExcelPasteModalOpen(false)}
+      />
 
     </div>
   );

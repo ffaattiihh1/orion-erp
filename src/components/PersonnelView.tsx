@@ -20,7 +20,14 @@ import { exportToExcel } from '@/lib/excel-export';
 import { PersonnelRole, Personnel } from '@/types';
 
 export default function PersonnelView() {
-  const { personnel, addPersonnel, toggleBlacklist, projects, assignPersonnelToProject } = useApp();
+  const { 
+    personnel, 
+    addPersonnel, 
+    toggleBlacklist, 
+    projects, 
+    assignPersonnelToProject,
+    getProjectsForPersonnel 
+  } = useApp();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState<string>('all');
@@ -224,6 +231,8 @@ export default function PersonnelView() {
       {/* Personnel Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {filteredPersonnel.map(person => {
+          const workedProjects = getProjectsForPersonnel(person.id);
+
           return (
             <div 
               key={person.id}
@@ -243,7 +252,7 @@ export default function PersonnelView() {
                   {person.isBlacklisted ? (
                     <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-rose-500/20 text-rose-400 border border-rose-500/30">
                       <ShieldAlert className="w-3 h-3" />
-                      <span>Kara Liste</span>
+                      <span>Engelli</span>
                     </span>
                   ) : (
                     <span className="flex items-center gap-1 text-[10px] font-semibold text-emerald-400">
@@ -253,16 +262,21 @@ export default function PersonnelView() {
                   )}
                 </div>
 
-                {/* Name */}
-                <h3 className={`text-base font-bold ${person.isBlacklisted ? 'text-rose-200 line-through' : 'text-white'}`}>
-                  {person.fullName}
-                </h3>
+                {/* Name & TC */}
+                <div className="flex items-baseline justify-between">
+                  <h3 className={`text-base font-bold ${person.isBlacklisted ? 'text-rose-200 line-through' : 'text-white'}`}>
+                    {person.fullName}
+                  </h3>
+                  {person.identityNumber && (
+                    <span className="font-mono text-[11px] text-slate-500">TC: {person.identityNumber}</span>
+                  )}
+                </div>
 
                 {/* Contact details */}
                 <div className="mt-2 text-xs text-slate-400 space-y-1">
                   <div className="flex items-center gap-2">
                     <Phone className="w-3.5 h-3.5 text-slate-500" />
-                    <span>{person.phone}</span>
+                    <span className="text-slate-200 font-mono">{person.phone}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <MapPin className="w-3.5 h-3.5 text-slate-500" />
@@ -270,16 +284,26 @@ export default function PersonnelView() {
                   </div>
                 </div>
 
-                {/* Standard rate & stats */}
-                <div className="mt-3 pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs">
-                  <div>
-                    <span className="text-slate-500 block text-[10px]">Standart Tarife:</span>
-                    <span className="font-mono font-bold text-slate-200">₺{person.defaultUnitPrice} / Anket</span>
-                  </div>
-                  <div className="text-right">
-                    <span className="text-slate-500 block text-[10px]">Bitirilen Proje:</span>
-                    <span className="font-mono font-bold text-sky-400">{person.totalProjectsCompleted || 0}</span>
-                  </div>
+                {/* Worked Projects List (Çalıştığı Projeler) */}
+                <div className="mt-3 pt-2.5 border-t border-slate-800/80">
+                  <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block mb-1.5">
+                    Görev Aldığı Projeler ({workedProjects.length}):
+                  </span>
+                  {workedProjects.length === 0 ? (
+                    <span className="text-[11px] text-slate-500 italic">Henüz bir projede görev almadı</span>
+                  ) : (
+                    <div className="flex flex-wrap gap-1">
+                      {workedProjects.map(proj => (
+                        <span 
+                          key={proj.id}
+                          className="px-2 py-0.5 rounded bg-slate-950 border border-slate-800 text-[10px] font-mono text-sky-400 font-bold"
+                          title={proj.title}
+                        >
+                          {proj.code}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 {/* Blacklist Warning Box if applicable */}
@@ -287,7 +311,7 @@ export default function PersonnelView() {
                   <div className="mt-3 p-2.5 rounded-xl bg-rose-950/60 border border-rose-800/80 text-[11px] text-rose-300">
                     <div className="flex items-center gap-1.5 font-bold mb-1">
                       <AlertTriangle className="w-3.5 h-3.5 text-rose-400" />
-                      <span>Men Gerekçesi:</span>
+                      <span>Engelleme Sebebi:</span>
                     </div>
                     <p className="text-rose-200/90 leading-relaxed">{person.blacklistReason}</p>
                   </div>
@@ -296,23 +320,9 @@ export default function PersonnelView() {
 
               {/* Bottom Actions */}
               <div className="mt-4 pt-3 border-t border-slate-800 flex items-center justify-between gap-2">
-                {/* Projeye Ata & Fiyat Ez (Override) */}
-                {!person.isBlacklisted ? (
-                  <button
-                    onClick={() => {
-                      setAssignTarget(person);
-                      setOverridePriceInput(String(person.defaultUnitPrice + 20)); // Suggest slight override
-                    }}
-                    className="flex-1 py-1.5 px-3 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition-all border border-slate-700 flex items-center justify-center gap-1 cursor-pointer"
-                  >
-                    <Layers className="w-3.5 h-3.5 text-sky-400" />
-                    <span>Projeye Ata & Özel Fiyat</span>
-                  </button>
-                ) : (
-                  <div className="flex-1 text-[11px] text-rose-400/80 italic text-center py-1">
-                    Yeni projeye atanamaz
-                  </div>
-                )}
+                <span className="text-[11px] text-slate-500">
+                  Tarife: <strong className="text-slate-300 font-mono">₺{person.defaultUnitPrice}</strong>
+                </span>
 
                 {/* Blacklist Toggle Button */}
                 <button
@@ -323,13 +333,13 @@ export default function PersonnelView() {
                       setBlacklistTarget(person);
                     }
                   }}
-                  className={`py-1.5 px-3 rounded-lg text-xs font-semibold transition-all border cursor-pointer ${
+                  className={`py-1 px-3 rounded-lg text-xs font-semibold transition-all border cursor-pointer ${
                     person.isBlacklisted
                       ? 'bg-slate-800 text-emerald-400 border-slate-700 hover:bg-emerald-950/30'
-                      : 'bg-rose-950/40 text-rose-400 border-rose-900/60 hover:bg-rose-900/40'
+                      : 'bg-slate-800 text-rose-400 border-slate-700 hover:bg-rose-950/30'
                   }`}
                 >
-                  {person.isBlacklisted ? 'Aftan Yararlandır' : 'Kara Listeye Al'}
+                  {person.isBlacklisted ? 'Aktifleştir' : 'Engelle'}
                 </button>
               </div>
             </div>

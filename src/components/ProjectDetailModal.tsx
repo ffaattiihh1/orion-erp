@@ -291,9 +291,9 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
         {/* Quick KPI Ribbon */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 my-4">
           <div className="p-3.5 rounded-2xl bg-slate-950/70 border border-slate-800">
-            <span className="text-[10px] text-slate-400 uppercase tracking-wider block">Sözleşme / Toplam Ciro</span>
-            <span className="text-lg font-black font-mono text-white">₺{project.clientTotalBudget.toLocaleString('tr-TR')}</span>
-            <span className="text-[10px] text-slate-500 block">{project.targetSurveys} Anket × ₺{project.clientUnitPrice}</span>
+            <span className="text-[10px] text-slate-400 uppercase tracking-wider block">Hedef Anket Sayısı</span>
+            <span className="text-lg font-black font-mono text-white">{project.targetSurveys} <span className="text-xs font-normal text-slate-500">Anket</span></span>
+            <span className="text-[10px] text-slate-500 block">Birim: ₺{project.clientUnitPrice}</span>
           </div>
 
           <div className="p-3.5 rounded-2xl bg-slate-950/70 border border-slate-800">
@@ -308,11 +308,21 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
             <span className="text-[10px] text-slate-500 block">₺{totalProjectExpenses} Masraf + ₺{totalProjectAdvances} Avans</span>
           </div>
 
-          <div className="p-3.5 rounded-2xl bg-emerald-950/20 border border-emerald-800/40">
-            <span className="text-[10px] text-slate-400 uppercase tracking-wider block">Beklenen Kâr Marjı</span>
-            <span className="text-lg font-black font-mono text-emerald-400">%{project.simulatedMarginPercent || 35}</span>
-            <span className="text-[10px] text-emerald-300 block font-mono">₺{((project.clientTotalBudget) * ((project.simulatedMarginPercent || 35)/100)).toLocaleString('tr-TR')} Kâr</span>
-          </div>
+          {currentUser?.role === 'admin' ? (
+            <div className="p-3.5 rounded-2xl bg-emerald-950/20 border border-emerald-800/40">
+              <span className="text-[10px] text-slate-400 uppercase tracking-wider block">Beklenen Kâr Marjı</span>
+              <span className="text-lg font-black font-mono text-emerald-400">%{project.simulatedMarginPercent || 35}</span>
+              <span className="text-[10px] text-emerald-300 block font-mono">₺{((project.clientTotalBudget) * ((project.simulatedMarginPercent || 35)/100)).toLocaleString('tr-TR')} Kâr</span>
+            </div>
+          ) : (
+            <div className="p-3.5 rounded-2xl bg-slate-950/70 border border-slate-800">
+              <span className="text-[10px] text-slate-400 uppercase tracking-wider block">Kalan Hedef Anket</span>
+              <span className="text-lg font-black font-mono text-emerald-400">
+                {Math.max(0, project.targetSurveys - totalValidSurveysDone)} <span className="text-xs font-normal text-slate-500">Adet</span>
+              </span>
+              <span className="text-[10px] text-slate-500 block">Saha kapanışı bekleniyor</span>
+            </div>
+          )}
         </div>
 
         {/* PROJE İÇİ HIZLI İŞLEM BUTONLARI */}

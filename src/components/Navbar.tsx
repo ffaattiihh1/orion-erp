@@ -41,11 +41,11 @@ export default function Navbar({ activeTab, setActiveTab }: NavbarProps) {
 
   const navItems = [
     { id: 'projects', label: 'Projeler', icon: Briefcase },
-    { id: 'feasibility', label: 'Fizibilite Simülatörü', icon: Calculator },
+    { id: 'settlements', label: 'Hakediş Proje Kapama', icon: Calculator },
     { id: 'personnel', label: 'Personel Listesi', icon: Users },
-    { id: 'settlements', label: 'Hakediş & Anket Kapama', icon: Calculator },
     { id: 'expenses', label: 'Saha Masrafları', icon: Receipt },
     { id: 'advances', label: 'Canlı Avanslar', icon: Banknote },
+    { id: 'feasibility', label: 'Fizibilite Simülatörü', icon: Calculator },
     { id: 'invoices', label: 'Faturalandırma & Tahsilat', icon: FileText },
   ];
 
@@ -62,12 +62,12 @@ export default function Navbar({ activeTab, setActiveTab }: NavbarProps) {
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-bold text-white text-base tracking-tight">SAHA-ERP</span>
+                <span className="font-bold text-white text-base tracking-tight">ORİON SAHA-ERP</span>
                 <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded bg-sky-500/10 text-sky-400 border border-sky-500/20">
-                  Orion v1.0
+                  {currentUser?.role === 'admin' ? 'Müdür / Yönetim' : 'Saha SPV'}
                 </span>
               </div>
-              <p className="text-[11px] text-slate-400 leading-none">Pazar Araştırma ve Finans Yönetim Sistemi</p>
+              <p className="text-[11px] text-slate-400 leading-none">Pazar Araştırma ve Saha Operasyon Yönetimi</p>
             </div>
           </div>
 
@@ -79,7 +79,7 @@ export default function Navbar({ activeTab, setActiveTab }: NavbarProps) {
               {isOnline ? (
                 <div className="flex items-center gap-1.5 text-xs text-emerald-400 font-medium">
                   <Wifi className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">Çevrimiçi (Canlı)</span>
+                  <span className="hidden sm:inline">Çevrimiçi</span>
                 </div>
               ) : (
                 <div className="flex items-center gap-1.5 text-xs text-amber-400 font-medium animate-pulse">
@@ -100,7 +100,7 @@ export default function Navbar({ activeTab, setActiveTab }: NavbarProps) {
               )}
             </div>
 
-            {/* Active Role Switcher (Admin vs SPV) */}
+            {/* Active Role Switcher */}
             <div className="flex items-center p-1 rounded-xl bg-slate-950/80 border border-slate-800 text-xs">
               <button
                 onClick={() => handleRoleToggle('admin')}
@@ -111,7 +111,7 @@ export default function Navbar({ activeTab, setActiveTab }: NavbarProps) {
                 }`}
               >
                 <ShieldCheck className="w-3.5 h-3.5" />
-                <span className="hidden md:inline">Merkez (Admin)</span>
+                <span className="hidden md:inline">Müdür (Merkez)</span>
               </button>
               <button
                 onClick={() => handleRoleToggle('spv')}
@@ -122,7 +122,7 @@ export default function Navbar({ activeTab, setActiveTab }: NavbarProps) {
                 }`}
               >
                 <Smartphone className="w-3.5 h-3.5" />
-                <span className="hidden md:inline">Saha (SPV)</span>
+                <span className="hidden md:inline">SPV (Saha)</span>
               </button>
             </div>
 
@@ -130,7 +130,7 @@ export default function Navbar({ activeTab, setActiveTab }: NavbarProps) {
             <div className="flex items-center gap-2 pl-2 border-l border-slate-800">
               <div className="text-right hidden sm:block">
                 <p className="text-xs font-semibold text-white leading-tight">{currentUser?.fullName}</p>
-                <p className="text-[10px] text-slate-400 uppercase tracking-wider">{currentUser?.role}</p>
+                <p className="text-[10px] text-slate-400 font-mono">@{currentUser?.username || currentUser?.email?.split('@')[0]}</p>
               </div>
               <button
                 onClick={() => setCurrentUser(null)}

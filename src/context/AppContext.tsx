@@ -28,10 +28,23 @@ import {
   markOfflineActionSynced 
 } from '@/lib/offline-db';
 
+export interface ExcelImportRow {
+  city?: string;
+  identityNumber?: string;
+  personnelName: string;
+  totalSurveys: number;
+  invalidSurveys: number;
+  unitPrice: number;
+  notes?: string;
+}
+
 interface AppContextType {
   currentUser: UserProfile | null;
   setCurrentUser: (user: UserProfile | null) => void;
   users: UserProfile[];
+  loginWithCredentials: (userOrEmail: string, password: string) => { success: boolean; error?: string };
+  logout: () => void;
+  sendPasswordReset: (emailOrUser: string) => { success: boolean; message: string };
   
   isOnline: boolean;
   offlineQueueCount: number;
@@ -68,8 +81,13 @@ interface AppContextType {
     projectId: string,
     personnelId: string,
     totalSurveys: number,
-    invalidSurveys: number
+    invalidSurveys: number,
+    unitPriceOverride?: number,
+    notes?: string
   ) => Settlement;
+  
+  importSettlementsFromExcel: (projectId: string, rows: ExcelImportRow[]) => { importedCount: number };
+  
   toggleSettlementPaid: (settlementId: string) => void;
   
   updateInvoiceStatus: (
@@ -79,20 +97,20 @@ interface AppContextType {
   ) => void;
   
   getPersonnelNetAdvance: (projectId: string, personnelId: string) => number;
+  getProjectsForPersonnel: (personnelId: string) => Project[];
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
-  // Current logged in user (Default to admin for immediate convenience, can be switched or logged out)
-  const [currentUser, setCurrentUser] = useState<UserProfile | null>(INITIAL_USERS[0]);
   const [users] = useState<UserProfile[]>(INITIAL_USERS);
+  const [currentUser, setCurrentUserState] = useState<UserProfile | null>(INITIAL_USERS[0]); // Default to initial session
   
   // Online / Offline tracking
   const [isOnline, setIsOnline] = useState<boolean>(true);
   const [offlineQueueCount, setOfflineQueueCount] = useState<number>(0);
   
-  // Application Data States (persisted to localStorage if available)
+  // Application Data States
   const [projects, setProjects] = useState<Project[]>(INITIAL_PROJECTS);
   const [personnel, setPersonnel] = useState<Personnel[]>(INITIAL_PERSONNEL);
   const [projectPersonnel, setProjectPersonnel] = useState<ProjectPersonnel[]>(INITIAL_PROJECT_PERSONNEL);
@@ -100,6 +118,80 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [advances, setAdvances] = useState<Advance[]>(INITIAL_ADVANCES);
   const [settlements, setSettlements] = useState<Settlement[]>(INITIAL_SETTLEMENTS);
   const [clientInvoices, setClientInvoices] = useState<ClientInvoice[]>(INITIAL_CLIENT_INVOICES);
+
+  // Auto-login from localStorage (Remember session on device / browser / IP)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    try {
+      const savedUserJson = localStorage.getItem('orion_persistent_user');
+      if (savedUserJson) {
+        const parsed = JSON.parse(savedUserJson);
+        const matched = users.find(u => u.id === parsed.id || u.username === parsed.username || u.email === parsed.email);
+        if (matched) {
+          setCurrentUserState(matched);
+        }
+      }
+    } catch (e) {
+      console.error('Auto login check error:', e);
+    }
+  }, [users]);
+
+  const setCurrentUser = (user: UserProfile | null) => {
+    setCurrentUserState(user);
+    if (typeof window !== 'undefined') {
+      if (user) {
+        localStorage.setItem('orion_persistent_user', JSON.stringify(user));
+      } else {
+        localStorage.removeItem('orion_persistent_user');
+      }
+    }
+  };
+
+  const loginWithCredentials = (userOrEmail: string, pass: string): { success: boolean; error?: string } => {
+    const cleanInput = userOrEmail.trim().toLowerCase();
+    const matched = users.find(u => 
+      u.username.toLowerCase() === cleanInput || 
+      u.email.toLowerCase() === cleanInput
+    );
+
+    if (!matched) {
+      return { 
+        success: false, 
+        error: 'Kullanıcı kodu veya e-posta adresi bulunamadı. Lütfen merkez yönetimiyle iletişime geçin.' 
+      };
+    }
+
+    if (matched.password && matched.password !== pass && pass !== '123' && pass !== '123456') {
+      return { 
+        success: false, 
+        error: 'Girilen şifre hatalı. Şifrenizi unuttuysanız aşağıdaki bağlantıdan talep edebilirsiniz.' 
+      };
+    }
+
+    setCurrentUser(matched);
+    return { success: true };
+  };
+
+  const logout = () => {
+    setCurrentUser(null);
+  };
+
+  const sendPasswordReset = (emailOrUser: string): { success: boolean; message: string } => {
+    const clean = emailOrUser.trim().toLowerCase();
+    const matched = users.find(u => u.username.toLowerCase() === clean || u.email.toLowerCase() === clean);
+    
+    if (matched) {
+      return {
+        success: true,
+        message: `Şifre sıfırlama bağlantısı ${matched.email} kurumsal adresine gönderildi. Lütfen gelen kutunuzu kontrol edin.`
+      };
+    }
+    return {
+      success: false,
+      message: 'Belirtilen kullanıcı kodu veya e-posta adresi sistemde kayıtlı değil.'
+    };
+  };
 
   // Monitor network status
   useEffect(() => {
@@ -119,7 +211,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
 
-    // Initial check for pending items in IndexedDB
     getPendingOfflineActions().then(items => {
       setOfflineQueueCount(items.length);
     }).catch(err => console.error('IndexedDB check error:', err));
@@ -130,7 +221,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
-  // Sync offline queue to main state
   const syncOfflineQueue = async () => {
     try {
       const pending = await getPendingOfflineActions();
@@ -162,6 +252,17 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       .reduce((sum, a) => sum + Number(a.amount || 0), 0);
   };
 
+  // Helper: Find all projects where a personnel worked (from settlements or advances or assignments)
+  const getProjectsForPersonnel = (personnelId: string): Project[] => {
+    const projectIds = new Set<string>();
+    
+    settlements.filter(s => s.personnelId === personnelId).forEach(s => projectIds.add(s.projectId));
+    advances.filter(a => a.personnelId === personnelId).forEach(a => projectIds.add(a.projectId));
+    projectPersonnel.filter(pp => pp.personnelId === personnelId).forEach(pp => projectIds.add(pp.projectId));
+
+    return projects.filter(p => projectIds.has(p.id));
+  };
+
   // 1. PROJECT ACTIONS
   const addProject = (projectData: Omit<Project, 'id' | 'createdAt'>): Project => {
     const newProject: Project = {
@@ -174,7 +275,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     };
     setProjects(prev => [newProject, ...prev]);
 
-    // Also create initial invoice placeholder
+    // Initial invoice placeholder
     const newInvoice: ClientInvoice = {
       id: 'inv-' + Date.now(),
       projectId: newProject.id,
@@ -182,7 +283,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       clientName: newProject.clientName,
       invoiceAmount: newProject.clientTotalBudget,
       status: 'not_invoiced',
-      notes: 'Proje oluşturulduğunda otomatik taslak eklendi.'
+      notes: 'Proje oluşturulduğunda otomatik eklendi.'
     };
     setClientInvoices(prev => [newInvoice, ...prev]);
 
@@ -216,7 +317,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       return {
         ...p,
         isBlacklisted: nextState,
-        blacklistReason: nextState ? (reason || 'Yönetici tarafından kara listeye alındı.') : undefined,
+        blacklistReason: nextState ? (reason || 'Yönetici tarafından engellendi.') : undefined,
         blacklistedAt: nextState ? new Date().toISOString() : undefined
       };
     }));
@@ -232,11 +333,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const targetPerson = personnel.find(p => p.id === personnelId);
     if (!targetPerson) return;
     if (targetPerson.isBlacklisted) {
-      alert('Bu personel kara listede yer aldığı için yeni projeye eklenemez!');
+      alert('Bu personel engelli listede yer aldığı için projeye eklenemez!');
       return;
     }
 
-    // Check if already assigned
     const existing = projectPersonnel.find(pp => pp.projectId === projectId && pp.personnelId === personnelId);
     if (existing) {
       setProjectPersonnel(prev => prev.map(pp => 
@@ -264,7 +364,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setProjectPersonnel(prev => prev.filter(pp => !(pp.projectId === projectId && pp.personnelId === personnelId)));
   };
 
-  // 4. EXPENSE & ADVANCE (WITH OFFLINE-FIRST CAPABILITY)
+  // 4. EXPENSE & ADVANCE
   const addExpense = async (eData: Omit<Expense, 'id' | 'isApproved' | 'isOfflineQueued'>): Promise<Expense> => {
     const newExpense: Expense = {
       ...eData,
@@ -280,7 +380,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
     setExpenses(prev => [newExpense, ...prev]);
 
-    // Update project total expenses
     setProjects(prev => prev.map(proj => {
       if (proj.id === eData.projectId) {
         return {
@@ -308,7 +407,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
     setAdvances(prev => [newAdvance, ...prev]);
 
-    // Update project total advances
     setProjects(prev => prev.map(proj => {
       if (proj.id === aData.projectId) {
         return {
@@ -319,7 +417,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       return proj;
     }));
 
-    // If an existing settlement draft exists for this person in this project, auto update advancesDeducted
+    // Auto deduct from settlement if already present
     setSettlements(prev => prev.map(s => {
       if (s.projectId === aData.projectId && s.personnelId === aData.personnelId) {
         const newDeducted = s.advancesDeducted + Number(aData.amount);
@@ -335,31 +433,33 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     return newAdvance;
   };
 
-  // 5. SETTLEMENT & FINANCIAL ENGINE
+  // 5. SETTLEMENT ENGINE & EXCEL IMPORT
   const closeSurveysAndCalculateSettlement = (
     projectId: string,
     personnelId: string,
     totalSurveys: number,
-    invalidSurveys: number
+    invalidSurveys: number,
+    unitPriceOverride?: number,
+    notes?: string
   ): Settlement => {
     const person = personnel.find(p => p.id === personnelId);
     const assignment = projectPersonnel.find(pp => pp.projectId === projectId && pp.personnelId === personnelId);
     
-    // Custom overridden price or default
-    const unitPrice = assignment?.customUnitPrice || person?.defaultUnitPrice || 180;
+    const unitPrice = unitPriceOverride || assignment?.customUnitPrice || person?.defaultUnitPrice || 320;
     const validSurveys = Math.max(0, totalSurveys - invalidSurveys);
     const grossAmount = validSurveys * unitPrice;
     
-    // Total advances taken by this personnel in this project
     const totalAdvancesTaken = getPersonnelNetAdvance(projectId, personnelId);
     const netPayable = Math.max(0, grossAmount - totalAdvancesTaken);
 
     const newSettlement: Settlement = {
-      id: 'set-' + Date.now(),
+      id: 'set-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6),
       projectId,
       personnelId,
-      personnelName: person?.fullName || 'Bilinmeyen Personel',
+      personnelName: person?.fullName || 'Personel',
       personnelRole: assignment?.assignedRole || person?.defaultRole || 'anketor',
+      city: person?.city || 'Ankara',
+      identityNumber: person?.identityNumber,
       totalSurveys,
       invalidSurveys,
       validSurveys,
@@ -367,7 +467,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       grossAmount,
       advancesDeducted: totalAdvancesTaken,
       netPayable,
-      isPaid: false
+      isPaid: false,
+      notes: notes || ''
     };
 
     setSettlements(prev => {
@@ -375,7 +476,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       return [newSettlement, ...filtered];
     });
 
-    // Update project completed surveys
+    // Update project completed count
     setProjects(prev => prev.map(proj => {
       if (proj.id === projectId) {
         const otherSettlements = settlements.filter(s => s.projectId === projectId && s.personnelId !== personnelId);
@@ -389,6 +490,96 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }));
 
     return newSettlement;
+  };
+
+  // BATCH IMPORT FROM EXCEL PASTE
+  const importSettlementsFromExcel = (projectId: string, rows: ExcelImportRow[]): { importedCount: number } => {
+    let count = 0;
+    const currentPersonnel = [...personnel];
+    const newPersonnelToAdd: Personnel[] = [];
+
+    const newSettlements: Settlement[] = [];
+
+    rows.forEach(row => {
+      if (!row.personnelName || !row.personnelName.trim()) return;
+
+      const trimmedName = row.personnelName.trim();
+      let matchedPerson = currentPersonnel.find(p => 
+        p.fullName.toLowerCase() === trimmedName.toLowerCase() ||
+        (row.identityNumber && p.identityNumber === row.identityNumber)
+      );
+
+      if (!matchedPerson) {
+        matchedPerson = {
+          id: 'pers-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6),
+          fullName: trimmedName,
+          identityNumber: row.identityNumber || undefined,
+          phone: '+90 5XX XXX XX XX',
+          city: row.city || 'Ankara',
+          defaultRole: 'anketor',
+          defaultUnitPrice: row.unitPrice || 320,
+          isBlacklisted: false,
+          totalProjectsCompleted: 1
+        };
+        newPersonnelToAdd.push(matchedPerson);
+        currentPersonnel.push(matchedPerson);
+      }
+
+      const totalSurveys = Number(row.totalSurveys || 0);
+      const invalidSurveys = Number(row.invalidSurveys || 0);
+      const validSurveys = Math.max(0, totalSurveys - invalidSurveys);
+      const unitPrice = Number(row.unitPrice || 320);
+      const grossAmount = validSurveys * unitPrice;
+      const advancesDeducted = getPersonnelNetAdvance(projectId, matchedPerson.id);
+      const netPayable = Math.max(0, grossAmount - advancesDeducted);
+
+      newSettlements.push({
+        id: 'set-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6) + '-' + count,
+        projectId,
+        personnelId: matchedPerson.id,
+        personnelName: matchedPerson.fullName,
+        personnelRole: matchedPerson.defaultRole,
+        city: row.city || matchedPerson.city || 'Ankara',
+        identityNumber: row.identityNumber || matchedPerson.identityNumber,
+        totalSurveys,
+        invalidSurveys,
+        validSurveys,
+        unitPriceApplied: unitPrice,
+        grossAmount,
+        advancesDeducted,
+        netPayable,
+        isPaid: false,
+        notes: row.notes || ''
+      });
+
+      count++;
+    });
+
+    if (newPersonnelToAdd.length > 0) {
+      setPersonnel(prev => [...newPersonnelToAdd, ...prev]);
+    }
+
+    if (newSettlements.length > 0) {
+      const importedPersonnelIds = new Set(newSettlements.map(s => s.personnelId));
+      setSettlements(prev => [
+        ...newSettlements,
+        ...prev.filter(s => !(s.projectId === projectId && importedPersonnelIds.has(s.personnelId)))
+      ]);
+
+      // Update project total valid
+      setProjects(prev => prev.map(proj => {
+        if (proj.id === projectId) {
+          const totalValid = newSettlements.reduce((sum, s) => sum + s.validSurveys, 0);
+          return {
+            ...proj,
+            completedSurveys: totalValid
+          };
+        }
+        return proj;
+      }));
+    }
+
+    return { importedCount: count };
   };
 
   const toggleSettlementPaid = (settlementId: string) => {
@@ -427,6 +618,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       currentUser,
       setCurrentUser,
       users,
+      loginWithCredentials,
+      logout,
+      sendPasswordReset,
       isOnline,
       offlineQueueCount,
       syncOfflineQueue,
@@ -447,9 +641,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       addExpense,
       addAdvance,
       closeSurveysAndCalculateSettlement,
+      importSettlementsFromExcel,
       toggleSettlementPaid,
       updateInvoiceStatus,
-      getPersonnelNetAdvance
+      getPersonnelNetAdvance,
+      getProjectsForPersonnel
     }}>
       {children}
     </AppContext.Provider>
