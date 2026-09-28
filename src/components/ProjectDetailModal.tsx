@@ -21,10 +21,12 @@ import {
   StickyNote, 
   FileText,
   Eye,
-  Plus
+  Plus,
+  Edit3
 } from 'lucide-react';
 import { exportToExcel } from '@/lib/excel-export';
 import { Project, ExpenseCategory, Personnel } from '@/types';
+import EditProjectModal from './EditProjectModal';
 
 interface ProjectDetailModalProps {
   project: Project | null;
@@ -52,6 +54,7 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
   } = useApp();
 
   const [activeTab, setActiveTab] = useState<'personnel' | 'expenses' | 'advances' | 'notes'>('personnel');
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   // Action Modals within Project
   const [isAdvanceModalOpen, setIsAdvanceModalOpen] = useState(false);
@@ -273,6 +276,15 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
           </div>
 
           <div className="flex items-center gap-2">
+            <button
+              onClick={() => setIsEditModalOpen(true)}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition-all border border-slate-700 cursor-pointer"
+              title="Proje adı, hedefi, birim fiyatları veya illerini düzenle"
+            >
+              <Edit3 className="w-4 h-4 text-sky-400" />
+              <span className="hidden sm:inline">Projeyi Düzenle</span>
+            </button>
+
             <button
               onClick={handleExportProjectSheet}
               className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition-all border border-slate-700 cursor-pointer"
@@ -1017,6 +1029,13 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
             </div>
           </div>
         )}
+
+        {/* Edit Project Modal */}
+        <EditProjectModal
+          project={project}
+          isOpen={isEditModalOpen}
+          onClose={() => setIsEditModalOpen(false)}
+        />
 
       </div>
     </div>

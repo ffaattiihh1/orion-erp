@@ -20,11 +20,13 @@ import {
   Banknote,
   Receipt,
   MapPin,
-  Trash2
+  Trash2,
+  Edit3
 } from 'lucide-react';
 import { exportToExcel } from '@/lib/excel-export';
 import { Project, BusinessModel, ProjectType, CityPricing } from '@/types';
 import ProjectDetailModal from './ProjectDetailModal';
+import EditProjectModal from './EditProjectModal';
 
 interface ProjectsViewProps {
   onOpenFeasibility: () => void;
@@ -35,6 +37,7 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
   const [filterModel, setFilterModel] = useState<string>('all');
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [editingProject, setEditingProject] = useState<Project | null>(null);
 
   // New Project Modal State (For SPV & Admin)
   const [isNewProjectModalOpen, setIsNewProjectModalOpen] = useState(false);
@@ -449,6 +452,18 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
+                        setEditingProject(project);
+                      }}
+                      className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white font-bold text-xs border border-slate-700 transition-all cursor-pointer"
+                      title="Proje bilgilerini veya birim fiyatlarını düzenle"
+                    >
+                      <Edit3 className="w-3.5 h-3.5 text-sky-400" />
+                      <span>Düzenle</span>
+                    </button>
+
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
                         setSelectedProject(project);
                       }}
                       className="flex items-center gap-1 px-3.5 py-1.5 rounded-xl bg-sky-500/15 hover:bg-sky-500/25 text-sky-400 font-bold text-xs border border-sky-500/30 transition-all cursor-pointer"
@@ -643,6 +658,18 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
           </div>
         </div>
       )}
+
+      {/* Edit Project Modal */}
+      <EditProjectModal
+        project={editingProject}
+        isOpen={Boolean(editingProject)}
+        onClose={() => setEditingProject(null)}
+        onSaved={(updated) => {
+          if (selectedProject?.id === updated.id) {
+            setSelectedProject(updated);
+          }
+        }}
+      />
 
       {/* Project Detail Modal */}
       <ProjectDetailModal
