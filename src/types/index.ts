@@ -170,6 +170,10 @@ export interface Project {
   createdByName?: string;
   createdAt: string;
   
+  // Archive / Hide status
+  isArchived?: boolean;
+  archivedAt?: string;
+  
   // Aggregated live stats
   completedSurveys?: number;
   totalExpenses?: number;

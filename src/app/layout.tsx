@@ -3,8 +3,8 @@ import "./globals.css";
 import { AppProvider } from "@/context/AppContext";
 
 export const metadata: Metadata = {
-  title: "SAHA-ERP | Orion Proje Takip & Finans",
-  description: "Uçtan Uca Saha Operasyon, Hakediş ve Finans Yönetim Sistemi",
+  title: "Orion OPT | Saha Yönetim Sistemi & Proje Takip",
+  description: "Orion OPT - Pazar Araştırma, Hakediş, Avans & Saha Yönetim Sistemi",
   manifest: "/manifest.json",
   robots: {
     index: false,

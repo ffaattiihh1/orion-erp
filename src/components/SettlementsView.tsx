@@ -166,46 +166,60 @@ export default function SettlementsView() {
         </div>
       </div>
 
-      {/* Project Selector Tabs */}
-      <div className="space-y-2">
-        <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider block">
-          Proje Seçin:
-        </span>
-        <div className="flex space-x-2 overflow-x-auto pb-2 scrollbar-none">
-          <button
-            onClick={() => setSelectedProjectId('all')}
-            className={`px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all border cursor-pointer ${
-              selectedProjectId === 'all'
-                ? 'bg-sky-500 text-white border-sky-400 shadow-md shadow-sky-500/20'
-                : 'bg-slate-900 text-slate-400 border-slate-800 hover:border-slate-700 hover:text-slate-200'
-            }`}
-          >
-            Tüm Projeler ({settlements.length} Kayıt)
-          </button>
-
-          {projects.map(p => {
-            const count = settlements.filter(s => s.projectId === p.id).length;
-            const isSelected = selectedProjectId === p.id;
-
-            return (
-              <button
-                key={p.id}
-                onClick={() => setSelectedProjectId(p.id)}
-                className={`px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all border cursor-pointer flex items-center gap-2 ${
-                  isSelected
-                    ? 'bg-sky-500 text-white border-sky-400 shadow-md shadow-sky-500/20'
-                    : 'bg-slate-900 text-slate-400 border-slate-800 hover:border-slate-700 hover:text-slate-200'
-                }`}
-              >
-                <span>{p.code}</span>
-                <span className="opacity-70 font-normal max-w-[140px] truncate">{p.title}</span>
-                <span className={`px-1.5 py-0.2 rounded-full text-[10px] ${isSelected ? 'bg-white/20 text-white' : 'bg-slate-800 text-slate-400'}`}>
-                  {count}
-                </span>
-              </button>
-            );
-          })}
+      {/* Project Selector Dropdown */}
+      <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-3">
+        <div className="flex-1">
+          <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+            <Building2 className="w-4 h-4 text-sky-400" />
+            <span>Hakediş Görüntülenecek Projeyi Seçin:</span>
+          </label>
+          <div className="relative">
+            <select
+              value={selectedProjectId}
+              onChange={(e) => setSelectedProjectId(e.target.value)}
+              className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-sm font-semibold text-white focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer"
+            >
+              <option value="all">📁 Tüm Projeler (Toplam {settlements.length} Hakediş Kaydı)</option>
+              {projects.filter(p => !p.isArchived).map(p => {
+                const count = settlements.filter(s => s.projectId === p.id).length;
+                return (
+                  <option key={p.id} value={p.id}>
+                    [{p.code}] {p.title} — {p.clientName} ({count} Kayıt)
+                  </option>
+                );
+              })}
+              {projects.some(p => p.isArchived) && (
+                <optgroup label="--- Arşivlenen / Gizlenen Projeler ---">
+                  {projects.filter(p => p.isArchived).map(p => {
+                    const count = settlements.filter(s => s.projectId === p.id).length;
+                    return (
+                      <option key={p.id} value={p.id}>
+                        [ARŞİV - {p.code}] {p.title} ({count} Kayıt)
+                      </option>
+                    );
+                  })}
+                </optgroup>
+              )}
+            </select>
+          </div>
         </div>
+
+        {selectedProject && (
+          <div className="flex items-center gap-3 pt-2 md:pt-0 md:border-l md:border-slate-800 md:pl-4 text-xs">
+            <div>
+              <span className="text-[10px] text-slate-500 block uppercase">Müşteri:</span>
+              <strong className="text-white">{selectedProject.clientName}</strong>
+            </div>
+            <div>
+              <span className="text-[10px] text-slate-500 block uppercase">Hedef Anket:</span>
+              <strong className="text-sky-400 font-mono">{selectedProject.targetSurveys} Adet</strong>
+            </div>
+            <div>
+              <span className="text-[10px] text-slate-500 block uppercase">Tarih:</span>
+              <span className="text-slate-300 font-mono text-[11px]">{selectedProject.startDate}</span>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* KPI Ribbon for Selected Project */}

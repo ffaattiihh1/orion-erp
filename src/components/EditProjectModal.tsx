@@ -229,8 +229,8 @@ export default function EditProjectModal({
                 onChange={(e) => setBusinessModel(e.target.value as BusinessModel)}
                 className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white"
               >
-                <option value="model_b_micro">Model B: İstanbul Ekip</option>
-                <option value="model_a_macro">Model A: İller</option>
+                <option value="model_b_micro">İstanbul Ekip</option>
+                <option value="model_a_macro">İller</option>
               </select>
             </div>
 
@@ -293,7 +293,7 @@ export default function EditProjectModal({
             <div className="p-4 rounded-2xl bg-indigo-950/20 border border-indigo-900/40 space-y-3">
               <span className="font-bold text-indigo-300 flex items-center gap-1.5">
                 <Building2 className="w-4 h-4" />
-                <span>Model A: Taşeron Bilgileri</span>
+                <span>İller: Taşeron Bilgileri</span>
               </span>
               <div className="grid grid-cols-2 gap-3">
                 <div>

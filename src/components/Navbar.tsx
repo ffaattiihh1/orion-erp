@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useApp } from '@/context/AppContext';
 import ChangePasswordModal from '@/components/ChangePasswordModal';
+import BackupModal from '@/components/BackupModal';
 import { 
   Wifi, 
   WifiOff, 
@@ -17,7 +18,8 @@ import {
   Banknote, 
   FileText,
   KeyRound,
-  User
+  User,
+  Database
 } from 'lucide-react';
 
 interface NavbarProps {
@@ -36,6 +38,7 @@ export default function Navbar({ activeTab, setActiveTab }: NavbarProps) {
   } = useApp();
 
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+  const [isBackupModalOpen, setIsBackupModalOpen] = useState(false);
 
   const handleRoleToggle = (targetRole: 'admin' | 'spv') => {
     const user = users.find(u => u.role === targetRole);
@@ -71,7 +74,7 @@ export default function Navbar({ activeTab, setActiveTab }: NavbarProps) {
               </div>
               <div className="min-w-0">
                 <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
-                  <span className="font-black text-white text-sm sm:text-base tracking-tight truncate">ORİON ERP</span>
+                  <span className="font-black text-white text-sm sm:text-base tracking-tight truncate">ORİON OPT</span>
                   <span className={`text-[9px] sm:text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded border flex-shrink-0 ${
                     currentUser?.role === 'admin' 
                       ? 'bg-sky-500/15 text-sky-300 border-sky-500/30' 
@@ -131,6 +134,16 @@ export default function Navbar({ activeTab, setActiveTab }: NavbarProps) {
                   <span>SPV</span>
                 </button>
               </div>
+
+              {/* Data Backup & Restore Button */}
+              <button
+                onClick={() => setIsBackupModalOpen(true)}
+                title="Sistem Yedeği Al & Geri Yükle"
+                className="flex items-center gap-1 p-2 rounded-xl text-slate-300 hover:text-emerald-400 bg-slate-950/50 hover:bg-slate-800 border border-slate-800 transition-colors cursor-pointer text-xs"
+              >
+                <Database className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-400" />
+                <span className="hidden sm:inline font-medium text-[11px]">Yedek</span>
+              </button>
 
               {/* Password Change Button */}
               <button
@@ -211,6 +224,12 @@ export default function Navbar({ activeTab, setActiveTab }: NavbarProps) {
       <ChangePasswordModal 
         isOpen={isPasswordModalOpen} 
         onClose={() => setIsPasswordModalOpen(false)} 
+      />
+
+      {/* Backup & Data Preservation Modal */}
+      <BackupModal
+        isOpen={isBackupModalOpen}
+        onClose={() => setIsBackupModalOpen(false)}
       />
     </>
   );

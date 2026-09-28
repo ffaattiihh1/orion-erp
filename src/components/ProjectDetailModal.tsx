@@ -250,11 +250,11 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
 
               {isModelA ? (
                 <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-indigo-500/15 text-indigo-300 border border-indigo-500/30">
-                  Model A • İller
+                  İller
                 </span>
               ) : (
                 <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-sky-500/15 text-sky-300 border border-sky-500/30">
-                  Model B • İstanbul Ekip
+                  İstanbul Ekip
                 </span>
               )}
 
@@ -462,7 +462,7 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
               <div className="p-6 rounded-2xl bg-indigo-950/20 border border-indigo-900/40 space-y-3 text-xs">
                 <div className="flex items-center gap-2">
                   <Building2 className="w-5 h-5 text-indigo-400" />
-                  <h3 className="text-sm font-bold text-indigo-300">Model A: İller Hakediş Özeti</h3>
+                  <h3 className="text-sm font-bold text-indigo-300">İller Hakediş Özeti</h3>
                 </div>
                 <p className="text-slate-300">
                   Bu proje İller modeliyle yönetilmektedir. Kişi bazlı avans ve masraf tutulmaz.

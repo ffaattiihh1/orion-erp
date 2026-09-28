@@ -21,23 +21,41 @@ import {
   Receipt,
   MapPin,
   Trash2,
-  Edit3
+  Edit3,
+  Eye,
+  EyeOff,
+  Filter,
+  Archive
 } from 'lucide-react';
 import { exportToExcel } from '@/lib/excel-export';
 import { Project, BusinessModel, ProjectType, CityPricing } from '@/types';
 import ProjectDetailModal from './ProjectDetailModal';
 import EditProjectModal from './EditProjectModal';
+import SafeDeleteProjectModal from './SafeDeleteProjectModal';
 
 interface ProjectsViewProps {
   onOpenFeasibility: () => void;
 }
 
 export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
-  const { currentUser, projects, addProject, activateProjectFromFeasibility, settlements, advances, expenses } = useApp();
+  const { 
+    currentUser, 
+    projects, 
+    addProject, 
+    settlements, 
+    advances, 
+    expenses, 
+    toggleArchiveProject 
+  } = useApp();
+
   const [filterModel, setFilterModel] = useState<string>('all');
   const [filterStatus, setFilterStatus] = useState<string>('all');
+  const [filterPeriod, setFilterPeriod] = useState<string>('all');
+  const [filterArchive, setFilterArchive] = useState<string>('active');
+
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
+  const [deletingProject, setDeletingProject] = useState<Project | null>(null);
 
   // New Project Modal State (For SPV & Admin)
   const [isNewProjectModalOpen, setIsNewProjectModalOpen] = useState(false);
@@ -75,14 +93,64 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
     }));
   };
 
+  // Filtered list based on Model, Status, Period and Archive
+  const filteredProjects = projects.filter(p => {
+    // Archive visibility filter
+    if (filterArchive === 'active' && p.isArchived) return false;
+    if (filterArchive === 'archived' && !p.isArchived) return false;
+
+    // Business model filter
+    if (filterModel !== 'all' && p.businessModel !== filterModel) return false;
+
+    // Status filter
+    if (filterStatus !== 'all' && p.status !== filterStatus) return false;
+
+    // Period filter (Based on startDate or createdAt)
+    if (filterPeriod !== 'all') {
+      const dateStr = p.startDate || p.createdAt;
+      if (dateStr) {
+        const pDate = new Date(dateStr).getTime();
+        const now = Date.now();
+        const daysDiff = (now - pDate) / (1000 * 60 * 60 * 24);
+
+        if (filterPeriod === '1m' && daysDiff > 30) return false;
+        if (filterPeriod === '3m' && daysDiff > 90) return false;
+        if (filterPeriod === '6m' && daysDiff > 180) return false;
+        if (filterPeriod === '1y' && daysDiff > 365) return false;
+      }
+    }
+
+    return true;
+  });
+
+  // KPI Calculations dynamically calculated for the filtered period and projects
+  const filteredProjectIds = new Set(filteredProjects.map(p => p.id));
+
+  const totalActiveBudget = filteredProjects
+    .filter(p => p.status === 'active')
+    .reduce((sum, p) => sum + (p.clientTotalBudget || 0), 0);
+
+  const totalCompletedSurveys = filteredProjects.reduce((sum, p) => sum + (p.completedSurveys || 0), 0);
+  const totalTargetSurveys = filteredProjects.reduce((sum, p) => sum + (p.targetSurveys || 0), 0);
+
+  const filteredSettlements = settlements.filter(s => filteredProjectIds.has(s.projectId));
+  const filteredAdvances = advances.filter(a => filteredProjectIds.has(a.projectId));
+  const filteredExpenses = expenses.filter(e => filteredProjectIds.has(e.projectId));
+
+  const totalPersonnelGrossPay = filteredSettlements.reduce((sum, s) => sum + (s.grossAmount || 0), 0);
+  const totalAdvancesIssued = filteredAdvances.reduce((sum, a) => sum + Number(a.amount || 0), 0);
+  const totalFieldExpenses = filteredExpenses.reduce((sum, e) => sum + Number(e.amount || 0), 0);
+
   // Excel Export
   const handleExport = () => {
-    const exportData = projects.map(p => ({
+    const exportData = filteredProjects.map(p => ({
       'Proje Kodu': p.code,
       'Proje Başlığı': p.title,
       'Müşteri': p.clientName,
       'Proje Tipi': p.projectType.toUpperCase(),
       'Durum': p.status === 'active' ? 'Aktif' : p.status === 'feasibility' ? 'Fizibilite' : 'Tamamlandı',
+      'Arşiv Durumu': p.isArchived ? 'Arşivde / Gizli' : 'Aktif',
+      'İş Modeli': p.businessModel === 'model_a_macro' ? 'İller' : 'İstanbul Ekip',
       'Hedef Anket': p.targetSurveys,
       'Tamamlanan Anket': p.completedSurveys || 0,
       'Personele Birim Fiyat (TL)': p.defaultPersonnelRate || p.clientUnitPrice,
@@ -98,26 +166,6 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
 
     exportToExcel(exportData, 'Orion_Proje_Listesi', 'Projeler');
   };
-
-  // Filtered list
-  const filteredProjects = projects.filter(p => {
-    if (filterModel !== 'all' && p.businessModel !== filterModel) return false;
-    if (filterStatus !== 'all' && p.status !== filterStatus) return false;
-    return true;
-  });
-
-  // KPI Calculations
-  const totalActiveBudget = projects
-    .filter(p => p.status === 'active')
-    .reduce((sum, p) => sum + p.clientTotalBudget, 0);
-
-  const totalCompletedSurveys = projects.reduce((sum, p) => sum + (p.completedSurveys || 0), 0);
-  const totalTargetSurveys = projects.reduce((sum, p) => sum + p.targetSurveys, 0);
-
-  // SPV Specific Operational Totals
-  const totalPersonnelGrossPay = settlements.reduce((sum, s) => sum + s.grossAmount, 0);
-  const totalAdvancesIssued = advances.reduce((sum, a) => sum + Number(a.amount || 0), 0);
-  const totalFieldExpenses = expenses.reduce((sum, e) => sum + Number(e.amount || 0), 0);
 
   const handleCreateProjectSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -167,13 +215,15 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4">
           <div className="p-3 sm:p-4.5 rounded-2xl bg-slate-900 border border-slate-800">
             <div className="flex items-center justify-between text-slate-400 mb-1">
-              <span className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider truncate">Portföy Cirosu</span>
+              <span className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider truncate">Dönem Cirosu</span>
               <TrendingUp className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-400 flex-shrink-0" />
             </div>
             <p className="text-base sm:text-2xl font-black text-white font-mono">
               ₺{totalActiveBudget.toLocaleString('tr-TR')}
             </p>
-            <p className="text-[10px] text-slate-500 mt-0.5 hidden sm:block">Müdür & Yönetim Canlı Finansı</p>
+            <p className="text-[10px] text-slate-500 mt-0.5 hidden sm:block">
+              {filterPeriod === 'all' ? 'Tüm aktif portföy' : `Seçili dönem (${filterPeriod.toUpperCase()})`}
+            </p>
           </div>
 
           <div className="p-3 sm:p-4.5 rounded-2xl bg-slate-900 border border-slate-800">
@@ -194,28 +244,28 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
 
           <div className="p-3 sm:p-4.5 rounded-2xl bg-slate-900 border border-slate-800">
             <div className="flex items-center justify-between text-slate-400 mb-1">
-              <span className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider truncate">Model A (İller)</span>
+              <span className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider truncate">İller Projeleri</span>
               <Building2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-indigo-400 flex-shrink-0" />
             </div>
             <p className="text-base sm:text-2xl font-black text-indigo-400 font-mono">
-              {projects.filter(p => p.businessModel === 'model_a_macro').length} Proje
+              {filteredProjects.filter(p => p.businessModel === 'model_a_macro').length} Proje
             </p>
-            <p className="text-[10px] text-slate-500 mt-0.5 hidden sm:block">İller dış bölge projeleri</p>
+            <p className="text-[10px] text-slate-500 mt-0.5 hidden sm:block">Dış iller / Taşeron projeleri</p>
           </div>
 
           <div className="p-3 sm:p-4.5 rounded-2xl bg-slate-900 border border-slate-800">
             <div className="flex items-center justify-between text-slate-400 mb-1">
-              <span className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider truncate">Model B (İst. Ekip)</span>
+              <span className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider truncate">İstanbul Ekip</span>
               <Briefcase className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-sky-400 flex-shrink-0" />
             </div>
             <p className="text-base sm:text-2xl font-black text-sky-400 font-mono">
-              {projects.filter(p => p.businessModel === 'model_b_micro').length} Proje
+              {filteredProjects.filter(p => p.businessModel === 'model_b_micro').length} Proje
             </p>
             <p className="text-[10px] text-slate-500 mt-0.5 hidden sm:block">İstanbul ekip operasyonu</p>
           </div>
         </div>
       ) : (
-        /* SPV Rich KPI Header (Shows Surveyor Gross Earnings, Advances, Expenses, Progress, ZERO company margins) */
+        /* SPV Rich KPI Header */
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4">
           <div className="p-3 sm:p-4.5 rounded-2xl bg-slate-900 border border-slate-800">
             <div className="flex items-center justify-between text-slate-400 mb-1">
@@ -241,7 +291,7 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
             <p className="text-base sm:text-2xl font-black text-emerald-400 font-mono">
               ₺{totalPersonnelGrossPay.toLocaleString('tr-TR')}
             </p>
-            <p className="text-[10px] text-slate-500 mt-0.5 hidden sm:block">Personele tahakkuk eden kazanç</p>
+            <p className="text-[10px] text-slate-500 mt-0.5 hidden sm:block">Dönem personele tahakkuk</p>
           </div>
 
           <div className="p-3 sm:p-4.5 rounded-2xl bg-slate-900 border border-slate-800">
@@ -268,51 +318,89 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
         </div>
       )}
 
-      {/* Control Bar */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 p-3 sm:p-4 rounded-2xl bg-slate-900 border border-slate-800">
-        <div className="grid grid-cols-2 sm:flex sm:items-center gap-2">
-          {/* Status Filter */}
-          <select
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
-            className="px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-700 text-xs text-slate-200"
-          >
-            <option value="all">Tüm Durumlar</option>
-            <option value="active">Aktif Projeler</option>
-            {isAdmin && <option value="feasibility">Fizibilite / Taslak</option>}
-            <option value="completed">Tamamlananlar</option>
-          </select>
+      {/* Control Bar (Period, Archive, Model, Status Filters) */}
+      <div className="flex flex-col xl:flex-row items-stretch xl:items-center justify-between gap-3 p-3.5 sm:p-4 rounded-2xl bg-slate-900 border border-slate-800">
+        
+        {/* Filters Grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 flex-1">
+          {/* Period Filter (1 Ay / 3 Ay / 6 Ay / 1 Yıl / Tümü) */}
+          <div>
+            <label className="block text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Dönem</label>
+            <select
+              value={filterPeriod}
+              onChange={(e) => setFilterPeriod(e.target.value)}
+              className="w-full px-2.5 py-1.5 rounded-xl bg-slate-950 border border-slate-700 text-xs text-slate-200 font-medium cursor-pointer"
+            >
+              <option value="all">Tüm Zamanlar</option>
+              <option value="1m">Son 1 Ay (30 Gün)</option>
+              <option value="3m">Son 3 Ay (90 Gün)</option>
+              <option value="6m">Son 6 Ay (180 Gün)</option>
+              <option value="1y">Son 1 Yıl</option>
+            </select>
+          </div>
 
-          {/* Model Filter */}
-          <select
-            value={filterModel}
-            onChange={(e) => setFilterModel(e.target.value)}
-            className="px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-700 text-xs text-slate-200"
-          >
-            <option value="all">Tüm İş Modelleri</option>
-            <option value="model_a_macro">Model A: İller</option>
-            <option value="model_b_micro">Model B: İstanbul Ekip</option>
-          </select>
+          {/* Archive / Visibility Filter */}
+          <div>
+            <label className="block text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Görünüm / Arşiv</label>
+            <select
+              value={filterArchive}
+              onChange={(e) => setFilterArchive(e.target.value)}
+              className="w-full px-2.5 py-1.5 rounded-xl bg-slate-950 border border-slate-700 text-xs text-slate-200 font-medium cursor-pointer"
+            >
+              <option value="active">Aktif Projeler</option>
+              <option value="archived">Gizlenen / Arşivdekiler</option>
+              <option value="all">Tümü (Arşiv Dahil)</option>
+            </select>
+          </div>
+
+          {/* Model Filter (İller vs İstanbul Ekip) */}
+          <div>
+            <label className="block text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1">İş Modeli</label>
+            <select
+              value={filterModel}
+              onChange={(e) => setFilterModel(e.target.value)}
+              className="w-full px-2.5 py-1.5 rounded-xl bg-slate-950 border border-slate-700 text-xs text-slate-200 font-medium cursor-pointer"
+            >
+              <option value="all">Tüm Modeller</option>
+              <option value="model_a_macro">İller</option>
+              <option value="model_b_micro">İstanbul Ekip</option>
+            </select>
+          </div>
+
+          {/* Status Filter */}
+          <div>
+            <label className="block text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Durum</label>
+            <select
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+              className="w-full px-2.5 py-1.5 rounded-xl bg-slate-950 border border-slate-700 text-xs text-slate-200 font-medium cursor-pointer"
+            >
+              <option value="all">Tüm Durumlar</option>
+              <option value="active">Aktif</option>
+              {isAdmin && <option value="feasibility">Fizibilite / Taslak</option>}
+              <option value="completed">Tamamlandı</option>
+            </select>
+          </div>
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 self-end xl:self-center">
           <button
             onClick={handleExport}
             className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition-all border border-slate-700 cursor-pointer"
             title="Tüm proje listesini Excel formatında indirin"
           >
             <FileSpreadsheet className="w-4 h-4 text-emerald-400" />
-            <span>Excel'e Aktar</span>
+            <span className="hidden sm:inline">Excel'e Aktar</span>
           </button>
 
           {isAdmin && (
             <button
               onClick={onOpenFeasibility}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white text-xs font-bold shadow-lg shadow-sky-500/20 transition-all cursor-pointer"
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white text-xs font-bold shadow-lg shadow-sky-500/20 transition-all cursor-pointer"
             >
               <Sparkles className="w-4 h-4" />
-              <span>Fizibilite Simülatörü</span>
+              <span className="hidden sm:inline">Fizibilite Simülatörü</span>
             </button>
           )}
 
@@ -330,29 +418,39 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
       {filteredProjects.length === 0 ? (
         <div className="p-12 text-center rounded-3xl bg-slate-900 border border-slate-800 text-slate-400 space-y-3">
           <Briefcase className="w-12 h-12 mx-auto text-slate-600" />
-          <h3 className="text-base font-bold text-white">Henüz Tanımlanmış Proje Yok</h3>
+          <h3 className="text-base font-bold text-white">
+            {filterArchive === 'archived' ? 'Arşivde Proje Bulunmuyor' : 'Kriterlere Uygun Proje Yok'}
+          </h3>
           <p className="text-xs text-slate-400 max-w-sm mx-auto">
-            İlk projenizi ekleyerek anket sayısı, iller ve personele verilecek birim fiyatları tanımlayabilirsiniz.
+            {filterArchive === 'archived' 
+              ? 'Gizlenen veya arşivlenen proje bulunmamaktadır.'
+              : 'Filtre kriterlerini temizleyebilir veya yeni proje tanımlayabilirsiniz.'}
           </p>
-          <button
-            onClick={() => setIsNewProjectModalOpen(true)}
-            className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-white text-xs font-bold shadow-lg shadow-sky-500/20 transition-all cursor-pointer"
-          >
-            <Plus className="w-4 h-4" />
-            <span>+ İlk Projeyi Tanımla</span>
-          </button>
+          {filterArchive !== 'archived' && (
+            <button
+              onClick={() => setIsNewProjectModalOpen(true)}
+              className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-white text-xs font-bold shadow-lg shadow-sky-500/20 transition-all cursor-pointer"
+            >
+              <Plus className="w-4 h-4" />
+              <span>+ Yeni Proje Tanımla</span>
+            </button>
+          )}
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {filteredProjects.map(project => {
             const isModelA = project.businessModel === 'model_a_macro';
-            const progressPercent = Math.min(((project.completedSurveys || 0) / project.targetSurveys) * 100, 100);
+            const progressPercent = Math.min(((project.completedSurveys || 0) / (project.targetSurveys || 1)) * 100, 100);
 
             return (
               <div 
                 key={project.id}
                 onClick={() => setSelectedProject(project)}
-                className="p-6 rounded-2xl bg-slate-900 border border-slate-800 hover:border-sky-500/50 hover:shadow-xl hover:shadow-sky-500/5 transition-all flex flex-col justify-between relative group cursor-pointer"
+                className={`p-6 rounded-2xl bg-slate-900 border transition-all flex flex-col justify-between relative group cursor-pointer ${
+                  project.isArchived 
+                    ? 'border-amber-500/30 bg-slate-900/60 opacity-80 hover:opacity-100 hover:border-amber-500/60'
+                    : 'border-slate-800 hover:border-sky-500/50 hover:shadow-xl hover:shadow-sky-500/5'
+                }`}
               >
                 <div>
                   {/* Header row */}
@@ -366,8 +464,14 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
                         </span>
 
                         <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-300 border border-indigo-500/20">
-                          {isModelA ? 'Model A • İller' : 'Model B • İstanbul Ekip'}
+                          {isModelA ? 'İller' : 'İstanbul Ekip'}
                         </span>
+
+                        {project.isArchived && (
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30 flex items-center gap-1">
+                            <EyeOff className="w-3 h-3" /> Arşivde / Gizli
+                          </span>
+                        )}
 
                         {project.status === 'active' ? (
                           <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
@@ -394,14 +498,14 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
 
                     {/* Admin sees Profit Margin, SPV sees Surveyor Price */}
                     {isAdmin ? (
-                      project.simulatedMarginPercent && (
+                      project.simulatedMarginPercent ? (
                         <div className="text-right flex-shrink-0">
                           <span className="text-[10px] text-slate-400 block">Kâr Marjı</span>
                           <span className="text-base font-black font-mono text-emerald-400">
                             %{project.simulatedMarginPercent}
                           </span>
                         </div>
-                      )
+                      ) : null
                     ) : (
                       <div className="text-right flex-shrink-0">
                         <span className="text-[10px] text-slate-400 block">Personele Fiyat</span>
@@ -441,34 +545,66 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
                   </div>
                 </div>
 
-                {/* Card Footer & Action Button */}
-                <div className="mt-5 pt-4 border-t border-slate-800 flex items-center justify-between text-xs">
+                {/* Card Footer & Action Buttons */}
+                <div className="mt-5 pt-4 border-t border-slate-800 flex flex-wrap items-center justify-between gap-2 text-xs">
                   <div className="flex items-center gap-1.5 text-slate-400">
                     <Calendar className="w-3.5 h-3.5" />
                     <span>{project.startDate} - {project.endDate}</span>
                   </div>
 
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1.5">
+                    {/* Toggle Hide / Archive Button */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleArchiveProject(project.id);
+                      }}
+                      className={`flex items-center gap-1 px-2.5 py-1.5 rounded-xl font-bold text-xs border transition-all cursor-pointer ${
+                        project.isArchived
+                          ? 'bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border-amber-500/30'
+                          : 'bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-slate-200 border-slate-700'
+                      }`}
+                      title={project.isArchived ? "Projeyi görünür yap" : "Projeyi gizle / arşive kaldır"}
+                    >
+                      {project.isArchived ? <Eye className="w-3.5 h-3.5 text-amber-400" /> : <EyeOff className="w-3.5 h-3.5" />}
+                      <span className="hidden sm:inline">{project.isArchived ? 'Göster' : 'Gizle'}</span>
+                    </button>
+
+                    {/* Edit Button */}
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         setEditingProject(project);
                       }}
-                      className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white font-bold text-xs border border-slate-700 transition-all cursor-pointer"
+                      className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white font-bold text-xs border border-slate-700 transition-all cursor-pointer"
                       title="Proje bilgilerini veya birim fiyatlarını düzenle"
                     >
                       <Edit3 className="w-3.5 h-3.5 text-sky-400" />
-                      <span>Düzenle</span>
+                      <span className="hidden sm:inline">Düzenle</span>
                     </button>
 
+                    {/* Safe Delete Button */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setDeletingProject(project);
+                      }}
+                      className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 hover:text-rose-300 font-bold text-xs border border-rose-500/30 transition-all cursor-pointer"
+                      title="Projeyi kalıcı olarak sil"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span className="hidden sm:inline">Sil</span>
+                    </button>
+
+                    {/* Detail Button */}
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         setSelectedProject(project);
                       }}
-                      className="flex items-center gap-1 px-3.5 py-1.5 rounded-xl bg-sky-500/15 hover:bg-sky-500/25 text-sky-400 font-bold text-xs border border-sky-500/30 transition-all cursor-pointer"
+                      className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-sky-500/15 hover:bg-sky-500/25 text-sky-400 font-bold text-xs border border-sky-500/30 transition-all cursor-pointer"
                     >
-                      <span>Detay & İşlem Ekle</span>
+                      <span>Detay</span>
                       <ArrowRight className="w-3.5 h-3.5" />
                     </button>
                   </div>
@@ -668,6 +804,19 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
           if (selectedProject?.id === updated.id) {
             setSelectedProject(updated);
           }
+        }}
+      />
+
+      {/* Safe Delete Project Modal */}
+      <SafeDeleteProjectModal
+        project={deletingProject}
+        isOpen={Boolean(deletingProject)}
+        onClose={() => setDeletingProject(null)}
+        onDeleted={() => {
+          if (selectedProject?.id === deletingProject?.id) {
+            setSelectedProject(null);
+          }
+          setDeletingProject(null);
         }}
       />
 

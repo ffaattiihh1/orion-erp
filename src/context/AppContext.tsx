@@ -97,11 +97,17 @@ interface AppContextType {
   settlements: Settlement[];
   clientInvoices: ClientInvoice[];
   
-  // Actions
+  // Project Management Actions
   addProject: (p: Omit<Project, 'id' | 'createdAt'>) => Project;
   updateProject: (id: string, p: Partial<Project>) => void;
+  toggleArchiveProject: (id: string) => void;
+  deleteProject: (id: string) => void;
   activateProjectFromFeasibility: (id: string) => void;
   addProjectNote: (projectId: string, noteText: string) => void;
+  
+  // Backup & Data Preservation Actions
+  exportFullBackup: () => void;
+  importFullBackup: (backupJson: string) => { success: boolean; message: string };
   
   addPersonnel: (p: Omit<Personnel, 'id' | 'isBlacklisted' | 'totalProjectsCompleted'>) => Personnel;
   toggleBlacklist: (id: string, reason?: string) => void;
@@ -151,74 +157,64 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [offlineQueueCount, setOfflineQueueCount] = useState<number>(0);
   
   // Application Data States (Clean initialization, synced with localStorage)
-  const [projects, setProjects] = useState<Project[]>(INITIAL_PROJECTS);
-  const [personnel, setPersonnel] = useState<Personnel[]>(INITIAL_PERSONNEL);
-  const [projectPersonnel, setProjectPersonnel] = useState<ProjectPersonnel[]>(INITIAL_PROJECT_PERSONNEL);
-  const [expenses, setExpenses] = useState<Expense[]>(INITIAL_EXPENSES);
-  const [advances, setAdvances] = useState<Advance[]>(INITIAL_ADVANCES);
-  const [settlements, setSettlements] = useState<Settlement[]>(INITIAL_SETTLEMENTS);
-  const [clientInvoices, setClientInvoices] = useState<ClientInvoice[]>(INITIAL_CLIENT_INVOICES);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [personnel, setPersonnel] = useState<Personnel[]>([]);
+  const [projectPersonnel, setProjectPersonnel] = useState<ProjectPersonnel[]>([]);
+  const [expenses, setExpenses] = useState<Expense[]>([]);
+  const [advances, setAdvances] = useState<Advance[]>([]);
+  const [settlements, setSettlements] = useState<Settlement[]>([]);
+  const [clientInvoices, setClientInvoices] = useState<ClientInvoice[]>([]);
 
-  // Sync state with localStorage on mount & wipe outdated demo mock caches
+  // Sync state with localStorage on mount (Never wipe user data on code updates)
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
     try {
-      const DATA_VERSION_KEY = 'orion_clean_data_v3';
-      const isCleaned = localStorage.getItem(DATA_VERSION_KEY);
+      const savedProjects = localStorage.getItem('orion_projects');
+      if (savedProjects) {
+        try { setProjects(JSON.parse(savedProjects)); } catch(e) {}
+      }
 
-      if (!isCleaned) {
-        // Clean out old mock data from previous sessions
-        localStorage.removeItem('orion_projects');
-        localStorage.removeItem('orion_personnel');
-        localStorage.removeItem('orion_project_personnel');
-        localStorage.removeItem('orion_expenses');
-        localStorage.removeItem('orion_advances');
-        localStorage.removeItem('orion_settlements');
-        localStorage.removeItem('orion_client_invoices');
-        localStorage.removeItem('orion_persistent_user');
-        localStorage.setItem(DATA_VERSION_KEY, 'true');
+      const savedPersonnel = localStorage.getItem('orion_personnel');
+      if (savedPersonnel) {
+        try { setPersonnel(JSON.parse(savedPersonnel)); } catch(e) {}
+      }
 
-        setProjects([]);
-        setPersonnel([]);
-        setProjectPersonnel([]);
-        setExpenses([]);
-        setAdvances([]);
-        setSettlements([]);
-        setClientInvoices([]);
-        setCurrentUserState(null);
-      } else {
-        // Load user-created persisted data if present
-        const savedProjects = localStorage.getItem('orion_projects');
-        if (savedProjects) setProjects(JSON.parse(savedProjects));
+      const savedProjectPersonnel = localStorage.getItem('orion_project_personnel');
+      if (savedProjectPersonnel) {
+        try { setProjectPersonnel(JSON.parse(savedProjectPersonnel)); } catch(e) {}
+      }
 
-        const savedPersonnel = localStorage.getItem('orion_personnel');
-        if (savedPersonnel) setPersonnel(JSON.parse(savedPersonnel));
+      const savedExpenses = localStorage.getItem('orion_expenses');
+      if (savedExpenses) {
+        try { setExpenses(JSON.parse(savedExpenses)); } catch(e) {}
+      }
 
-        const savedProjectPersonnel = localStorage.getItem('orion_project_personnel');
-        if (savedProjectPersonnel) setProjectPersonnel(JSON.parse(savedProjectPersonnel));
+      const savedAdvances = localStorage.getItem('orion_advances');
+      if (savedAdvances) {
+        try { setAdvances(JSON.parse(savedAdvances)); } catch(e) {}
+      }
 
-        const savedExpenses = localStorage.getItem('orion_expenses');
-        if (savedExpenses) setExpenses(JSON.parse(savedExpenses));
+      const savedSettlements = localStorage.getItem('orion_settlements');
+      if (savedSettlements) {
+        try { setSettlements(JSON.parse(savedSettlements)); } catch(e) {}
+      }
 
-        const savedAdvances = localStorage.getItem('orion_advances');
-        if (savedAdvances) setAdvances(JSON.parse(savedAdvances));
+      const savedInvoices = localStorage.getItem('orion_client_invoices');
+      if (savedInvoices) {
+        try { setClientInvoices(JSON.parse(savedInvoices)); } catch(e) {}
+      }
 
-        const savedSettlements = localStorage.getItem('orion_settlements');
-        if (savedSettlements) setSettlements(JSON.parse(savedSettlements));
-
-        const savedInvoices = localStorage.getItem('orion_client_invoices');
-        if (savedInvoices) setClientInvoices(JSON.parse(savedInvoices));
-
-        // Auto-login only if user explicitly logged in before
-        const savedUserJson = localStorage.getItem('orion_persistent_user');
-        if (savedUserJson) {
+      // Auto-login only if user explicitly logged in before
+      const savedUserJson = localStorage.getItem('orion_persistent_user');
+      if (savedUserJson) {
+        try {
           const parsed = JSON.parse(savedUserJson);
           const matched = users.find(u => u.id === parsed.id || u.username === parsed.username || u.email === parsed.email);
           if (matched) {
             setCurrentUserState(matched);
           }
-        }
+        } catch(e) {}
       }
     } catch (e) {
       console.error('Storage sync error:', e);
@@ -485,6 +481,77 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const updateProject = (id: string, updatedFields: Partial<Project>) => {
     setProjects(prev => prev.map(p => (p.id === id ? { ...p, ...updatedFields } : p)));
+  };
+
+  const toggleArchiveProject = (id: string) => {
+    setProjects(prev => prev.map(p => {
+      if (p.id !== id) return p;
+      const nextArchived = !p.isArchived;
+      return {
+        ...p,
+        isArchived: nextArchived,
+        archivedAt: nextArchived ? new Date().toISOString() : undefined
+      };
+    }));
+  };
+
+  const deleteProject = (id: string) => {
+    setProjects(prev => prev.filter(p => p.id !== id));
+    setProjectPersonnel(prev => prev.filter(pp => pp.projectId !== id));
+    setExpenses(prev => prev.filter(e => e.projectId !== id));
+    setAdvances(prev => prev.filter(a => a.projectId !== id));
+    setSettlements(prev => prev.filter(s => s.projectId !== id));
+    setClientInvoices(prev => prev.filter(inv => inv.projectId !== id));
+  };
+
+  // Full System Data Export & Import (Backup & Restore)
+  const exportFullBackup = () => {
+    if (typeof window === 'undefined') return;
+    const backupData = {
+      system: 'Orion OPT',
+      version: '1.0',
+      exportDate: new Date().toISOString(),
+      projects,
+      personnel,
+      projectPersonnel,
+      expenses,
+      advances,
+      settlements,
+      clientInvoices
+    };
+
+    const jsonStr = JSON.stringify(backupData, null, 2);
+    const blob = new Blob([jsonStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const downloadAnchor = document.createElement('a');
+    const dateFormatted = new Date().toISOString().split('T')[0];
+    downloadAnchor.href = url;
+    downloadAnchor.download = `Orion_OPT_Tam_Sistem_Yedegi_${dateFormatted}.json`;
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    downloadAnchor.remove();
+    URL.revokeObjectURL(url);
+  };
+
+  const importFullBackup = (backupJson: string): { success: boolean; message: string } => {
+    try {
+      const data = JSON.parse(backupJson);
+      if (!data || typeof data !== 'object') {
+        return { success: false, message: 'Geçersiz yedek dosyası formatı.' };
+      }
+
+      if (Array.isArray(data.projects)) setProjects(data.projects);
+      if (Array.isArray(data.personnel)) setPersonnel(data.personnel);
+      if (Array.isArray(data.projectPersonnel)) setProjectPersonnel(data.projectPersonnel);
+      if (Array.isArray(data.expenses)) setExpenses(data.expenses);
+      if (Array.isArray(data.advances)) setAdvances(data.advances);
+      if (Array.isArray(data.settlements)) setSettlements(data.settlements);
+      if (Array.isArray(data.clientInvoices)) setClientInvoices(data.clientInvoices);
+
+      return { success: true, message: 'Tüm projeler, personeller ve hakedişler başarıyla geri yüklendi.' };
+    } catch (err: any) {
+      return { success: false, message: 'Yedek yükleme hatası: ' + err.message };
+    }
   };
 
   const activateProjectFromFeasibility = (id: string) => {
@@ -880,8 +947,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       clientInvoices,
       addProject,
       updateProject,
+      toggleArchiveProject,
+      deleteProject,
       activateProjectFromFeasibility,
       addProjectNote,
+      exportFullBackup,
+      importFullBackup,
       addPersonnel,
       toggleBlacklist,
       assignPersonnelToProject,

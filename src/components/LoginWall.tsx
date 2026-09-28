@@ -55,9 +55,9 @@ export default function LoginWall() {
             <Lock className="w-7 h-7 sm:w-8 sm:h-8 text-white" />
           </div>
           <h1 className="text-xl sm:text-2xl font-black tracking-tight text-white flex items-center gap-2">
-            ORİON SAHA-ERP
+            Orion Proje Takip
           </h1>
-          <p className="text-xs text-slate-400 mt-1">Pazar Araştırma, Hakediş & Saha Yönetim Sistemi</p>
+          <p className="text-xs text-sky-400 font-semibold tracking-wide mt-1">Saha Yönetim Sistemi</p>
           
           <div className="mt-3 flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-500/10 border border-sky-500/20 text-sky-300 text-[11px] font-medium">
             <ShieldCheck className="w-3.5 h-3.5 text-sky-400" />

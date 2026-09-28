@@ -141,7 +141,7 @@ export default function FeasibilitySimulatorModal({ isOpen, onClose }: Feasibili
           {/* Left Column: Inputs (7 Cols) */}
           <div className="lg:col-span-7 space-y-4">
             
-            {/* Business Model Selector (Model A vs Model B) */}
+            {/* Business Model Selector (İller vs İstanbul Ekip) */}
             <div className="p-3.5 rounded-xl bg-slate-950/60 border border-slate-800">
               <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
                 İş Modeli Seçimi
@@ -156,7 +156,7 @@ export default function FeasibilitySimulatorModal({ isOpen, onClose }: Feasibili
                       : 'bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700'
                   }`}
                 >
-                  <p className="text-xs font-bold text-sky-300">Model B: İstanbul Ekip</p>
+                  <p className="text-xs font-bold text-sky-300">İstanbul Ekip</p>
                   <p className="text-[11px] text-slate-400 mt-1">Avanslar, SPV günlüğü, fişli masraflar ve operasyon.</p>
                 </button>
 
@@ -169,7 +169,7 @@ export default function FeasibilitySimulatorModal({ isOpen, onClose }: Feasibili
                       : 'bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700'
                   }`}
                 >
-                  <p className="text-xs font-bold text-indigo-300">Model A: İller</p>
+                  <p className="text-xs font-bold text-indigo-300">İller</p>
                   <p className="text-[11px] text-slate-400 mt-1">İller / Dış ekip tek birim fiyat. Masraf detayı tutulmaz.</p>
                 </button>
               </div>
@@ -234,7 +234,7 @@ export default function FeasibilitySimulatorModal({ isOpen, onClose }: Feasibili
             {businessModel === 'model_a_macro' ? (
               <div className="p-3.5 rounded-xl bg-indigo-950/20 border border-indigo-900/40 space-y-3">
                 <span className="text-xs font-semibold text-indigo-300 uppercase tracking-wider block">
-                  Model A: İller Parametreleri
+                  İller Parametreleri
                 </span>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
@@ -261,7 +261,7 @@ export default function FeasibilitySimulatorModal({ isOpen, onClose }: Feasibili
             ) : (
               <div className="p-3.5 rounded-xl bg-slate-950/60 border border-slate-800 space-y-3">
                 <span className="text-xs font-semibold text-sky-400 uppercase tracking-wider block">
-                  Model B: İstanbul Ekip & Sabit Gider Dağıtımı
+                  İstanbul Ekip & Sabit Gider Dağıtımı
                 </span>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
