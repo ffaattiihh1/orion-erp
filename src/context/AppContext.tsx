@@ -156,7 +156,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [isOnline, setIsOnline] = useState<boolean>(true);
   const [offlineQueueCount, setOfflineQueueCount] = useState<number>(0);
   
-  // Application Data States (Clean initialization, synced with localStorage)
+  // Application Data States (Synced with Central Server API & cached in localStorage)
   const [projects, setProjects] = useState<Project[]>([]);
   const [personnel, setPersonnel] = useState<Personnel[]>([]);
   const [projectPersonnel, setProjectPersonnel] = useState<ProjectPersonnel[]>([]);
@@ -164,126 +164,248 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [advances, setAdvances] = useState<Advance[]>([]);
   const [settlements, setSettlements] = useState<Settlement[]>([]);
   const [clientInvoices, setClientInvoices] = useState<ClientInvoice[]>([]);
+  const [isInitialLoadDone, setIsInitialLoadDone] = useState<boolean>(false);
+  const lastSyncTimestampRef = React.useRef<string>('');
 
-  // Sync state with localStorage on mount (Never wipe user data on code updates)
+  // Helper to push updates to central server API
+  const pushToServer = async (payload: {
+    projects?: Project[];
+    personnel?: Personnel[];
+    projectPersonnel?: ProjectPersonnel[];
+    expenses?: Expense[];
+    advances?: Advance[];
+    settlements?: Settlement[];
+    clientInvoices?: ClientInvoice[];
+  }) => {
+    try {
+      const res = await fetch('/api/data', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if (res.ok) {
+        const json = await res.json();
+        if (json.data?.lastUpdated) {
+          lastSyncTimestampRef.current = json.data.lastUpdated;
+        }
+      }
+    } catch (err) {
+      console.warn('Central server sync warning (working offline):', err);
+    }
+  };
+
+  // Initial Data Load: Fetch central server data, fallback to localStorage if server is empty
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    try {
-      const savedProjects = localStorage.getItem('orion_projects');
-      if (savedProjects) {
-        try { setProjects(JSON.parse(savedProjects)); } catch(e) {}
-      }
+    const loadCentralData = async () => {
+      try {
+        // 1. Fast load from localStorage first (Zero lag)
+        const localProjects = localStorage.getItem('orion_projects');
+        const localPersonnel = localStorage.getItem('orion_personnel');
+        const localExpenses = localStorage.getItem('orion_expenses');
+        const localAdvances = localStorage.getItem('orion_advances');
+        const localSettlements = localStorage.getItem('orion_settlements');
+        const localInvoices = localStorage.getItem('orion_client_invoices');
+        const localProjectPersonnel = localStorage.getItem('orion_project_personnel');
 
-      const savedPersonnel = localStorage.getItem('orion_personnel');
-      if (savedPersonnel) {
-        try { setPersonnel(JSON.parse(savedPersonnel)); } catch(e) {}
-      }
+        const parsedLocalProjects: Project[] = localProjects ? JSON.parse(localProjects) : [];
+        const parsedLocalPersonnel: Personnel[] = localPersonnel ? JSON.parse(localPersonnel) : [];
+        const parsedLocalExpenses: Expense[] = localExpenses ? JSON.parse(localExpenses) : [];
+        const parsedLocalAdvances: Advance[] = localAdvances ? JSON.parse(localAdvances) : [];
+        const parsedLocalSettlements: Settlement[] = localSettlements ? JSON.parse(localSettlements) : [];
+        const parsedLocalInvoices: ClientInvoice[] = localInvoices ? JSON.parse(localInvoices) : [];
+        const parsedLocalPP: ProjectPersonnel[] = localProjectPersonnel ? JSON.parse(localProjectPersonnel) : [];
 
-      const savedProjectPersonnel = localStorage.getItem('orion_project_personnel');
-      if (savedProjectPersonnel) {
-        try { setProjectPersonnel(JSON.parse(savedProjectPersonnel)); } catch(e) {}
-      }
+        if (parsedLocalProjects.length > 0) setProjects(parsedLocalProjects);
+        if (parsedLocalPersonnel.length > 0) setPersonnel(parsedLocalPersonnel);
+        if (parsedLocalExpenses.length > 0) setExpenses(parsedLocalExpenses);
+        if (parsedLocalAdvances.length > 0) setAdvances(parsedLocalAdvances);
+        if (parsedLocalSettlements.length > 0) setSettlements(parsedLocalSettlements);
+        if (parsedLocalInvoices.length > 0) setClientInvoices(parsedLocalInvoices);
+        if (parsedLocalPP.length > 0) setProjectPersonnel(parsedLocalPP);
 
-      const savedExpenses = localStorage.getItem('orion_expenses');
-      if (savedExpenses) {
-        try { setExpenses(JSON.parse(savedExpenses)); } catch(e) {}
-      }
+        // 2. Fetch fresh data from Central Server
+        const res = await fetch('/api/data', { cache: 'no-store' });
+        if (res.ok) {
+          const json = await res.json();
+          if (json.success && json.data) {
+            const serverDb = json.data;
+            lastSyncTimestampRef.current = serverDb.lastUpdated || '';
 
-      const savedAdvances = localStorage.getItem('orion_advances');
-      if (savedAdvances) {
-        try { setAdvances(JSON.parse(savedAdvances)); } catch(e) {}
-      }
+            // If server has data, update state and local cache
+            const hasServerData = 
+              (serverDb.projects && serverDb.projects.length > 0) ||
+              (serverDb.personnel && serverDb.personnel.length > 0) ||
+              (serverDb.settlements && serverDb.settlements.length > 0);
 
-      const savedSettlements = localStorage.getItem('orion_settlements');
-      if (savedSettlements) {
-        try { setSettlements(JSON.parse(savedSettlements)); } catch(e) {}
-      }
+            if (hasServerData) {
+              setProjects(serverDb.projects || []);
+              setPersonnel(serverDb.personnel || []);
+              setProjectPersonnel(serverDb.projectPersonnel || []);
+              setExpenses(serverDb.expenses || []);
+              setAdvances(serverDb.advances || []);
+              setSettlements(serverDb.settlements || []);
+              setClientInvoices(serverDb.clientInvoices || []);
 
-      const savedInvoices = localStorage.getItem('orion_client_invoices');
-      if (savedInvoices) {
-        try { setClientInvoices(JSON.parse(savedInvoices)); } catch(e) {}
-      }
-
-      // Auto-login only if user explicitly logged in before
-      const savedUserJson = localStorage.getItem('orion_persistent_user');
-      if (savedUserJson) {
-        try {
-          const parsed = JSON.parse(savedUserJson);
-          const matched = users.find(u => u.id === parsed.id || u.username === parsed.username || u.email === parsed.email);
-          if (matched) {
-            setCurrentUserState(matched);
+              localStorage.setItem('orion_projects', JSON.stringify(serverDb.projects || []));
+              localStorage.setItem('orion_personnel', JSON.stringify(serverDb.personnel || []));
+              localStorage.setItem('orion_expenses', JSON.stringify(serverDb.expenses || []));
+              localStorage.setItem('orion_advances', JSON.stringify(serverDb.advances || []));
+              localStorage.setItem('orion_settlements', JSON.stringify(serverDb.settlements || []));
+              localStorage.setItem('orion_client_invoices', JSON.stringify(serverDb.clientInvoices || []));
+              localStorage.setItem('orion_project_personnel', JSON.stringify(serverDb.projectPersonnel || []));
+            } else if (parsedLocalProjects.length > 0 || parsedLocalPersonnel.length > 0) {
+              // Server is empty, but local has data: Upload local data to central server!
+              await pushToServer({
+                projects: parsedLocalProjects,
+                personnel: parsedLocalPersonnel,
+                projectPersonnel: parsedLocalPP,
+                expenses: parsedLocalExpenses,
+                advances: parsedLocalAdvances,
+                settlements: parsedLocalSettlements,
+                clientInvoices: parsedLocalInvoices
+              });
+            }
           }
-        } catch(e) {}
+        }
+
+        // Auto-login persistent user
+        const savedUserJson = localStorage.getItem('orion_persistent_user');
+        if (savedUserJson) {
+          try {
+            const parsed = JSON.parse(savedUserJson);
+            const matched = users.find(u => u.id === parsed.id || u.username === parsed.username || u.email === parsed.email);
+            if (matched) {
+              setCurrentUserState(matched);
+            }
+          } catch(e) {}
+        }
+      } catch (err) {
+        console.error('Initial central data load error:', err);
+      } finally {
+        setIsInitialLoadDone(true);
       }
-    } catch (e) {
-      console.error('Storage sync error:', e);
-    }
+    };
+
+    loadCentralData();
   }, [users]);
 
-  // Persist user changes to localStorage
+  // Real-time live polling & sync (Checks server every 3.5 seconds and on tab focus)
   useEffect(() => {
-    if (typeof window === 'undefined') return;
+    if (!isInitialLoadDone || typeof window === 'undefined') return;
+
+    const pullServerUpdates = async () => {
+      try {
+        const res = await fetch('/api/data', { cache: 'no-store' });
+        if (!res.ok) return;
+        const json = await res.json();
+        if (json.success && json.data) {
+          const serverDb = json.data;
+          if (serverDb.lastUpdated && serverDb.lastUpdated !== lastSyncTimestampRef.current) {
+            lastSyncTimestampRef.current = serverDb.lastUpdated;
+            setProjects(serverDb.projects || []);
+            setPersonnel(serverDb.personnel || []);
+            setProjectPersonnel(serverDb.projectPersonnel || []);
+            setExpenses(serverDb.expenses || []);
+            setAdvances(serverDb.advances || []);
+            setSettlements(serverDb.settlements || []);
+            setClientInvoices(serverDb.clientInvoices || []);
+
+            localStorage.setItem('orion_projects', JSON.stringify(serverDb.projects || []));
+            localStorage.setItem('orion_personnel', JSON.stringify(serverDb.personnel || []));
+            localStorage.setItem('orion_expenses', JSON.stringify(serverDb.expenses || []));
+            localStorage.setItem('orion_advances', JSON.stringify(serverDb.advances || []));
+            localStorage.setItem('orion_settlements', JSON.stringify(serverDb.settlements || []));
+            localStorage.setItem('orion_client_invoices', JSON.stringify(serverDb.clientInvoices || []));
+            localStorage.setItem('orion_project_personnel', JSON.stringify(serverDb.projectPersonnel || []));
+          }
+        }
+      } catch (err) {
+        // Silently skip on network glitch
+      }
+    };
+
+    const interval = setInterval(pullServerUpdates, 3500);
+    const handleFocus = () => pullServerUpdates();
+    window.addEventListener('focus', handleFocus);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, [isInitialLoadDone]);
+
+  // Persist user changes to localStorage and push to Central Server
+  useEffect(() => {
+    if (!isInitialLoadDone || typeof window === 'undefined') return;
     try {
       localStorage.setItem('orion_projects', JSON.stringify(projects));
+      pushToServer({ projects });
     } catch (e) {
       console.error(e);
     }
-  }, [projects]);
+  }, [projects, isInitialLoadDone]);
 
   useEffect(() => {
-    if (typeof window === 'undefined') return;
+    if (!isInitialLoadDone || typeof window === 'undefined') return;
     try {
       localStorage.setItem('orion_personnel', JSON.stringify(personnel));
+      pushToServer({ personnel });
     } catch (e) {
       console.error(e);
     }
-  }, [personnel]);
+  }, [personnel, isInitialLoadDone]);
 
   useEffect(() => {
-    if (typeof window === 'undefined') return;
+    if (!isInitialLoadDone || typeof window === 'undefined') return;
     try {
       localStorage.setItem('orion_project_personnel', JSON.stringify(projectPersonnel));
+      pushToServer({ projectPersonnel });
     } catch (e) {
       console.error(e);
     }
-  }, [projectPersonnel]);
+  }, [projectPersonnel, isInitialLoadDone]);
 
   useEffect(() => {
-    if (typeof window === 'undefined') return;
+    if (!isInitialLoadDone || typeof window === 'undefined') return;
     try {
       localStorage.setItem('orion_expenses', JSON.stringify(expenses));
+      pushToServer({ expenses });
     } catch (e) {
       console.error(e);
     }
-  }, [expenses]);
+  }, [expenses, isInitialLoadDone]);
 
   useEffect(() => {
-    if (typeof window === 'undefined') return;
+    if (!isInitialLoadDone || typeof window === 'undefined') return;
     try {
       localStorage.setItem('orion_advances', JSON.stringify(advances));
+      pushToServer({ advances });
     } catch (e) {
       console.error(e);
     }
-  }, [advances]);
+  }, [advances, isInitialLoadDone]);
 
   useEffect(() => {
-    if (typeof window === 'undefined') return;
+    if (!isInitialLoadDone || typeof window === 'undefined') return;
     try {
       localStorage.setItem('orion_settlements', JSON.stringify(settlements));
+      pushToServer({ settlements });
     } catch (e) {
       console.error(e);
     }
-  }, [settlements]);
+  }, [settlements, isInitialLoadDone]);
 
   useEffect(() => {
-    if (typeof window === 'undefined') return;
+    if (!isInitialLoadDone || typeof window === 'undefined') return;
     try {
       localStorage.setItem('orion_client_invoices', JSON.stringify(clientInvoices));
+      pushToServer({ clientInvoices });
     } catch (e) {
       console.error(e);
     }
-  }, [clientInvoices]);
+  }, [clientInvoices, isInitialLoadDone]);
 
   const setCurrentUser = (user: UserProfile | null) => {
     setCurrentUserState(user);
