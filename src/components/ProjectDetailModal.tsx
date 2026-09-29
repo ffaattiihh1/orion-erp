@@ -248,25 +248,25 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
                 {project.code}
               </span>
 
-              {isModelA ? (
-                <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-indigo-500/15 text-indigo-300 border border-indigo-500/30">
-                  İller
-                </span>
-              ) : (
-                <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-sky-500/15 text-sky-300 border border-sky-500/30">
-                  İstanbul Ekip
-                </span>
-              )}
-
-              <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
-                {project.status === 'active' ? 'Aktif Proje' : project.status === 'feasibility' ? 'Fizibilite' : 'Tamamlandı'}
+              <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded border ${
+                project.projectType === 'nokta'
+                  ? 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30'
+                  : 'bg-slate-800 text-slate-300 border-slate-700'
+              }`}>
+                {project.projectType === 'nokta' 
+                  ? 'Nokta Projesi' 
+                  : project.projectType === 'saha' 
+                  ? 'Saha Araştırması' 
+                  : project.projectType === 'studyo' 
+                  ? 'Stüdyo / Odak' 
+                  : project.projectType === 'gizli_musteri' 
+                  ? 'Gizli Müşteri' 
+                  : 'Genel Proje'}
               </span>
 
-              {project.createdByName && (
-                <span className="text-[10px] font-medium px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">
-                  Oluşturan: <strong className="text-white">{project.createdByName}</strong>
-                </span>
-              )}
+              <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                {project.status === 'active' ? 'Aktif Proje' : project.status === 'completed' ? 'Tamamlandı' : 'Taslak'}
+              </span>
             </div>
 
             <h1 className="text-xl font-black text-white tracking-tight">{project.title}</h1>
@@ -652,22 +652,50 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
         {/* Tab 4: NOTES & LOGS */}
         {activeTab === 'notes' && (
           <div className="space-y-4">
-            {/* Inline Fast Note Addition */}
-            <form onSubmit={handleNoteSubmit} className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 flex flex-col sm:flex-row gap-2">
-              <input
-                type="text"
-                required
-                value={newNoteText}
-                onChange={(e) => setNewNoteText(e.target.value)}
-                placeholder={`${currentUser?.fullName || 'Fatih Sakar'} olarak sahaya hızlı bir not ekleyin...`}
-                className="flex-1 px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
-              />
-              <button
-                type="submit"
-                className="px-4 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-white font-bold text-xs shadow-md transition-all cursor-pointer whitespace-nowrap"
-              >
-                + Notu Kaydet
-              </button>
+            
+            {/* Quick Shift / Substitute Action Chips */}
+            <div className="p-3.5 rounded-2xl bg-slate-950/80 border border-slate-800 space-y-2">
+              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
+                Hızlı Saha & Vardiya Şablonları (Tek Tıkla Ekle):
+              </span>
+              <div className="flex flex-wrap gap-1.5">
+                {[
+                  'Ahmet adına Ali çalıştı',
+                  "Ahmet'in yerine Ayşe gözlemcilik yaptı",
+                  'Saha ekibine 2 ek anketör takviyesi yapıldı',
+                  'Nokta kontrolü yapıldı, anketler eksiksiz devam ediyor',
+                  'Hava muhalefeti sebebiyle çalışma 1 saat erken sonlandırıldı'
+                ].map((template, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => setNewNoteText(template)}
+                    className="text-[11px] px-2.5 py-1 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-sky-300 border border-slate-800 transition-all cursor-pointer"
+                  >
+                    + {template}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Inline Fast Note Addition Form */}
+            <form onSubmit={handleNoteSubmit} className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-2.5">
+              <div className="flex flex-col sm:flex-row gap-2">
+                <input
+                  type="text"
+                  required
+                  value={newNoteText}
+                  onChange={(e) => setNewNoteText(e.target.value)}
+                  placeholder={`${currentUser?.fullName || 'Fatih Sakar'} olarak sahaya vardiya veya günlük not ekleyin...`}
+                  className="flex-1 px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+                />
+                <button
+                  type="submit"
+                  className="px-5 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-white font-bold text-xs shadow-md transition-all cursor-pointer whitespace-nowrap"
+                >
+                  + Notu Kaydet
+                </button>
+              </div>
             </form>
 
             {/* Note History List */}

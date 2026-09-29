@@ -5,17 +5,13 @@ import { useApp } from '@/context/AppContext';
 import { 
   Briefcase, 
   Plus, 
-  Calculator, 
   FileSpreadsheet, 
   Users, 
   TrendingUp, 
   Building2, 
   Calendar, 
-  CheckCircle2, 
-  Clock, 
   Sparkles,
   ArrowRight,
-  PlusCircle,
   X,
   Banknote,
   Receipt,
@@ -24,8 +20,7 @@ import {
   Edit3,
   Eye,
   EyeOff,
-  Filter,
-  Archive
+  UserCheck
 } from 'lucide-react';
 import { exportToExcel } from '@/lib/excel-export';
 import { Project, BusinessModel, ProjectType, CityPricing } from '@/types';
@@ -57,14 +52,16 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [deletingProject, setDeletingProject] = useState<Project | null>(null);
 
-  // New Project Modal State (For SPV & Admin)
+  // New Project Modal State
   const [isNewProjectModalOpen, setIsNewProjectModalOpen] = useState(false);
   const [newCode, setNewCode] = useState('ORION-2026-' + Math.floor(100 + Math.random() * 900));
   const [newTitle, setNewTitle] = useState('');
   const [newClient, setNewClient] = useState('Ipsos Türkiye');
   const [newType, setNewType] = useState<ProjectType>('saha');
   const [newTargetSurveys, setNewTargetSurveys] = useState('500');
-  const [newUnitPrice, setNewUnitPrice] = useState('320');
+  const [newUnitPrice, setNewUnitPrice] = useState('320'); // Anketör Birim Fiyatı
+  const [newObserverPrice, setNewObserverPrice] = useState('450'); // Gözlemci Birim Fiyatı (Nokta Projesi vb.)
+  const [newClientUnitPrice, setNewClientUnitPrice] = useState('550'); // Müşteri Birim Fiyatı (Bize Geliş)
   const [newStartDate, setNewStartDate] = useState(new Date().toISOString().split('T')[0]);
   const [newEndDate, setNewEndDate] = useState('');
   
@@ -149,17 +146,16 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
       'Müşteri': p.clientName,
       'Proje Tipi': p.projectType.toUpperCase(),
       'Durum': p.status === 'active' ? 'Aktif' : p.status === 'feasibility' ? 'Fizibilite' : 'Tamamlandı',
-      'Arşiv Durumu': p.isArchived ? 'Arşivde / Gizli' : 'Aktif',
-      'İş Modeli': p.businessModel === 'model_a_macro' ? 'İller' : 'İstanbul Ekip',
       'Hedef Anket': p.targetSurveys,
       'Tamamlanan Anket': p.completedSurveys || 0,
-      'Personele Birim Fiyat (TL)': p.defaultPersonnelRate || p.clientUnitPrice,
+      'Anketör Birim Fiyatı (TL)': p.defaultPersonnelRate || p.clientUnitPrice,
+      'Gözlemci Birim Fiyatı (TL)': p.observerUnitPrice || '-',
       'Çalışılan İller': p.cities?.join(', ') || p.cityPricing?.map(c => c.city).join(', ') || '-',
       ...(isAdmin ? {
+        'Müşteri Birim Fiyatı (TL)': p.clientUnitPrice,
         'Toplam Müşteri Bütçesi (TL)': p.clientTotalBudget,
         'Kâr Marjı (%)': p.simulatedMarginPercent ? `%${p.simulatedMarginPercent}` : '-'
       } : {}),
-      'Sorumlu SPV / Ekip': p.businessModel === 'model_a_macro' ? p.subcontractorName : p.assignedSpvName,
       'Başlangıç Tarihi': p.startDate,
       'Bitiş Tarihi': p.endDate
     }));
@@ -172,7 +168,9 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
     if (!newTitle || !newClient) return;
 
     const count = Number(newTargetSurveys || 500);
-    const price = Number(newUnitPrice || 320);
+    const surveyorPrice = Number(newUnitPrice || 320);
+    const observerPrice = Number(newObserverPrice || 450);
+    const clientPrice = Number(newClientUnitPrice || surveyorPrice * 1.35);
     const end = newEndDate || new Date(Date.now() + 20 * 86400000).toISOString().split('T')[0];
 
     // Filter valid cities
@@ -189,16 +187,17 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
       startDate: newStartDate,
       endDate: end,
       targetSurveys: count,
-      clientUnitPrice: price,
-      clientTotalBudget: count * price,
-      cityPricing: validCityPricings.length > 0 ? validCityPricings : [{ city: 'Ankara', unitPrice: price, targetSurveys: count }],
+      clientUnitPrice: clientPrice,
+      clientTotalBudget: count * clientPrice,
+      defaultPersonnelRate: surveyorPrice,
+      observerUnitPrice: newType === 'nokta' || observerPrice > 0 ? observerPrice : undefined,
+      cityPricing: validCityPricings.length > 0 ? validCityPricings : [{ city: 'Ankara', unitPrice: surveyorPrice, targetSurveys: count }],
       cities: validCityNames.length > 0 ? validCityNames : ['Ankara'],
       assignedSpvId: currentUser?.id,
       assignedSpvName: currentUser?.fullName,
       dailyOverheadRate: 2000,
-      defaultPersonnelRate: price,
-      simulatedMarginPercent: 30,
-      notes: 'Saha SPV tarafından tanımlandı.'
+      simulatedMarginPercent: clientPrice > surveyorPrice ? Math.round(((clientPrice - surveyorPrice) / clientPrice) * 100) : 30,
+      notes: ''
     });
 
     setIsNewProjectModalOpen(false);
@@ -207,10 +206,20 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
     setCityPricingList([{ city: 'Ankara', unitPrice: 320, targetSurveys: 500 }]);
   };
 
+  const getProjectTypeLabel = (type: ProjectType) => {
+    switch (type) {
+      case 'nokta': return 'Nokta Projesi';
+      case 'saha': return 'Saha Araştırması';
+      case 'studyo': return 'Stüdyo / Odak';
+      case 'gizli_musteri': return 'Gizli Müşteri';
+      default: return 'Genel';
+    }
+  };
+
   return (
     <div className="space-y-6">
       
-      {/* Top Banner & KPI Metrics (Admin vs SPV) */}
+      {/* Top Banner & KPI Metrics */}
       {isAdmin ? (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4">
           <div className="p-3 sm:p-4.5 rounded-2xl bg-slate-900 border border-slate-800">
@@ -244,24 +253,24 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
 
           <div className="p-3 sm:p-4.5 rounded-2xl bg-slate-900 border border-slate-800">
             <div className="flex items-center justify-between text-slate-400 mb-1">
-              <span className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider truncate">İller Projeleri</span>
-              <Building2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-indigo-400 flex-shrink-0" />
+              <span className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider truncate">Aktif Projeler</span>
+              <Briefcase className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-indigo-400 flex-shrink-0" />
             </div>
             <p className="text-base sm:text-2xl font-black text-indigo-400 font-mono">
-              {filteredProjects.filter(p => p.businessModel === 'model_a_macro').length} Proje
+              {filteredProjects.filter(p => p.status === 'active').length} Proje
             </p>
-            <p className="text-[10px] text-slate-500 mt-0.5 hidden sm:block">Dış iller / Taşeron projeleri</p>
+            <p className="text-[10px] text-slate-500 mt-0.5 hidden sm:block">Yürütülen saha operasyonları</p>
           </div>
 
           <div className="p-3 sm:p-4.5 rounded-2xl bg-slate-900 border border-slate-800">
             <div className="flex items-center justify-between text-slate-400 mb-1">
-              <span className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider truncate">İstanbul Ekip</span>
-              <Briefcase className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-sky-400 flex-shrink-0" />
+              <span className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider truncate">Nokta & Saha</span>
+              <Building2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-400 flex-shrink-0" />
             </div>
-            <p className="text-base sm:text-2xl font-black text-sky-400 font-mono">
-              {filteredProjects.filter(p => p.businessModel === 'model_b_micro').length} Proje
+            <p className="text-base sm:text-2xl font-black text-emerald-400 font-mono">
+              {filteredProjects.filter(p => p.projectType === 'nokta' || p.projectType === 'saha').length} Proje
             </p>
-            <p className="text-[10px] text-slate-500 mt-0.5 hidden sm:block">İstanbul ekip operasyonu</p>
+            <p className="text-[10px] text-slate-500 mt-0.5 hidden sm:block">Nokta ve yüz yüze saha projeleri</p>
           </div>
         </div>
       ) : (
@@ -318,12 +327,12 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
         </div>
       )}
 
-      {/* Control Bar (Period, Archive, Model, Status Filters) */}
+      {/* Control Bar */}
       <div className="flex flex-col xl:flex-row items-stretch xl:items-center justify-between gap-3 p-3.5 sm:p-4 rounded-2xl bg-slate-900 border border-slate-800">
         
         {/* Filters Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 flex-1">
-          {/* Period Filter (1 Ay / 3 Ay / 6 Ay / 1 Yıl / Tümü) */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 flex-1">
+          {/* Period Filter */}
           <div>
             <label className="block text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Dönem</label>
             <select
@@ -350,20 +359,6 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
               <option value="active">Aktif Projeler</option>
               <option value="archived">Gizlenen / Arşivdekiler</option>
               <option value="all">Tümü (Arşiv Dahil)</option>
-            </select>
-          </div>
-
-          {/* Model Filter (İller vs İstanbul Ekip) */}
-          <div>
-            <label className="block text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1">İş Modeli</label>
-            <select
-              value={filterModel}
-              onChange={(e) => setFilterModel(e.target.value)}
-              className="w-full px-2.5 py-1.5 rounded-xl bg-slate-950 border border-slate-700 text-xs text-slate-200 font-medium cursor-pointer"
-            >
-              <option value="all">Tüm Modeller</option>
-              <option value="model_a_macro">İller</option>
-              <option value="model_b_micro">İstanbul Ekip</option>
             </select>
           </div>
 
@@ -414,7 +409,7 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
         </div>
       </div>
 
-      {/* Projects Grid */}
+      {/* Projects Grid (Ultra-Clean Modern Cards) */}
       {filteredProjects.length === 0 ? (
         <div className="p-12 text-center rounded-3xl bg-slate-900 border border-slate-800 text-slate-400 space-y-3">
           <Briefcase className="w-12 h-12 mx-auto text-slate-600" />
@@ -439,37 +434,39 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {filteredProjects.map(project => {
-            const isModelA = project.businessModel === 'model_a_macro';
             const progressPercent = Math.min(((project.completedSurveys || 0) / (project.targetSurveys || 1)) * 100, 100);
 
             return (
               <div 
                 key={project.id}
                 onClick={() => setSelectedProject(project)}
-                className={`p-6 rounded-2xl bg-slate-900 border transition-all flex flex-col justify-between relative group cursor-pointer ${
+                className={`p-5 sm:p-6 rounded-2xl bg-slate-900 border transition-all flex flex-col justify-between relative group cursor-pointer ${
                   project.isArchived 
                     ? 'border-amber-500/30 bg-slate-900/60 opacity-80 hover:opacity-100 hover:border-amber-500/60'
                     : 'border-slate-800 hover:border-sky-500/50 hover:shadow-xl hover:shadow-sky-500/5'
                 }`}
               >
                 <div>
-                  {/* Header row */}
+                  {/* Clean Header Row */}
                   <div className="flex items-start justify-between gap-3 mb-3">
-                    <div>
-                      <div className="flex flex-wrap items-center gap-2 mb-1">
-                        <span className="text-xs font-mono font-bold text-sky-400">{project.code}</span>
-                        
-                        <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">
-                          {project.projectType.toUpperCase()}
+                    <div className="min-w-0 flex-1">
+                      {/* Badge List (Clean, without Istanbul Ekip or Author) */}
+                      <div className="flex flex-wrap items-center gap-1.5 mb-1.5">
+                        <span className="text-xs font-mono font-bold text-sky-400">
+                          {project.code}
                         </span>
-
-                        <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-300 border border-indigo-500/20">
-                          {isModelA ? 'İller' : 'İstanbul Ekip'}
+                        
+                        <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded border ${
+                          project.projectType === 'nokta'
+                            ? 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30'
+                            : 'bg-slate-800 text-slate-300 border-slate-700'
+                        }`}>
+                          {getProjectTypeLabel(project.projectType)}
                         </span>
 
                         {project.isArchived && (
                           <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30 flex items-center gap-1">
-                            <EyeOff className="w-3 h-3" /> Arşivde / Gizli
+                            <EyeOff className="w-3 h-3" /> Arşivde
                           </span>
                         )}
 
@@ -477,26 +474,26 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
                           <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                             Aktif
                           </span>
+                        ) : project.status === 'completed' ? (
+                          <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                            Tamamlandı
+                          </span>
                         ) : (
                           <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20">
                             Taslak
                           </span>
                         )}
-
-                        {project.createdByName && (
-                          <span className="text-[10px] font-medium px-2 py-0.5 rounded bg-slate-800/80 text-slate-300 border border-slate-700">
-                            Oluşturan: <strong className="text-white">{project.createdByName}</strong>
-                          </span>
-                        )}
                       </div>
 
-                      <h3 className="text-base font-bold text-white tracking-tight group-hover:text-sky-300 transition-colors">
+                      <h3 className="text-base font-bold text-white tracking-tight group-hover:text-sky-300 transition-colors truncate">
                         {project.title}
                       </h3>
-                      <p className="text-xs text-slate-400 mt-0.5">Müşteri: <strong className="text-slate-300">{project.clientName}</strong></p>
+                      <p className="text-xs text-slate-400 mt-0.5">
+                        Müşteri: <strong className="text-slate-200">{project.clientName}</strong>
+                      </p>
                     </div>
 
-                    {/* Admin sees Profit Margin, SPV sees Surveyor Price */}
+                    {/* Right Price/Margin Display */}
                     {isAdmin ? (
                       project.simulatedMarginPercent ? (
                         <div className="text-right flex-shrink-0">
@@ -508,7 +505,7 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
                       ) : null
                     ) : (
                       <div className="text-right flex-shrink-0">
-                        <span className="text-[10px] text-slate-400 block">Personele Fiyat</span>
+                        <span className="text-[10px] text-slate-400 block">Anketör Fiyat</span>
                         <span className="text-base font-black font-mono text-sky-400">
                           ₺{project.defaultPersonnelRate || project.clientUnitPrice}
                         </span>
@@ -516,17 +513,35 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
                     )}
                   </div>
 
-                  {/* Target Cities & Pricing Badges */}
-                  {project.cityPricing && project.cityPricing.length > 0 && (
-                    <div className="flex flex-wrap items-center gap-1.5 my-2.5">
-                      <MapPin className="w-3.5 h-3.5 text-slate-500" />
-                      {project.cityPricing.map((cp, idx) => (
-                        <span key={idx} className="text-[10px] px-2 py-0.5 rounded-md bg-slate-800 text-slate-300 border border-slate-700 font-mono">
-                          {cp.city}: <strong className="text-sky-400 font-bold">₺{cp.unitPrice}</strong>
-                        </span>
-                      ))}
-                    </div>
-                  )}
+                  {/* Target Cities & Role Pricing Pills */}
+                  <div className="flex flex-wrap items-center gap-1.5 my-2.5">
+                    {project.cityPricing && project.cityPricing.length > 0 ? (
+                      <>
+                        <MapPin className="w-3.5 h-3.5 text-slate-500 flex-shrink-0" />
+                        {project.cityPricing.map((cp, idx) => (
+                          <span key={idx} className="text-[10px] px-2 py-0.5 rounded-md bg-slate-800 text-slate-300 border border-slate-700 font-mono">
+                            {cp.city}: <strong className="text-sky-400 font-bold">₺{cp.unitPrice}</strong>
+                          </span>
+                        ))}
+                      </>
+                    ) : project.cities && project.cities.length > 0 ? (
+                      <>
+                        <MapPin className="w-3.5 h-3.5 text-slate-500 flex-shrink-0" />
+                        {project.cities.map((city, idx) => (
+                          <span key={idx} className="text-[10px] px-2 py-0.5 rounded-md bg-slate-800 text-slate-300 border border-slate-700">
+                            {city}
+                          </span>
+                        ))}
+                      </>
+                    ) : null}
+
+                    {project.observerUnitPrice && project.observerUnitPrice > 0 && (
+                      <span className="text-[10px] px-2 py-0.5 rounded-md bg-indigo-500/10 text-indigo-300 border border-indigo-500/30 flex items-center gap-1 font-mono">
+                        <UserCheck className="w-3 h-3 text-indigo-400" />
+                        Gözlemci: <strong>₺{project.observerUnitPrice}</strong>
+                      </span>
+                    )}
+                  </div>
 
                   {/* Progress Bar */}
                   <div className="mt-3">
@@ -615,10 +630,10 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
         </div>
       )}
 
-      {/* NEW PROJECT DEFINITION MODAL (With City & Price Setup) */}
+      {/* NEW PROJECT DEFINITION MODAL (Flexible & Optional Pricing) */}
       {isNewProjectModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm overflow-y-auto">
-          <div className="w-full max-w-lg bg-slate-900 border border-slate-800 rounded-3xl p-6 text-slate-100 shadow-2xl my-8">
+          <div className="w-full max-w-lg bg-slate-900 border border-slate-800 rounded-3xl p-6 text-slate-100 shadow-2xl my-8 max-h-[92vh] overflow-y-auto">
             <div className="flex justify-between items-center pb-3 border-b border-slate-800">
               <h3 className="text-base font-bold text-white flex items-center gap-2">
                 <Briefcase className="w-5 h-5 text-sky-400" />
@@ -629,91 +644,131 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
               </button>
             </div>
 
-            <form onSubmit={handleCreateProjectSubmit} className="space-y-4 mt-4">
+            <form onSubmit={handleCreateProjectSubmit} className="space-y-4 mt-4 text-xs">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Proje Kodu</label>
+                  <label className="block font-semibold text-slate-300 mb-1">Proje Kodu</label>
                   <input
                     type="text"
                     required
                     value={newCode}
                     onChange={(e) => setNewCode(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs font-mono text-sky-400 font-bold"
+                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 font-mono text-sky-400 font-bold"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Müşteri Adı</label>
+                  <label className="block font-semibold text-slate-300 mb-1">Müşteri Adı</label>
                   <input
                     type="text"
                     required
                     value={newClient}
                     onChange={(e) => setNewClient(e.target.value)}
-                    placeholder="Örn: Ipsos, GfK"
-                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white"
+                    placeholder="Örn: Ipsos, GfK, Unilever"
+                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">Proje Başlığı / Adı</label>
+                <label className="block font-semibold text-slate-300 mb-1">Proje Başlığı / Adı</label>
                 <input
                   type="text"
                   required
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
                   placeholder="Örn: Ankara Tüketici Saha Anketi"
-                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white"
+                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white font-medium"
                 />
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">Proje Tipi</label>
-                <select
-                  value={newType}
-                  onChange={(e) => setNewType(e.target.value as ProjectType)}
-                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white"
-                >
-                  <option value="saha">Saha Araştırması (Yüz Yüze)</option>
-                  <option value="studyo">Stüdyo / Odak Grup</option>
-                  <option value="gizli_musteri">Gizli Müşteri</option>
-                  <option value="diger">Diğer</option>
-                </select>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Toplam Hedef Anket</label>
+                  <label className="block font-semibold text-slate-300 mb-1">Proje Tipi</label>
+                  <select
+                    value={newType}
+                    onChange={(e) => setNewType(e.target.value as ProjectType)}
+                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white"
+                  >
+                    <option value="saha">Saha Araştırması (Yüz Yüze)</option>
+                    <option value="nokta">Nokta Projesi (Anketör & Gözlemci)</option>
+                    <option value="studyo">Stüdyo / Odak Grup</option>
+                    <option value="gizli_musteri">Gizli Müşteri</option>
+                    <option value="diger">Diğer</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block font-semibold text-slate-300 mb-1">Toplam Hedef Anket</label>
                   <input
                     type="number"
                     required
                     min="1"
                     value={newTargetSurveys}
                     onChange={(e) => setNewTargetSurveys(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white font-mono"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Standart Birim Fiyat (TL)</label>
-                  <input
-                    type="number"
-                    required
-                    min="1"
-                    value={newUnitPrice}
-                    onChange={(e) => setNewUnitPrice(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white font-mono"
+                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white font-mono"
                   />
                 </div>
               </div>
 
+              {/* FİYATLANDIRMA BÖLÜMÜ (İsteğe Bağlı / Sonradan da Düzenlenebilir) */}
+              <div className="p-3.5 rounded-2xl bg-slate-950/70 border border-slate-800 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-white flex items-center gap-1.5">
+                    <Banknote className="w-4 h-4 text-emerald-400" />
+                    <span>Birim Fiyatlandırma (Opsiyonel / Sonradan da Girilebilir)</span>
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+                  <div>
+                    <label className="block text-[11px] text-sky-400 font-semibold mb-1">Anketör Fiyatı (TL)</label>
+                    <input
+                      type="number"
+                      min="0"
+                      value={newUnitPrice}
+                      onChange={(e) => setNewUnitPrice(e.target.value)}
+                      placeholder="320"
+                      className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-sky-400 font-mono font-bold"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] text-indigo-400 font-semibold mb-1">Gözlemci Fiyatı (TL)</label>
+                    <input
+                      type="number"
+                      min="0"
+                      value={newObserverPrice}
+                      onChange={(e) => setNewObserverPrice(e.target.value)}
+                      placeholder="450"
+                      className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-indigo-300 font-mono font-bold"
+                    />
+                  </div>
+
+                  {isAdmin && (
+                    <div>
+                      <label className="block text-[11px] text-emerald-400 font-semibold mb-1">Müşteri Fiyatı (TL)</label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={newClientUnitPrice}
+                        onChange={(e) => setNewClientUnitPrice(e.target.value)}
+                        placeholder="550"
+                        className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-emerald-400 font-mono font-bold"
+                      />
+                    </div>
+                  )}
+                </div>
+              </div>
+
               {/* DYNAMIC CITIES & CITY-BASED UNIT PRICES */}
-              <div className="p-4 rounded-2xl bg-slate-950/70 border border-slate-800 space-y-3">
+              <div className="p-3.5 rounded-2xl bg-slate-950/70 border border-slate-800 space-y-3">
                 <div className="flex items-center justify-between">
                   <div>
-                    <span className="text-xs font-bold text-white flex items-center gap-1.5">
+                    <span className="font-bold text-white flex items-center gap-1.5">
                       <MapPin className="w-3.5 h-3.5 text-sky-400" />
-                      <span>Çalışılacak İller ve İl Bazlı Birim Fiyatlar</span>
+                      <span>Çalışılacak İller</span>
                     </span>
-                    <p className="text-[11px] text-slate-400">Her ile özel anketör birim fiyatını belirleyebilirsiniz</p>
+                    <p className="text-[11px] text-slate-400">Her ile özel anketör birim fiyatı belirleyebilirsiniz</p>
                   </div>
                   <button
                     type="button"
@@ -725,7 +780,7 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
                   </button>
                 </div>
 
-                <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
+                <div className="space-y-2 max-h-36 overflow-y-auto pr-1">
                   {cityPricingList.map((cp, idx) => (
                     <div key={idx} className="flex items-center gap-2">
                       <input
@@ -734,17 +789,16 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
                         placeholder="İl Adı (Örn: Ankara)"
                         value={cp.city}
                         onChange={(e) => handleCityChange(idx, 'city', e.target.value)}
-                        className="flex-1 px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white"
+                        className="flex-1 px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white"
                       />
                       <div className="w-28 relative">
                         <input
                           type="number"
-                          required
-                          min="1"
+                          min="0"
                           placeholder="Fiyat (TL)"
                           value={cp.unitPrice}
                           onChange={(e) => handleCityChange(idx, 'unitPrice', e.target.value)}
-                          className="w-full px-3 py-1.5 pl-6 rounded-xl bg-slate-900 border border-slate-700 text-xs text-emerald-400 font-mono font-bold"
+                          className="w-full px-3 py-1.5 pl-6 rounded-xl bg-slate-900 border border-slate-700 text-emerald-400 font-mono font-bold"
                         />
                         <span className="text-[11px] text-slate-500 absolute left-2 top-2">₺</span>
                       </div>
@@ -764,31 +818,31 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Başlangıç Tarihi</label>
+                  <label className="block font-semibold text-slate-300 mb-1">Başlangıç Tarihi</label>
                   <input
                     type="date"
                     required
                     value={newStartDate}
                     onChange={(e) => setNewStartDate(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white"
+                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Bitiş Tarihi</label>
+                  <label className="block font-semibold text-slate-300 mb-1">Bitiş Tarihi</label>
                   <input
                     type="date"
                     value={newEndDate}
                     onChange={(e) => setNewEndDate(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white"
+                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white"
                   />
                 </div>
               </div>
 
               <button
                 type="submit"
-                className="w-full py-3.5 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-bold text-xs shadow-lg shadow-sky-500/20 transition-all cursor-pointer"
+                className="w-full py-3 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-bold text-xs shadow-lg shadow-sky-500/20 transition-all cursor-pointer"
               >
-                Projeyi Oluştur & Başlat
+                Projeyi Oluştur
               </button>
             </form>
           </div>

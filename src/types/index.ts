@@ -1,6 +1,6 @@
 export type UserRole = 'admin' | 'spv' | 'accountant';
 
-export type ProjectType = 'saha' | 'studyo' | 'gizli_musteri' | 'diger';
+export type ProjectType = 'saha' | 'nokta' | 'studyo' | 'gizli_musteri' | 'diger';
 
 export type BusinessModel = 'model_a_macro' | 'model_b_micro';
 
@@ -84,6 +84,9 @@ export interface ProjectNoteItem {
   authorName: string;
   authorRole: UserRole;
   text: string;
+  noteDate?: string;
+  relatedPersonnelName?: string;
+  tag?: 'vardiya' | 'yedek' | 'genel' | 'saha';
   createdAt: string;
 }
 
@@ -128,6 +131,7 @@ export interface CityPricing {
   city: string;
   unitPrice: number;
   targetSurveys?: number;
+  observerUnitPrice?: number;
 }
 
 export interface Project {
@@ -142,12 +146,16 @@ export interface Project {
   endDate: string;
   
   targetSurveys: number;
-  clientUnitPrice: number;
+  clientUnitPrice: number; // Müşteriden anket başı alınan fiyat (Bize Geliş)
   clientTotalBudget: number; // targetSurveys * clientUnitPrice
   
   // İl Bazlı Fiyatlandırmalar & Çalışılan İller
   cityPricing?: CityPricing[];
   cities?: string[];
+  
+  // Rol Bazlı Fiyatlandırma
+  defaultPersonnelRate: number; // Standart Anketör Birim Fiyatı (TL)
+  observerUnitPrice?: number; // Gözlemci / Denetmen Birim Fiyatı (TL)
   
   // Model A (İller / Dış İller)
   subcontractorName?: string;
@@ -157,7 +165,6 @@ export interface Project {
   assignedSpvId?: string;
   assignedSpvName?: string;
   dailyOverheadRate: number; // e.g. 2000 TL / day
-  defaultPersonnelRate: number; // e.g. 180 TL
   
   // Feasibility Metrics
   simulatedCost?: number;

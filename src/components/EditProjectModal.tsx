@@ -9,9 +9,9 @@ import {
   MapPin, 
   Plus, 
   Trash2, 
-  Check, 
   Save, 
-  AlertCircle 
+  Banknote,
+  UserCheck
 } from 'lucide-react';
 import { Project, ProjectType, BusinessModel, CityPricing, ProjectStatus } from '@/types';
 
@@ -38,6 +38,7 @@ export default function EditProjectModal({
   const [status, setStatus] = useState<ProjectStatus>('active');
   const [targetSurveys, setTargetSurveys] = useState('');
   const [defaultPersonnelRate, setDefaultPersonnelRate] = useState('');
+  const [observerUnitPrice, setObserverUnitPrice] = useState('');
   const [clientUnitPrice, setClientUnitPrice] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
@@ -46,6 +47,8 @@ export default function EditProjectModal({
   const [notes, setNotes] = useState('');
   const [cityPricingList, setCityPricingList] = useState<CityPricing[]>([]);
   const [saveSuccess, setSaveSuccess] = useState(false);
+
+  const isAdmin = currentUser?.role === 'admin';
 
   useEffect(() => {
     if (project) {
@@ -57,7 +60,8 @@ export default function EditProjectModal({
       setStatus(project.status || 'active');
       setTargetSurveys(String(project.targetSurveys || 0));
       setDefaultPersonnelRate(String(project.defaultPersonnelRate || project.clientUnitPrice || 320));
-      setClientUnitPrice(String(project.clientUnitPrice || 450));
+      setObserverUnitPrice(String(project.observerUnitPrice || 450));
+      setClientUnitPrice(String(project.clientUnitPrice || 550));
       setStartDate(project.startDate || '');
       setEndDate(project.endDate || '');
       setSubcontractorName(project.subcontractorName || '');
@@ -102,7 +106,8 @@ export default function EditProjectModal({
 
     const targetSurveysNum = Number(targetSurveys) || 0;
     const clientPriceNum = Number(clientUnitPrice) || 0;
-    const personnelPriceNum = Number(defaultPersonnelRate) || 0;
+    const surveyorPriceNum = Number(defaultPersonnelRate) || 0;
+    const observerPriceNum = Number(observerUnitPrice) || 0;
     const validCityPricing = cityPricingList.filter(cp => cp.city.trim() !== '');
 
     const updatedData: Partial<Project> = {
@@ -115,13 +120,15 @@ export default function EditProjectModal({
       targetSurveys: targetSurveysNum,
       clientUnitPrice: clientPriceNum,
       clientTotalBudget: targetSurveysNum * clientPriceNum,
-      defaultPersonnelRate: personnelPriceNum,
+      defaultPersonnelRate: surveyorPriceNum,
+      observerUnitPrice: projectType === 'nokta' || observerPriceNum > 0 ? observerPriceNum : undefined,
       startDate,
       endDate,
       subcontractorName: businessModel === 'model_a_macro' ? subcontractorName : undefined,
       subcontractorUnitPrice: businessModel === 'model_a_macro' ? Number(subcontractorUnitPrice) : undefined,
       notes,
-      cityPricing: validCityPricing.length > 0 ? validCityPricing : undefined
+      cityPricing: validCityPricing.length > 0 ? validCityPricing : undefined,
+      cities: validCityPricing.map(c => c.city.trim())
     };
 
     updateProject(project.id, updatedData);
@@ -139,7 +146,7 @@ export default function EditProjectModal({
     setTimeout(() => {
       setSaveSuccess(false);
       onClose();
-    }, 600);
+    }, 500);
   };
 
   return (
@@ -155,7 +162,7 @@ export default function EditProjectModal({
             <div>
               <h3 className="text-base font-bold text-white tracking-tight">Projeyi Düzenle</h3>
               <p className="text-xs text-slate-400">
-                <span className="font-mono font-bold text-sky-400">{project.code}</span> - Bilgileri güncelleyin
+                <span className="font-mono font-bold text-sky-400">{project.code}</span> - Bilgileri ve birim fiyatları güncelleyin
               </p>
             </div>
           </div>
@@ -206,8 +213,8 @@ export default function EditProjectModal({
             />
           </div>
 
-          {/* Row 3: Project Type, Business Model & Status */}
-          <div className="grid grid-cols-3 gap-3">
+          {/* Row 3: Project Type & Status */}
+          <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block font-semibold text-slate-300 mb-1">Proje Tipi</label>
               <select
@@ -215,22 +222,11 @@ export default function EditProjectModal({
                 onChange={(e) => setProjectType(e.target.value as ProjectType)}
                 className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white"
               >
-                <option value="saha">Saha Araştırması</option>
+                <option value="saha">Saha Araştırması (Yüz Yüze)</option>
+                <option value="nokta">Nokta Projesi (Anketör & Gözlemci)</option>
                 <option value="studyo">Stüdyo / Odak Grup</option>
                 <option value="gizli_musteri">Gizli Müşteri</option>
                 <option value="diger">Diğer</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block font-semibold text-slate-300 mb-1">İş Modeli</label>
-              <select
-                value={businessModel}
-                onChange={(e) => setBusinessModel(e.target.value as BusinessModel)}
-                className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white"
-              >
-                <option value="model_b_micro">İstanbul Ekip</option>
-                <option value="model_a_macro">İller</option>
               </select>
             </div>
 
@@ -249,87 +245,69 @@ export default function EditProjectModal({
           </div>
 
           {/* Row 4: Target Surveys & Pricing */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            <div>
-              <label className="block font-semibold text-slate-300 mb-1">Toplam Hedef Anket</label>
-              <input
-                type="number"
-                required
-                min="1"
-                value={targetSurveys}
-                onChange={(e) => setTargetSurveys(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 font-mono text-white font-bold"
-              />
-            </div>
+          <div className="p-3.5 rounded-2xl bg-slate-950/70 border border-slate-800 space-y-3">
+            <span className="font-bold text-white flex items-center gap-1.5">
+              <Banknote className="w-4 h-4 text-emerald-400" />
+              <span>Fiyatlandırma & Hedef Sayısı</span>
+            </span>
 
-            <div>
-              <label className="block font-semibold text-sky-400 mb-1">Personele Standart Fiyat (TL)</label>
-              <input
-                type="number"
-                required
-                min="1"
-                value={defaultPersonnelRate}
-                onChange={(e) => setDefaultPersonnelRate(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 font-mono text-sky-400 font-bold"
-              />
-            </div>
-
-            {currentUser?.role === 'admin' && (
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
               <div>
-                <label className="block font-semibold text-emerald-400 mb-1">Müşteri Birim Fiyatı (TL)</label>
+                <label className="block font-semibold text-slate-300 mb-1">Hedef Anket Sayısı</label>
                 <input
                   type="number"
+                  required
                   min="1"
-                  value={clientUnitPrice}
-                  onChange={(e) => setClientUnitPrice(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 font-mono text-emerald-400 font-bold"
+                  value={targetSurveys}
+                  onChange={(e) => setTargetSurveys(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 font-mono text-white font-bold"
                 />
               </div>
-            )}
-          </div>
 
-          {/* If Model A: Subcontractor Info */}
-          {businessModel === 'model_a_macro' && (
-            <div className="p-4 rounded-2xl bg-indigo-950/20 border border-indigo-900/40 space-y-3">
-              <span className="font-bold text-indigo-300 flex items-center gap-1.5">
-                <Building2 className="w-4 h-4" />
-                <span>İller: Taşeron Bilgileri</span>
-              </span>
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-slate-400 mb-1">Taşeron Firma Adı</label>
-                  <input
-                    type="text"
-                    value={subcontractorName}
-                    onChange={(e) => setSubcontractorName(e.target.value)}
-                    placeholder="Örn: Anadolu Saha Araştırma Ltd."
-                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white"
-                  />
-                </div>
-                <div>
-                  <label className="block text-slate-400 mb-1">Taşeron Anket Başı Fiyat (TL)</label>
+              <div>
+                <label className="block font-semibold text-sky-400 mb-1">Anketör Fiyatı (TL)</label>
+                <input
+                  type="number"
+                  min="0"
+                  value={defaultPersonnelRate}
+                  onChange={(e) => setDefaultPersonnelRate(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 font-mono text-sky-400 font-bold"
+                />
+              </div>
+
+              <div>
+                <label className="block font-semibold text-indigo-300 mb-1">Gözlemci Fiyatı (TL)</label>
+                <input
+                  type="number"
+                  min="0"
+                  value={observerUnitPrice}
+                  onChange={(e) => setObserverUnitPrice(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 font-mono text-indigo-300 font-bold"
+                />
+              </div>
+
+              {isAdmin && (
+                <div className="col-span-2 sm:col-span-3 pt-1">
+                  <label className="block font-semibold text-emerald-400 mb-1">Müşteri Birim Fiyatı (Bize Geliş - TL)</label>
                   <input
                     type="number"
-                    value={subcontractorUnitPrice}
-                    onChange={(e) => setSubcontractorUnitPrice(e.target.value)}
-                    placeholder="250"
-                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-indigo-300 font-mono font-bold"
+                    min="0"
+                    value={clientUnitPrice}
+                    onChange={(e) => setClientUnitPrice(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 font-mono text-emerald-400 font-bold"
                   />
                 </div>
-              </div>
+              )}
             </div>
-          )}
+          </div>
 
-          {/* DYNAMIC CITIES & CITY-BASED UNIT PRICES */}
-          <div className="p-4 rounded-2xl bg-slate-950/70 border border-slate-800 space-y-3">
+          {/* Row 5: Dynamic Cities Setup */}
+          <div className="p-3.5 rounded-2xl bg-slate-950/70 border border-slate-800 space-y-3">
             <div className="flex items-center justify-between">
-              <div>
-                <span className="font-bold text-white flex items-center gap-1.5">
-                  <MapPin className="w-3.5 h-3.5 text-sky-400" />
-                  <span>Çalışılacak İller ve İl Bazlı Birim Fiyatlar</span>
-                </span>
-                <p className="text-[11px] text-slate-400">Excel hakediş aktarımında bu illerin fiyatları otomatik baz alınır</p>
-              </div>
+              <span className="font-bold text-white flex items-center gap-1.5">
+                <MapPin className="w-4 h-4 text-sky-400" />
+                <span>Çalışılacak İller & İl Fiyatları</span>
+              </span>
               <button
                 type="button"
                 onClick={handleAddCityRow}
@@ -340,7 +318,7 @@ export default function EditProjectModal({
               </button>
             </div>
 
-            <div className="space-y-2 max-h-44 overflow-y-auto pr-1">
+            <div className="space-y-2 max-h-36 overflow-y-auto pr-1">
               {cityPricingList.map((cp, idx) => (
                 <div key={idx} className="flex items-center gap-2">
                   <input
@@ -354,8 +332,7 @@ export default function EditProjectModal({
                   <div className="w-28 relative">
                     <input
                       type="number"
-                      required
-                      min="1"
+                      min="0"
                       placeholder="Fiyat (TL)"
                       value={cp.unitPrice}
                       onChange={(e) => handleCityChange(idx, 'unitPrice', e.target.value)}
@@ -377,7 +354,7 @@ export default function EditProjectModal({
             </div>
           </div>
 
-          {/* Row 5: Dates */}
+          {/* Row 6: Dates */}
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block font-semibold text-slate-300 mb-1">Başlangıç Tarihi</label>
@@ -400,48 +377,24 @@ export default function EditProjectModal({
             </div>
           </div>
 
-          {/* Row 6: Notes */}
-          <div>
-            <label className="block font-semibold text-slate-300 mb-1">Proje Notları / Açıklama</label>
-            <textarea
-              rows={3}
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              placeholder="Proje ile ilgili genel operasyonel notlar..."
-              className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:ring-1 focus:ring-sky-500 font-mono text-[11px]"
-            />
-          </div>
-
-          {/* Action Buttons */}
-          <div className="pt-2 flex items-center justify-end gap-2 border-t border-slate-800">
+          {/* Actions */}
+          <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-800">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold transition-all cursor-pointer"
+              className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold cursor-pointer"
             >
               İptal
             </button>
-
             <button
               type="submit"
-              disabled={saveSuccess}
-              className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-bold shadow-lg shadow-sky-500/20 transition-all cursor-pointer disabled:opacity-50"
+              className="flex items-center gap-1.5 px-5 py-2 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-bold shadow-lg shadow-sky-500/20 transition-all cursor-pointer"
             >
-              {saveSuccess ? (
-                <>
-                  <Check className="w-4 h-4 text-emerald-300" />
-                  <span>Güncellendi!</span>
-                </>
-              ) : (
-                <>
-                  <Save className="w-4 h-4" />
-                  <span>Değişiklikleri Kaydet</span>
-                </>
-              )}
+              <Save className="w-4 h-4" />
+              <span>{saveSuccess ? 'Kaydedildi!' : 'Değişiklikleri Kaydet'}</span>
             </button>
           </div>
         </form>
-
       </div>
     </div>
   );
