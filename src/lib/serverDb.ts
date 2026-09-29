@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import os from 'os';
 import { 
   Project, 
   Personnel, 
@@ -24,8 +25,16 @@ export interface DatabaseSchema {
   version: number;
 }
 
-const DATA_DIR = path.join(process.cwd(), 'data');
-const DB_FILE = path.join(DATA_DIR, 'database.json');
+// Global in-memory storage fallback for serverless / lambda
+declare global {
+  var __ORION_GLOBAL_DB__: DatabaseSchema | undefined;
+}
+
+const PRIMARY_DATA_DIR = path.join(process.cwd(), 'data');
+const PRIMARY_DB_FILE = path.join(PRIMARY_DATA_DIR, 'database.json');
+
+const FALLBACK_DATA_DIR = os.tmpdir();
+const FALLBACK_DB_FILE = path.join(FALLBACK_DATA_DIR, 'orion_database.json');
 
 const INITIAL_DB: DatabaseSchema = {
   projects: [],
@@ -39,42 +48,57 @@ const INITIAL_DB: DatabaseSchema = {
   version: 1
 };
 
-function ensureDataDirExists() {
-  if (!fs.existsSync(DATA_DIR)) {
-    fs.mkdirSync(DATA_DIR, { recursive: true });
+function getDbFilePath(): string {
+  try {
+    if (!fs.existsSync(PRIMARY_DATA_DIR)) {
+      fs.mkdirSync(PRIMARY_DATA_DIR, { recursive: true });
+    }
+    return PRIMARY_DB_FILE;
+  } catch {
+    return FALLBACK_DB_FILE;
   }
 }
 
 export function readDatabase(): DatabaseSchema {
+  // Check in-memory global first
+  if (globalThis.__ORION_GLOBAL_DB__) {
+    return globalThis.__ORION_GLOBAL_DB__;
+  }
+
+  const filePath = getDbFilePath();
   try {
-    ensureDataDirExists();
-    if (!fs.existsSync(DB_FILE)) {
-      fs.writeFileSync(DB_FILE, JSON.stringify(INITIAL_DB, null, 2), 'utf-8');
+    if (!fs.existsSync(filePath)) {
+      try {
+        fs.writeFileSync(filePath, JSON.stringify(INITIAL_DB, null, 2), 'utf-8');
+      } catch {}
+      globalThis.__ORION_GLOBAL_DB__ = INITIAL_DB;
       return INITIAL_DB;
     }
-    const raw = fs.readFileSync(DB_FILE, 'utf-8');
+    const raw = fs.readFileSync(filePath, 'utf-8');
     const parsed = JSON.parse(raw);
-    return {
-      projects: parsed.projects || [],
-      personnel: parsed.personnel || [],
-      projectPersonnel: parsed.projectPersonnel || [],
-      expenses: parsed.expenses || [],
-      advances: parsed.advances || [],
-      settlements: parsed.settlements || [],
-      clientInvoices: parsed.clientInvoices || [],
+    const db: DatabaseSchema = {
+      projects: Array.isArray(parsed.projects) ? parsed.projects : [],
+      personnel: Array.isArray(parsed.personnel) ? parsed.personnel : [],
+      projectPersonnel: Array.isArray(parsed.projectPersonnel) ? parsed.projectPersonnel : [],
+      expenses: Array.isArray(parsed.expenses) ? parsed.expenses : [],
+      advances: Array.isArray(parsed.advances) ? parsed.advances : [],
+      settlements: Array.isArray(parsed.settlements) ? parsed.settlements : [],
+      clientInvoices: Array.isArray(parsed.clientInvoices) ? parsed.clientInvoices : [],
       users: parsed.users,
       lastUpdated: parsed.lastUpdated || new Date().toISOString(),
       version: parsed.version || 1
     };
+    globalThis.__ORION_GLOBAL_DB__ = db;
+    return db;
   } catch (error) {
-    console.error('Error reading database file:', error);
+    console.warn('Fallback to initial DB:', error);
+    globalThis.__ORION_GLOBAL_DB__ = INITIAL_DB;
     return INITIAL_DB;
   }
 }
 
 export function writeDatabase(data: Partial<DatabaseSchema>): DatabaseSchema {
   try {
-    ensureDataDirExists();
     const current = readDatabase();
     const updated: DatabaseSchema = {
       projects: data.projects !== undefined ? data.projects : current.projects,
@@ -89,14 +113,24 @@ export function writeDatabase(data: Partial<DatabaseSchema>): DatabaseSchema {
       version: (current.version || 1) + 1
     };
 
-    // Atomic write via temp file
-    const tempFile = `${DB_FILE}.tmp.${Date.now()}`;
-    fs.writeFileSync(tempFile, JSON.stringify(updated, null, 2), 'utf-8');
-    fs.renameSync(tempFile, DB_FILE);
+    // Save to global in-memory
+    globalThis.__ORION_GLOBAL_DB__ = updated;
+
+    // Try saving to disk
+    const filePath = getDbFilePath();
+    try {
+      const tempFile = `${filePath}.tmp.${Date.now()}`;
+      fs.writeFileSync(tempFile, JSON.stringify(updated, null, 2), 'utf-8');
+      fs.renameSync(tempFile, filePath);
+    } catch {
+      try {
+        fs.writeFileSync(filePath, JSON.stringify(updated, null, 2), 'utf-8');
+      } catch {}
+    }
 
     return updated;
   } catch (error) {
-    console.error('Error writing database file:', error);
+    console.error('Error writing database:', error);
     throw error;
   }
 }
