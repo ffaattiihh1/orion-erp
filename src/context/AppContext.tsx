@@ -691,7 +691,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       totalExpenses: 0,
       totalAdvances: 0
     };
-    setProjects(prev => [newProject, ...prev]);
+    setProjects(prev => {
+      const updated = [newProject, ...prev];
+      try { localStorage.setItem('orion_projects', JSON.stringify(updated)); } catch {}
+      pushToServer({ projects: updated });
+      return updated;
+    });
 
     // Initial invoice placeholder
     const newInvoice: ClientInvoice = {
@@ -703,36 +708,83 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       status: 'not_invoiced',
       notes: 'Proje oluşturulduğunda otomatik eklendi.'
     };
-    setClientInvoices(prev => [newInvoice, ...prev]);
+    setClientInvoices(prev => {
+      const updated = [newInvoice, ...prev];
+      try { localStorage.setItem('orion_client_invoices', JSON.stringify(updated)); } catch {}
+      return updated;
+    });
 
     return newProject;
   };
 
   const updateProject = (id: string, updatedFields: Partial<Project>) => {
-    setProjects(prev => prev.map(p => (p.id === id ? { ...p, ...updatedFields } : p)));
+    setProjects(prev => {
+      const updated = prev.map(p => (p.id === id ? { ...p, ...updatedFields } : p));
+      try { localStorage.setItem('orion_projects', JSON.stringify(updated)); } catch {}
+      pushToServer({ projects: updated });
+      return updated;
+    });
   };
 
   const toggleArchiveProject = (id: string) => {
-    setProjects(prev => prev.map(p => {
-      if (p.id !== id) return p;
-      const nextArchived = !p.isArchived;
-      return {
-        ...p,
-        isArchived: nextArchived,
-        archivedAt: nextArchived ? new Date().toISOString() : undefined
-      };
-    }));
+    setProjects(prev => {
+      const updated = prev.map(p => {
+        if (p.id !== id) return p;
+        const nextArchived = !p.isArchived;
+        return {
+          ...p,
+          isArchived: nextArchived,
+          archivedAt: nextArchived ? new Date().toISOString() : undefined
+        };
+      });
+      try { localStorage.setItem('orion_projects', JSON.stringify(updated)); } catch {}
+      pushToServer({ projects: updated });
+      return updated;
+    });
   };
 
   const deleteProject = (id: string) => {
-    setProjects(prev => prev.filter(p => p.id !== id));
-    setProjectPersonnel(prev => prev.filter(pp => pp.projectId !== id));
-    setExpenses(prev => prev.filter(e => e.projectId !== id));
-    setAdvances(prev => prev.filter(a => a.projectId !== id));
-    setSettlements(prev => prev.filter(s => s.projectId !== id));
-    setClientInvoices(prev => prev.filter(inv => inv.projectId !== id));
-    setDailyReports(prev => prev.filter(r => r.projectId !== id));
-    setPhoneControlRecords(prev => prev.filter(p => p.projectId !== id));
+    setProjects(prev => {
+      const updated = prev.filter(p => p.id !== id);
+      try { localStorage.setItem('orion_projects', JSON.stringify(updated)); } catch {}
+      pushToServer({ projects: updated });
+      return updated;
+    });
+    setProjectPersonnel(prev => {
+      const updated = prev.filter(pp => pp.projectId !== id);
+      try { localStorage.setItem('orion_project_personnel', JSON.stringify(updated)); } catch {}
+      return updated;
+    });
+    setExpenses(prev => {
+      const updated = prev.filter(e => e.projectId !== id);
+      try { localStorage.setItem('orion_expenses', JSON.stringify(updated)); } catch {}
+      return updated;
+    });
+    setAdvances(prev => {
+      const updated = prev.filter(a => a.projectId !== id);
+      try { localStorage.setItem('orion_advances', JSON.stringify(updated)); } catch {}
+      return updated;
+    });
+    setSettlements(prev => {
+      const updated = prev.filter(s => s.projectId !== id);
+      try { localStorage.setItem('orion_settlements', JSON.stringify(updated)); } catch {}
+      return updated;
+    });
+    setClientInvoices(prev => {
+      const updated = prev.filter(inv => inv.projectId !== id);
+      try { localStorage.setItem('orion_client_invoices', JSON.stringify(updated)); } catch {}
+      return updated;
+    });
+    setDailyReports(prev => {
+      const updated = prev.filter(r => r.projectId !== id);
+      try { localStorage.setItem('orion_daily_reports', JSON.stringify(updated)); } catch {}
+      return updated;
+    });
+    setPhoneControlRecords(prev => {
+      const updated = prev.filter(p => p.projectId !== id);
+      try { localStorage.setItem('orion_phone_control_records', JSON.stringify(updated)); } catch {}
+      return updated;
+    });
   };
 
   // Full System Data Export & Import (Backup & Restore)
