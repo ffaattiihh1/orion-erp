@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { 
@@ -194,15 +194,27 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [dailyReports, setDailyReports] = useState<DailyFieldReport[]>(() => getInitialState('orion_daily_reports', []));
   const [phoneControlRecords, setPhoneControlRecords] = useState<PhoneControlRecord[]>(() => getInitialState('orion_phone_control_records', []));
   
-  // localStorage is the single source of truth (server has no persistent storage on Vercel)
-  const saveToStorage = (key: string, value: unknown) => {
+  // localStorage = fast cache (instant load). Neon = cross-device persistent storage.
+  const saveLocal = (key: string, value: unknown) => {
     if (typeof window === 'undefined') return;
     try { localStorage.setItem(key, JSON.stringify(value)); } catch {}
   };
 
-  // Auto-login: restore user from localStorage on mount
+  const pushToServer = async (payload: Record<string, unknown>) => {
+    try {
+      await fetch('/api/data', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+    } catch { /* offline - localStorage still has the data */ }
+  };
+
+  // On mount: restore from localStorage immediately, then load latest from Neon
   useEffect(() => {
     if (typeof window === 'undefined') return;
+
+    // Auto-login
     try {
       const savedUserJson = localStorage.getItem('orion_persistent_user');
       if (savedUserJson) {
@@ -211,18 +223,65 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         if (matched) setCurrentUserState(matched);
       }
     } catch {}
+
+    // Pull latest from Neon (overrides localStorage with server truth)
+    const loadFromServer = async () => {
+      try {
+        const res = await fetch('/api/data', { cache: 'no-store' });
+        if (!res.ok) return;
+        const json = await res.json();
+        if (!json.success || !json.data) return;
+        const d = json.data;
+
+        if (Array.isArray(d.projects) && d.projects.length > 0) {
+          setProjects(d.projects); saveLocal('orion_projects', d.projects);
+        }
+        if (Array.isArray(d.personnel) && d.personnel.length > 0) {
+          setPersonnel(d.personnel); saveLocal('orion_personnel', d.personnel);
+        }
+        if (Array.isArray(d.projectPersonnel) && d.projectPersonnel.length > 0) {
+          setProjectPersonnel(d.projectPersonnel); saveLocal('orion_project_personnel', d.projectPersonnel);
+        }
+        if (Array.isArray(d.expenses) && d.expenses.length > 0) {
+          setExpenses(d.expenses); saveLocal('orion_expenses', d.expenses);
+        }
+        if (Array.isArray(d.advances) && d.advances.length > 0) {
+          setAdvances(d.advances); saveLocal('orion_advances', d.advances);
+        }
+        if (Array.isArray(d.settlements) && d.settlements.length > 0) {
+          setSettlements(d.settlements); saveLocal('orion_settlements', d.settlements);
+        }
+        if (Array.isArray(d.clientInvoices) && d.clientInvoices.length > 0) {
+          setClientInvoices(d.clientInvoices); saveLocal('orion_client_invoices', d.clientInvoices);
+        }
+        if (Array.isArray(d.dailyReports) && d.dailyReports.length > 0) {
+          setDailyReports(d.dailyReports); saveLocal('orion_daily_reports', d.dailyReports);
+        }
+        if (Array.isArray(d.phoneControlRecords) && d.phoneControlRecords.length > 0) {
+          setPhoneControlRecords(d.phoneControlRecords); saveLocal('orion_phone_control_records', d.phoneControlRecords);
+        }
+      } catch { /* use localStorage cache */ }
+    };
+
+    loadFromServer();
+
+    // Poll every 30s for cross-device updates
+    const interval = setInterval(loadFromServer, 30000);
+    const onFocus = () => loadFromServer();
+    window.addEventListener('focus', onFocus);
+    return () => { clearInterval(interval); window.removeEventListener('focus', onFocus); };
   }, [users]);
 
-  // Persist all state to localStorage on every change (single source of truth)
-  useEffect(() => { saveToStorage('orion_projects', projects); }, [projects]);
-  useEffect(() => { saveToStorage('orion_personnel', personnel); }, [personnel]);
-  useEffect(() => { saveToStorage('orion_project_personnel', projectPersonnel); }, [projectPersonnel]);
-  useEffect(() => { saveToStorage('orion_expenses', expenses); }, [expenses]);
-  useEffect(() => { saveToStorage('orion_advances', advances); }, [advances]);
-  useEffect(() => { saveToStorage('orion_settlements', settlements); }, [settlements]);
-  useEffect(() => { saveToStorage('orion_daily_reports', dailyReports); }, [dailyReports]);
-  useEffect(() => { saveToStorage('orion_phone_control_records', phoneControlRecords); }, [phoneControlRecords]);
-  useEffect(() => { saveToStorage('orion_client_invoices', clientInvoices); }, [clientInvoices]);
+  // Save to localStorage on every state change (fast cache)
+  useEffect(() => { saveLocal('orion_projects', projects); }, [projects]);
+  useEffect(() => { saveLocal('orion_personnel', personnel); }, [personnel]);
+  useEffect(() => { saveLocal('orion_project_personnel', projectPersonnel); }, [projectPersonnel]);
+  useEffect(() => { saveLocal('orion_expenses', expenses); }, [expenses]);
+  useEffect(() => { saveLocal('orion_advances', advances); }, [advances]);
+  useEffect(() => { saveLocal('orion_settlements', settlements); }, [settlements]);
+  useEffect(() => { saveLocal('orion_daily_reports', dailyReports); }, [dailyReports]);
+  useEffect(() => { saveLocal('orion_phone_control_records', phoneControlRecords); }, [phoneControlRecords]);
+  useEffect(() => { saveLocal('orion_client_invoices', clientInvoices); }, [clientInvoices]);
 
   const setCurrentUser = (user: UserProfile | null) => {
     setCurrentUserState(user);
@@ -403,8 +462,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     };
     setProjects(prev => {
       const updated = [newProject, ...prev];
-      try { localStorage.setItem('orion_projects', JSON.stringify(updated)); } catch {}
-            return updated;
+      saveLocal('orion_projects', updated);
+      pushToServer({ projects: updated });
+      return updated;
     });
 
     // Initial invoice placeholder
@@ -419,7 +479,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     };
     setClientInvoices(prev => {
       const updated = [newInvoice, ...prev];
-      try { localStorage.setItem('orion_client_invoices', JSON.stringify(updated)); } catch {}
+      saveLocal('orion_client_invoices', updated);
+      pushToServer({ clientInvoices: updated });
       return updated;
     });
 
@@ -429,8 +490,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const updateProject = (id: string, updatedFields: Partial<Project>) => {
     setProjects(prev => {
       const updated = prev.map(p => (p.id === id ? { ...p, ...updatedFields } : p));
-      try { localStorage.setItem('orion_projects', JSON.stringify(updated)); } catch {}
-            return updated;
+      saveLocal('orion_projects', updated);
+      pushToServer({ projects: updated });
+      return updated;
     });
   };
 
@@ -439,14 +501,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       const updated = prev.map(p => {
         if (p.id !== id) return p;
         const nextArchived = !p.isArchived;
-        return {
-          ...p,
-          isArchived: nextArchived,
-          archivedAt: nextArchived ? new Date().toISOString() : undefined
-        };
+        return { ...p, isArchived: nextArchived, archivedAt: nextArchived ? new Date().toISOString() : undefined };
       });
-      try { localStorage.setItem('orion_projects', JSON.stringify(updated)); } catch {}
-            return updated;
+      saveLocal('orion_projects', updated);
+      pushToServer({ projects: updated });
+      return updated;
     });
   };
 
