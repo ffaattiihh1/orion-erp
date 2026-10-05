@@ -422,7 +422,7 @@ export default function DailyReportsView() {
       <div className="space-y-3.5">
         {filteredReports.length === 0 ? (
           <div className="p-12 text-center rounded-3xl bg-white border border-gray-200 space-y-3">
-            <FileText className="w-10 h-10 text-slate-600 mx-auto" />
+            <FileText className="w-10 h-10 text-gray-500 mx-auto" />
             <h3 className="text-base font-bold text-gray-700">Henüz saha günlük raporu bulunmuyor</h3>
             <p className="text-xs text-gray-400 max-w-md mx-auto">
               Yukarıdaki <strong>"+ Günlük Rapor Yaz"</strong> butonunu kullanarak bugün anket yapılan noktaları, çalışan anketörleri ve yevmiyeleri kaydedebilirsiniz.
@@ -565,7 +565,7 @@ export default function DailyReportsView() {
                               <th className="py-2.5 px-3">Açıklama / Not</th>
                             </tr>
                           </thead>
-                          <tbody className="divide-y divide-slate-800/60 font-medium">
+                          <tbody className="divide-y divide-gray-200/60 font-medium">
                             {rep.workers && rep.workers.length > 0 ? (
                               rep.workers.map((w, idx) => (
                                 <tr key={w.id || idx} className="hover:bg-gray-100 transition-colors">
@@ -841,7 +841,7 @@ export default function DailyReportsView() {
                 </datalist>
 
                 {/* Live Cost Summary Bar */}
-                <div className="p-3 rounded-2xl bg-gradient-to-r from-slate-950 to-slate-900 border border-gray-200 flex items-center justify-between text-xs">
+                <div className="p-3 rounded-2xl bg-white border border-gray-200 border border-gray-200 flex items-center justify-between text-xs">
                   <span className="text-gray-500">
                     Toplam: <strong className="text-gray-900">{formWorkers.filter(w => w.personnelName.trim()).length}</strong> Personel •{' '}
                     <strong className="text-sky-400">{formWorkers.reduce((sum, w) => sum + Number(w.surveysCompleted || 0), 0)}</strong> Anket
@@ -892,5 +892,7 @@ export default function DailyReportsView() {
     </div>
   );
 }
+
+
 
 

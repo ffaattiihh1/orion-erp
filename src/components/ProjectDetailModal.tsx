@@ -446,7 +446,7 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
         </div>
 
         {/* PROJE İÇİ HIZLI İŞLEM BUTONLARI */}
-        <div className="p-3.5 rounded-2xl bg-gradient-to-r from-slate-950 to-slate-900 border border-gray-200 flex flex-wrap items-center gap-2 mb-4">
+        <div className="p-3.5 rounded-2xl bg-white border border-gray-200 border border-gray-200 flex flex-wrap items-center gap-2 mb-4">
           <span className="text-xs font-bold text-gray-500 mr-1 flex items-center gap-1.5">
             <PlusCircle className="w-4 h-4 text-sky-400" />
             <span>İşlem Ekle:</span>
@@ -663,7 +663,7 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
                       <th className="py-2.5 px-3 text-center">Ödeme</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-800/80">
+                  <tbody className="divide-y divide-gray-200/80">
                     {projectAssigned.length === 0 ? (
                       <tr>
                         <td colSpan={11} className="py-6 text-center text-gray-400">
@@ -771,14 +771,14 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
 
             {projectDailyReports.length === 0 ? (
               <div className="p-8 text-center rounded-2xl bg-white border border-gray-200 text-xs text-gray-400 space-y-2">
-                <ClipboardList className="w-8 h-8 text-slate-600 mx-auto" />
+                <ClipboardList className="w-8 h-8 text-gray-500 mx-auto" />
                 <p>Bu proje için henüz günlük saha raporu girilmedi.</p>
               </div>
             ) : (
               <div className="space-y-3">
                 {projectDailyReports.map((rep) => (
                   <div key={rep.id} className="p-4 rounded-2xl bg-white border border-gray-200 space-y-3 text-xs">
-                    <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-850 pb-2.5">
+                    <div className="flex flex-wrap items-center justify-between gap-2 border-b border-gray-200 pb-2.5">
                       <div className="flex items-center gap-2">
                         <span className="font-mono font-bold text-sky-400 bg-sky-500/10 px-2 py-0.5 rounded border border-sky-500/20">
                           {rep.reportDate}
@@ -835,7 +835,7 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
                               <th className="py-2 px-3 text-right text-amber-400">Yevmiye</th>
                             </tr>
                           </thead>
-                          <tbody className="divide-y divide-slate-800/50">
+                          <tbody className="divide-y divide-gray-200/50">
                             {rep.workers.map((w, idx) => (
                               <tr key={w.id || idx}>
                                 <td className="py-1.5 px-3 font-bold text-gray-900">{w.personnelName}</td>
@@ -891,7 +891,7 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
 
             {projectPhoneControls.length === 0 ? (
               <div className="p-8 text-center rounded-2xl bg-white border border-gray-200 text-xs text-gray-400 space-y-2">
-                <PhoneCall className="w-8 h-8 text-slate-600 mx-auto" />
+                <PhoneCall className="w-8 h-8 text-gray-500 mx-auto" />
                 <p>Bu proje için henüz telefon kontrol (TK) kaydı girilmedi.</p>
               </div>
             ) : (
@@ -910,7 +910,7 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
                       <th className="py-2.5 px-3 text-center">Sil</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-800/80 font-medium">
+                  <tbody className="divide-y divide-gray-200/80 font-medium">
                     {projectPhoneControls.map(rec => (
                       <tr key={rec.id} className="hover:bg-gray-100 transition-colors">
                         <td className="py-2.5 px-3 font-mono text-gray-500">{rec.controlDate}</td>
@@ -989,7 +989,7 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
                       <th className="py-2.5 px-3 text-center">Ödeme</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-800/80">
+                  <tbody className="divide-y divide-gray-200/80">
                     {projectAssigned.length === 0 ? (
                       <tr>
                         <td colSpan={11} className="py-6 text-center text-gray-400">
@@ -1118,7 +1118,7 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
             {projectAdvances.length === 0 ? (
               <p className="text-center py-6 text-gray-400 text-xs">Bu projede henüz personele avans verilmedi.</p>
             ) : (
-              <div className="divide-y divide-slate-800/80 rounded-2xl border border-gray-200 overflow-hidden">
+              <div className="divide-y divide-gray-200/80 rounded-2xl border border-gray-200 overflow-hidden">
                 {projectAdvances.map(adv => (
                   <div key={adv.id} className="p-3 bg-white flex items-center justify-between text-xs">
                     <div>
@@ -1282,7 +1282,7 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
 
                 <button
                   type="submit"
-                  className="w-full py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs shadow transition-all cursor-pointer"
+                  className="w-full py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-gray-500 font-black text-xs shadow transition-all cursor-pointer"
                 >
                   Avansı Kaydet & Bakiyeden Düş
                 </button>
@@ -1759,7 +1759,7 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
                         type="button"
                         onClick={() => setTkDailyWage(amt)}
                         className={`px-2.5 py-1 rounded-lg text-[11px] font-bold font-mono transition-all ${
-                          tkDailyWage === amt ? 'bg-amber-500 text-slate-950' : 'bg-white text-gray-700 border border-gray-200'
+                          tkDailyWage === amt ? 'bg-amber-500 text-gray-500' : 'bg-white text-gray-700 border border-gray-200'
                         }`}
                       >
                         ₺{amt}
@@ -1861,5 +1861,7 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
     </div>
   );
 }
+
+
 
 

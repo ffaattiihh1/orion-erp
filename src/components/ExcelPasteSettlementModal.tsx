@@ -283,7 +283,7 @@ Ankara	4147286	AYLA AKAT	6	0	6	₺320,00	₺1.920,00	`;
                     <th className="py-2 px-3">NOT</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-800/80">
+                <tbody className="divide-y divide-gray-200/80">
                   {parsedRows.map((row, idx) => {
                     const valid = Math.max(0, row.totalSurveys - row.invalidSurveys);
                     const gross = valid * row.unitPrice;
@@ -345,5 +345,7 @@ Ankara	4147286	AYLA AKAT	6	0	6	₺320,00	₺1.920,00	`;
     </div>
   );
 }
+
+
 
 

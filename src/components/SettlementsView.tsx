@@ -128,7 +128,7 @@ export default function SettlementsView() {
     <div className="space-y-6">
       
       {/* Top Header Banner */}
-      <div className="p-5 rounded-2xl bg-gradient-to-r from-slate-900 via-slate-900 to-slate-950 border border-gray-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="p-5 rounded-2xl bg-white border border-gray-200 border border-gray-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <div className="p-3 rounded-2xl bg-sky-500/15 text-sky-400 border border-sky-500/25">
             <FolderCheck className="w-6 h-6" />
@@ -305,12 +305,12 @@ export default function SettlementsView() {
                 <th className="py-3.5 px-4 font-bold">NOT</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/80">
+            <tbody className="divide-y divide-gray-200/80">
               {filteredSettlements.length === 0 ? (
                 <tr>
                   <td colSpan={14} className="py-12 text-center text-gray-400">
                     <p className="text-sm font-semibold">Bu projede kayıtlı hakediş bulunamadı.</p>
-                    <p className="text-xs text-slate-600 mt-1">
+                    <p className="text-xs text-gray-500 mt-1">
                       Yukarıdaki <strong>"Excel'den Kopyala-Yapıştır"</strong> butonuna tıklayarak Excel tablonuzu doğrudan aktarabilirsiniz.
                     </p>
                   </td>
@@ -384,7 +384,7 @@ export default function SettlementsView() {
                           className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold transition-all border cursor-pointer ${
                             s.isPaid
                               ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40 hover:bg-emerald-500/30'
-                              : 'bg-gray-100 text-gray-500 border-gray-200 hover:text-gray-800 hover:border-slate-600'
+                              : 'bg-gray-100 text-gray-500 border-gray-200 hover:text-gray-800 hover:border-gray-300'
                           }`}
                         >
                           {s.isPaid ? (
@@ -552,5 +552,7 @@ export default function SettlementsView() {
     </div>
   );
 }
+
+
 
 

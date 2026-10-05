@@ -378,11 +378,11 @@ export default function PhoneControlView() {
                 <th className="py-3 px-4 text-center">İşlemler</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/80 font-medium">
+            <tbody className="divide-y divide-gray-200/80 font-medium">
               {filteredRecords.length === 0 ? (
                 <tr>
                   <td colSpan={11} className="py-12 text-center text-gray-400">
-                    <PhoneCall className="w-8 h-8 text-slate-600 mx-auto mb-2" />
+                    <PhoneCall className="w-8 h-8 text-gray-500 mx-auto mb-2" />
                     Henüz kayıtlı telefon kontrol (TK) verisi bulunamadı.
                   </td>
                 </tr>
@@ -605,7 +605,7 @@ export default function PhoneControlView() {
                       onClick={() => setFormDailyWage(preset)}
                       className={`px-3 py-1 rounded-xl text-xs font-bold transition-all cursor-pointer font-mono ${
                         formDailyWage === preset
-                          ? 'bg-amber-500 text-slate-950 shadow-md'
+                          ? 'bg-amber-500 text-gray-500 shadow-md'
                           : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
                       }`}
                     >
@@ -687,7 +687,7 @@ export default function PhoneControlView() {
 
               {/* Live Quality Preview Ribbon */}
               {Number(formTotalCalled) > 0 && (
-                <div className="p-3 rounded-xl bg-gradient-to-r from-slate-950 to-slate-900 border border-gray-200 flex items-center justify-between text-xs">
+                <div className="p-3 rounded-xl bg-white border border-gray-200 border border-gray-200 flex items-center justify-between text-xs">
                   <span className="text-gray-500">
                     Hesaplanan Başarı Oranı:
                   </span>
@@ -752,5 +752,7 @@ export default function PhoneControlView() {
     </div>
   );
 }
+
+
 
 

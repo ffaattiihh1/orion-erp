@@ -220,7 +220,7 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
     <div className="space-y-6">
       
       {/* Clean Page Title & Stats Banner */}
-      <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-slate-900 to-slate-950 border border-gray-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-md">
+      <div className="p-4 sm:p-5 rounded-2xl bg-white border border-gray-200 border border-gray-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-md">
         <div className="flex items-center gap-3">
           <div className="p-2.5 rounded-xl bg-sky-500/15 text-sky-400 border border-sky-500/30">
             <Briefcase className="w-5 h-5" />
@@ -332,7 +332,7 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
       {/* Projects Grid (Ultra-Clean Modern Cards) */}
       {filteredProjects.length === 0 ? (
         <div className="p-12 text-center rounded-3xl bg-white border border-gray-200 text-gray-500 space-y-3">
-          <Briefcase className="w-12 h-12 mx-auto text-slate-600" />
+          <Briefcase className="w-12 h-12 mx-auto text-gray-500" />
           <h3 className="text-base font-bold text-gray-900">
             {filterArchive === 'archived' ? 'Arşivde Proje Bulunmuyor' : 'Kriterlere Uygun Proje Yok'}
           </h3>
@@ -804,5 +804,7 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
     </div>
   );
 }
+
+
 
 

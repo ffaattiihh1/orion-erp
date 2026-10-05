@@ -91,7 +91,7 @@ export default function InvoicesView() {
                 <th className="py-3 px-4 font-semibold text-center">İşlem / Durum Güncelle</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/80">
+            <tbody className="divide-y divide-gray-200/80">
               {clientInvoices.map((inv) => (
                 <tr key={inv.id} className="hover:bg-gray-100 transition-colors">
                   <td className="py-3.5 px-4 font-mono font-bold text-sky-400">
@@ -185,5 +185,7 @@ export default function InvoicesView() {
     </div>
   );
 }
+
+
 
 

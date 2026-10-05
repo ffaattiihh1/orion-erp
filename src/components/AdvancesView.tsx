@@ -44,7 +44,7 @@ export default function AdvancesView() {
     <div className="space-y-6">
       
       {/* Top Header Banner */}
-      <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-slate-900 to-slate-950 border border-gray-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-md">
+      <div className="p-4 sm:p-5 rounded-2xl bg-white border border-gray-200 border border-gray-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-md">
         <div className="flex items-center gap-3">
           <div className="p-2.5 rounded-xl bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
             <Banknote className="w-5 h-5" />
@@ -126,7 +126,7 @@ export default function AdvancesView() {
                 <th className="py-3 px-4 font-semibold text-right">Avans Tutarı</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/80">
+            <tbody className="divide-y divide-gray-200/80">
               {filteredAdvances.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="py-8 text-center text-gray-400">
@@ -178,5 +178,7 @@ export default function AdvancesView() {
     </div>
   );
 }
+
+
 
 

@@ -39,7 +39,7 @@ export default function ExpensesView() {
     <div className="space-y-6">
       
       {/* Top Header Banner */}
-      <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-slate-900 to-slate-950 border border-gray-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-md">
+      <div className="p-4 sm:p-5 rounded-2xl bg-white border border-gray-200 border border-gray-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-md">
         <div className="flex items-center gap-3">
           <div className="p-2.5 rounded-xl bg-amber-500/15 text-amber-400 border border-amber-500/30">
             <Receipt className="w-5 h-5" />
@@ -123,7 +123,7 @@ export default function ExpensesView() {
                 <th className="py-3 px-4 font-semibold text-center">Fiş Görseli</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/80">
+            <tbody className="divide-y divide-gray-200/80">
               {filteredExpenses.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="py-8 text-center text-gray-400">
@@ -171,7 +171,7 @@ export default function ExpensesView() {
                           <span>Görüntüle</span>
                         </button>
                       ) : (
-                        <span className="text-slate-600 italic text-[11px]">Fiş Yok</span>
+                        <span className="text-gray-500 italic text-[11px]">Fiş Yok</span>
                       )}
                     </td>
                   </tr>
@@ -206,5 +206,7 @@ export default function ExpensesView() {
     </div>
   );
 }
+
+
 
 

@@ -181,7 +181,7 @@ export default function MobileSpvView() {
       {/* SPV Active Project Header (RLS Filtered) */}
       <div 
         onClick={() => setSelectedProjectForDetail(activeProject)}
-        className="p-5 rounded-3xl bg-gradient-to-br from-slate-900 to-slate-950 border border-gray-200 hover:border-sky-500/40 shadow-xl relative overflow-hidden mb-6 cursor-pointer group transition-all"
+        className="p-5 rounded-3xl bg-gray-50 border border-gray-200 hover:border-sky-500/40 shadow-xl relative overflow-hidden mb-6 cursor-pointer group transition-all"
       >
         <div className="flex justify-between items-start">
           <div>
@@ -413,7 +413,7 @@ export default function MobileSpvView() {
 
               <button
                 type="submit"
-                className="w-full py-3.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-sm shadow-lg shadow-amber-500/20 transition-all cursor-pointer"
+                className="w-full py-3.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-gray-500 font-black text-sm shadow-lg shadow-amber-500/20 transition-all cursor-pointer"
               >
                 Avansı Onayla & Bakiyeden Düş
               </button>
@@ -604,5 +604,7 @@ export default function MobileSpvView() {
     </div>
   );
 }
+
+
 
 

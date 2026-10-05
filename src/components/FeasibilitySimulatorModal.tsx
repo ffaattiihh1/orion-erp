@@ -310,7 +310,7 @@ export default function FeasibilitySimulatorModal({ isOpen, onClose }: Feasibili
           </div>
 
           {/* Right Column: Live Output & Simulation Gauge (5 Cols) */}
-          <div className="lg:col-span-5 flex flex-col justify-between p-5 rounded-2xl bg-gradient-to-b from-slate-950 to-slate-900 border border-gray-200">
+          <div className="lg:col-span-5 flex flex-col justify-between p-5 rounded-2xl bg-gray-50 border border-gray-200">
             <div>
               <div className="flex items-center justify-between mb-4">
                 <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
@@ -411,5 +411,7 @@ export default function FeasibilitySimulatorModal({ isOpen, onClose }: Feasibili
     </div>
   );
 }
+
+
 
 

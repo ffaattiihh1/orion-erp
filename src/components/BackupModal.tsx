@@ -125,7 +125,7 @@ export default function BackupModal({ isOpen, onClose }: BackupModalProps) {
         {/* Action Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {/* Export Card */}
-          <div className="p-4 rounded-2xl bg-gradient-to-b from-sky-950/20 to-slate-950 border border-sky-500/20 flex flex-col justify-between space-y-3">
+          <div className="p-4 rounded-2xl bg-gradient-to-b from-sky-950/20 to-gray-100 border border-sky-500/20 flex flex-col justify-between space-y-3">
             <div>
               <div className="flex items-center gap-1.5 text-sky-400 font-bold text-xs mb-1">
                 <Download className="w-4 h-4" />
@@ -145,7 +145,7 @@ export default function BackupModal({ isOpen, onClose }: BackupModalProps) {
           </div>
 
           {/* Import Card */}
-          <div className="p-4 rounded-2xl bg-gradient-to-b from-emerald-950/20 to-slate-950 border border-emerald-500/20 flex flex-col justify-between space-y-3">
+          <div className="p-4 rounded-2xl bg-gradient-to-b from-emerald-950/20 to-gray-100 border border-emerald-500/20 flex flex-col justify-between space-y-3">
             <div>
               <div className="flex items-center gap-1.5 text-emerald-400 font-bold text-xs mb-1">
                 <Upload className="w-4 h-4" />
@@ -194,5 +194,7 @@ export default function BackupModal({ isOpen, onClose }: BackupModalProps) {
     </div>
   );
 }
+
+
 
 
