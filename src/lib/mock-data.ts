@@ -6,7 +6,9 @@ import {
   Expense, 
   Advance, 
   Settlement, 
-  ClientInvoice 
+  ClientInvoice,
+  DailyFieldReport,
+  PhoneControlRecord
 } from '@/types';
 
 export const INITIAL_USERS: UserProfile[] = [
@@ -53,3 +55,9 @@ export const INITIAL_ADVANCES: Advance[] = [];
 export const INITIAL_SETTLEMENTS: Settlement[] = [];
 
 export const INITIAL_CLIENT_INVOICES: ClientInvoice[] = [];
+
+export const INITIAL_DAILY_REPORTS: DailyFieldReport[] = [];
+
+export const INITIAL_PHONE_CONTROL_RECORDS: PhoneControlRecord[] = [];
+
+

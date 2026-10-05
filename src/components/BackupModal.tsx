@@ -26,7 +26,9 @@ export default function BackupModal({ isOpen, onClose }: BackupModalProps) {
     settlements, 
     expenses, 
     advances, 
-    clientInvoices, 
+    clientInvoices,
+    dailyReports,
+    phoneControlRecords,
     exportFullBackup, 
     importFullBackup 
   } = useApp();
@@ -79,7 +81,7 @@ export default function BackupModal({ isOpen, onClose }: BackupModalProps) {
             </div>
             <div>
               <h3 className="text-base font-bold text-white tracking-tight">Veri Güvenliği & Sistem Yedeği</h3>
-              <p className="text-xs text-slate-400">Tüm projelerinizi, personelleri ve hakedişleri yedekleyin</p>
+              <p className="text-xs text-slate-400">Tüm projelerinizi, personelleri, saha raporlarını ve hakedişleri yedekleyin</p>
             </div>
           </div>
           <button onClick={onClose} className="text-slate-400 hover:text-white p-1">
@@ -92,21 +94,29 @@ export default function BackupModal({ isOpen, onClose }: BackupModalProps) {
           <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider block">
             Mevcut Sistem Verisi Özeti
           </span>
-          <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 text-center text-xs">
+          <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 text-center text-xs">
             <div className="p-2 rounded-xl bg-slate-900 border border-slate-800">
               <span className="text-slate-400 text-[10px] block">Projeler</span>
               <strong className="text-white text-sm font-mono">{projects.length}</strong>
             </div>
             <div className="p-2 rounded-xl bg-slate-900 border border-slate-800">
-              <span className="text-slate-400 text-[10px] block">Personeller</span>
+              <span className="text-slate-400 text-[10px] block">Personel</span>
               <strong className="text-white text-sm font-mono">{personnel.length}</strong>
             </div>
             <div className="p-2 rounded-xl bg-slate-900 border border-slate-800">
-              <span className="text-slate-400 text-[10px] block">Hakedişler</span>
+              <span className="text-slate-400 text-[10px] block">Hakediş</span>
               <strong className="text-emerald-400 text-sm font-mono">{settlements.length}</strong>
             </div>
             <div className="p-2 rounded-xl bg-slate-900 border border-slate-800">
-              <span className="text-slate-400 text-[10px] block">Masraf & Avans</span>
+              <span className="text-slate-400 text-[10px] block">Saha Rapor</span>
+              <strong className="text-sky-400 text-sm font-mono">{dailyReports.length}</strong>
+            </div>
+            <div className="p-2 rounded-xl bg-slate-900 border border-slate-800">
+              <span className="text-slate-400 text-[10px] block">TK Kaydı</span>
+              <strong className="text-indigo-400 text-sm font-mono">{phoneControlRecords.length}</strong>
+            </div>
+            <div className="p-2 rounded-xl bg-slate-900 border border-slate-800">
+              <span className="text-slate-400 text-[10px] block">Gider/Avans</span>
               <strong className="text-amber-400 text-sm font-mono">{expenses.length + advances.length}</strong>
             </div>
           </div>

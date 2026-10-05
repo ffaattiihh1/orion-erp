@@ -11,7 +11,9 @@ import {
   Settlement, 
   ClientInvoice,
   OfflineSyncItem,
-  ProjectNoteItem 
+  ProjectNoteItem,
+  DailyFieldReport,
+  PhoneControlRecord
 } from '@/types';
 import { 
   INITIAL_USERS, 
@@ -21,7 +23,9 @@ import {
   INITIAL_EXPENSES, 
   INITIAL_ADVANCES, 
   INITIAL_SETTLEMENTS, 
-  INITIAL_CLIENT_INVOICES 
+  INITIAL_CLIENT_INVOICES,
+  INITIAL_DAILY_REPORTS,
+  INITIAL_PHONE_CONTROL_RECORDS
 } from '@/lib/mock-data';
 import { 
   queueOfflineAction, 
@@ -96,6 +100,8 @@ interface AppContextType {
   advances: Advance[];
   settlements: Settlement[];
   clientInvoices: ClientInvoice[];
+  dailyReports: DailyFieldReport[];
+  phoneControlRecords: PhoneControlRecord[];
   
   // Project Management Actions
   addProject: (p: Omit<Project, 'id' | 'createdAt'>) => Project;
@@ -104,6 +110,16 @@ interface AppContextType {
   deleteProject: (id: string) => void;
   activateProjectFromFeasibility: (id: string) => void;
   addProjectNote: (projectId: string, noteText: string) => void;
+
+  // Daily Field Reports Actions
+  addDailyReport: (r: Omit<DailyFieldReport, 'id' | 'createdAt'>) => Promise<DailyFieldReport>;
+  updateDailyReport: (id: string, r: Partial<DailyFieldReport>) => void;
+  deleteDailyReport: (id: string) => void;
+
+  // Phone Controller (TK) Actions
+  addPhoneControlRecord: (r: Omit<PhoneControlRecord, 'id' | 'createdAt'>) => Promise<PhoneControlRecord>;
+  updatePhoneControlRecord: (id: string, r: Partial<PhoneControlRecord>) => void;
+  deletePhoneControlRecord: (id: string) => void;
   
   // Backup & Data Preservation Actions
   exportFullBackup: () => void;
@@ -175,6 +191,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [advances, setAdvances] = useState<Advance[]>(() => getInitialState('orion_advances', []));
   const [settlements, setSettlements] = useState<Settlement[]>(() => getInitialState('orion_settlements', []));
   const [clientInvoices, setClientInvoices] = useState<ClientInvoice[]>(() => getInitialState('orion_client_invoices', []));
+  const [dailyReports, setDailyReports] = useState<DailyFieldReport[]>(() => getInitialState('orion_daily_reports', []));
+  const [phoneControlRecords, setPhoneControlRecords] = useState<PhoneControlRecord[]>(() => getInitialState('orion_phone_control_records', []));
   
   const isLoadedRef = React.useRef<boolean>(false);
   const lastSyncTimestampRef = React.useRef<string>('');
@@ -188,6 +206,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     advances?: Advance[];
     settlements?: Settlement[];
     clientInvoices?: ClientInvoice[];
+    dailyReports?: DailyFieldReport[];
+    phoneControlRecords?: PhoneControlRecord[];
   }) => {
     try {
       const res = await fetch('/api/data', {
@@ -307,6 +327,28 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
                 await pushToServer({ projectPersonnel: localPP });
               }
             }
+
+            // Daily Field Reports
+            if (serverDb.dailyReports && serverDb.dailyReports.length > 0) {
+              setDailyReports(serverDb.dailyReports);
+              localStorage.setItem('orion_daily_reports', JSON.stringify(serverDb.dailyReports));
+            } else {
+              const localDR = getInitialState<DailyFieldReport[]>('orion_daily_reports', []);
+              if (localDR.length > 0) {
+                await pushToServer({ dailyReports: localDR });
+              }
+            }
+
+            // Phone Control Records
+            if (serverDb.phoneControlRecords && serverDb.phoneControlRecords.length > 0) {
+              setPhoneControlRecords(serverDb.phoneControlRecords);
+              localStorage.setItem('orion_phone_control_records', JSON.stringify(serverDb.phoneControlRecords));
+            } else {
+              const localPC = getInitialState<PhoneControlRecord[]>('orion_phone_control_records', []);
+              if (localPC.length > 0) {
+                await pushToServer({ phoneControlRecords: localPC });
+              }
+            }
           }
         }
       } catch (err) {
@@ -357,6 +399,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             if (serverDb.clientInvoices && serverDb.clientInvoices.length > 0) {
               setClientInvoices(serverDb.clientInvoices);
               localStorage.setItem('orion_client_invoices', JSON.stringify(serverDb.clientInvoices));
+            }
+            if (serverDb.dailyReports && serverDb.dailyReports.length > 0) {
+              setDailyReports(serverDb.dailyReports);
+              localStorage.setItem('orion_daily_reports', JSON.stringify(serverDb.dailyReports));
+            }
+            if (serverDb.phoneControlRecords && serverDb.phoneControlRecords.length > 0) {
+              setPhoneControlRecords(serverDb.phoneControlRecords);
+              localStorage.setItem('orion_phone_control_records', JSON.stringify(serverDb.phoneControlRecords));
             }
           }
         }
@@ -433,6 +483,26 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       }
     } catch (e) {}
   }, [settlements]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      localStorage.setItem('orion_daily_reports', JSON.stringify(dailyReports));
+      if (isLoadedRef.current) {
+        pushToServer({ dailyReports });
+      }
+    } catch (e) {}
+  }, [dailyReports]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      localStorage.setItem('orion_phone_control_records', JSON.stringify(phoneControlRecords));
+      if (isLoadedRef.current) {
+        pushToServer({ phoneControlRecords });
+      }
+    } catch (e) {}
+  }, [phoneControlRecords]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -661,6 +731,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setAdvances(prev => prev.filter(a => a.projectId !== id));
     setSettlements(prev => prev.filter(s => s.projectId !== id));
     setClientInvoices(prev => prev.filter(inv => inv.projectId !== id));
+    setDailyReports(prev => prev.filter(r => r.projectId !== id));
+    setPhoneControlRecords(prev => prev.filter(p => p.projectId !== id));
   };
 
   // Full System Data Export & Import (Backup & Restore)
@@ -668,7 +740,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     if (typeof window === 'undefined') return;
     const backupData = {
       system: 'Orion OPT',
-      version: '1.0',
+      version: '1.1',
       exportDate: new Date().toISOString(),
       projects,
       personnel,
@@ -676,7 +748,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       expenses,
       advances,
       settlements,
-      clientInvoices
+      clientInvoices,
+      dailyReports,
+      phoneControlRecords
     };
 
     const jsonStr = JSON.stringify(backupData, null, 2);
@@ -706,11 +780,98 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       if (Array.isArray(data.advances)) setAdvances(data.advances);
       if (Array.isArray(data.settlements)) setSettlements(data.settlements);
       if (Array.isArray(data.clientInvoices)) setClientInvoices(data.clientInvoices);
+      if (Array.isArray(data.dailyReports)) setDailyReports(data.dailyReports);
+      if (Array.isArray(data.phoneControlRecords)) setPhoneControlRecords(data.phoneControlRecords);
 
-      return { success: true, message: 'Tüm projeler, personeller ve hakedişler başarıyla geri yüklendi.' };
+      return { success: true, message: 'Tüm projeler, personeller, hakedişler, günlük raporlar ve TK kayıtları başarıyla geri yüklendi.' };
     } catch (err: any) {
       return { success: false, message: 'Yedek yükleme hatası: ' + err.message };
     }
+  };
+
+  // DAILY FIELD REPORTS ACTIONS
+  const addDailyReport = async (rData: Omit<DailyFieldReport, 'id' | 'createdAt'>): Promise<DailyFieldReport> => {
+    const author = currentUser?.fullName || 'Fatih Sakar';
+    const totalWage = (rData.workers || []).reduce((sum, w) => sum + Number(w.dailyWage || 0), 0);
+    const totalSurveys = (rData.workers || []).reduce((sum, w) => sum + Number(w.surveysCompleted || 0), 0);
+    const targetProject = projects.find(p => p.id === rData.projectId);
+
+    const newReport: DailyFieldReport = {
+      ...rData,
+      id: 'drep-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6),
+      projectCode: targetProject?.code || rData.projectCode || 'PROJ',
+      projectTitle: targetProject?.title || rData.projectTitle || '',
+      totalDailyWage: totalWage,
+      totalDailySurveys: totalSurveys,
+      createdById: currentUser?.id,
+      createdByName: author,
+      createdAt: new Date().toISOString()
+    };
+
+    setDailyReports(prev => [newReport, ...prev]);
+    return newReport;
+  };
+
+  const updateDailyReport = (id: string, rData: Partial<DailyFieldReport>) => {
+    setDailyReports(prev => prev.map(rep => {
+      if (rep.id !== id) return rep;
+      const updatedWorkers = rData.workers !== undefined ? rData.workers : rep.workers;
+      const totalWage = (updatedWorkers || []).reduce((sum, w) => sum + Number(w.dailyWage || 0), 0);
+      const totalSurveys = (updatedWorkers || []).reduce((sum, w) => sum + Number(w.surveysCompleted || 0), 0);
+      return {
+        ...rep,
+        ...rData,
+        workers: updatedWorkers,
+        totalDailyWage: totalWage,
+        totalDailySurveys: totalSurveys,
+        updatedAt: new Date().toISOString()
+      };
+    }));
+  };
+
+  const deleteDailyReport = (id: string) => {
+    setDailyReports(prev => prev.filter(r => r.id !== id));
+  };
+
+  // PHONE CONTROL (TK) ACTIONS
+  const addPhoneControlRecord = async (rData: Omit<PhoneControlRecord, 'id' | 'createdAt'>): Promise<PhoneControlRecord> => {
+    const author = currentUser?.fullName || 'Fatih Sakar';
+    const targetProject = projects.find(p => p.id === rData.projectId);
+    const called = Number(rData.totalCalled || 0);
+    const approved = Number(rData.totalApproved || 0);
+    const rate = called > 0 ? Math.round((approved / called) * 100) : 0;
+
+    const newRecord: PhoneControlRecord = {
+      ...rData,
+      id: 'tk-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6),
+      projectCode: targetProject?.code || rData.projectCode || 'PROJ',
+      projectTitle: targetProject?.title || rData.projectTitle || '',
+      approvalRate: rate,
+      createdById: currentUser?.id,
+      createdByName: author,
+      createdAt: new Date().toISOString()
+    };
+
+    setPhoneControlRecords(prev => [newRecord, ...prev]);
+    return newRecord;
+  };
+
+  const updatePhoneControlRecord = (id: string, rData: Partial<PhoneControlRecord>) => {
+    setPhoneControlRecords(prev => prev.map(rec => {
+      if (rec.id !== id) return rec;
+      const updated = { ...rec, ...rData };
+      const called = Number(updated.totalCalled || 0);
+      const approved = Number(updated.totalApproved || 0);
+      const rate = called > 0 ? Math.round((approved / called) * 100) : 0;
+      return {
+        ...updated,
+        approvalRate: rate
+      };
+    }));
+  };
+
+  const deletePhoneControlRecord = (id: string) => {
+    setPhoneControlRecords(prev => prev.filter(r => r.id !== id));
   };
 
   const activateProjectFromFeasibility = (id: string) => {
@@ -1104,12 +1265,20 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       advances,
       settlements,
       clientInvoices,
+      dailyReports,
+      phoneControlRecords,
       addProject,
       updateProject,
       toggleArchiveProject,
       deleteProject,
       activateProjectFromFeasibility,
       addProjectNote,
+      addDailyReport,
+      updateDailyReport,
+      deleteDailyReport,
+      addPhoneControlRecord,
+      updatePhoneControlRecord,
+      deletePhoneControlRecord,
       exportFullBackup,
       importFullBackup,
       addPersonnel,

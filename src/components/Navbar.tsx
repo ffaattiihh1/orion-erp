@@ -19,7 +19,13 @@ import {
   FileText,
   KeyRound,
   User,
-  Database
+  Database,
+  PhoneCall,
+  ClipboardList,
+  Menu,
+  X,
+  Sparkles,
+  LayoutDashboard
 } from 'lucide-react';
 
 interface NavbarProps {
@@ -39,6 +45,7 @@ export default function Navbar({ activeTab, setActiveTab }: NavbarProps) {
 
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const [isBackupModalOpen, setIsBackupModalOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const handleRoleToggle = (targetRole: 'admin' | 'spv') => {
     const user = users.find(u => u.role === targetRole);
@@ -47,10 +54,14 @@ export default function Navbar({ activeTab, setActiveTab }: NavbarProps) {
     }
   };
 
+  // Main navigation items - Dashboard / Ana Sayfa is prominent and default
   const allNavItems = [
+    { id: 'dashboard', label: 'Ana Sayfa', shortLabel: 'Ana Sayfa', icon: LayoutDashboard, roles: ['admin', 'spv'] },
     { id: 'projects', label: 'Projeler', shortLabel: 'Projeler', icon: Briefcase, roles: ['admin', 'spv'] },
-    { id: 'settlements', label: 'Hakediş Proje Kapama', shortLabel: 'Hakediş', icon: Calculator, roles: ['admin', 'spv'] },
     { id: 'personnel', label: 'Personel Listesi', shortLabel: 'Personel', icon: Users, roles: ['admin', 'spv'] },
+    { id: 'phone-control', label: 'TK Telefon Kontrol', shortLabel: 'TK Kontrol', icon: PhoneCall, roles: ['admin', 'spv'] },
+    { id: 'daily-reports', label: 'Saha Günlük Raporları', shortLabel: 'Saha Rapor', icon: ClipboardList, roles: ['admin', 'spv'] },
+    { id: 'settlements', label: 'Hakediş Proje Kapama', shortLabel: 'Hakediş', icon: Calculator, roles: ['admin', 'spv'] },
     { id: 'expenses', label: 'Saha Masrafları', shortLabel: 'Masraf', icon: Receipt, roles: ['admin', 'spv'] },
     { id: 'advances', label: 'Canlı Avanslar', shortLabel: 'Avans', icon: Banknote, roles: ['admin', 'spv'] },
     { id: 'feasibility', label: 'Fizibilite Simülatörü', shortLabel: 'Fizibilite', icon: Calculator, roles: ['admin'] },
@@ -60,6 +71,10 @@ export default function Navbar({ activeTab, setActiveTab }: NavbarProps) {
   const visibleNavItems = allNavItems.filter(item => 
     !currentUser?.role || item.roles.includes(currentUser.role)
   );
+
+  // Quick primary items for mobile bottom bar
+  const mobilePrimaryIds = ['dashboard', 'projects', 'phone-control', 'daily-reports'];
+  const isOtherTabActive = !mobilePrimaryIds.includes(activeTab);
 
   return (
     <>
@@ -167,10 +182,10 @@ export default function Navbar({ activeTab, setActiveTab }: NavbarProps) {
           </div>
         </div>
 
-        {/* Desktop Top Sub-Navigation (Hidden on mobile to keep top clean) */}
-        <div className="hidden sm:block border-t border-slate-800/80 bg-slate-950/40">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <nav className="flex space-x-1 overflow-x-auto py-2 scrollbar-none">
+        {/* Top Sub-Navigation (Visible on both Desktop and Mobile with smooth swipe) */}
+        <div className="border-t border-slate-800/80 bg-slate-950/50">
+          <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
+            <nav className="flex space-x-1.5 overflow-x-auto py-2 scrollbar-none scroll-smooth">
               {visibleNavItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = activeTab === item.id;
@@ -178,10 +193,10 @@ export default function Navbar({ activeTab, setActiveTab }: NavbarProps) {
                   <button
                     key={item.id}
                     onClick={() => setActiveTab(item.id)}
-                    className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-medium whitespace-nowrap transition-all cursor-pointer ${
+                    className={`flex items-center gap-1.5 sm:gap-2 px-3 py-1.5 rounded-xl text-xs font-medium whitespace-nowrap transition-all cursor-pointer flex-shrink-0 ${
                       isActive
-                        ? 'bg-sky-500/15 text-sky-400 border border-sky-500/30 font-bold shadow-sm'
-                        : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
+                        ? 'bg-sky-500/20 text-sky-300 border border-sky-500/40 font-bold shadow-sm shadow-sky-500/10'
+                        : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 border border-transparent'
                     }`}
                   >
                     <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-sky-400' : 'text-slate-500'}`} />
@@ -196,29 +211,154 @@ export default function Navbar({ activeTab, setActiveTab }: NavbarProps) {
 
       {/* MOBILE BOTTOM NAVIGATION BAR (Fixed at bottom for easy thumb reach) */}
       <div className="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-slate-900/95 backdrop-blur-xl border-t border-slate-800 shadow-2xl safe-area-pb">
-        <nav className="grid grid-flow-col auto-cols-fr items-center h-15 px-1">
-          {visibleNavItems.slice(0, 5).map((item) => {
-            const Icon = item.icon;
-            const isActive = activeTab === item.id;
-            return (
-              <button
-                key={item.id}
-                onClick={() => setActiveTab(item.id)}
-                className={`flex flex-col items-center justify-center py-1 rounded-xl transition-all cursor-pointer ${
-                  isActive
-                    ? 'text-sky-400 font-bold'
-                    : 'text-slate-400 hover:text-slate-200'
-                }`}
-              >
-                <div className={`p-1 rounded-lg ${isActive ? 'bg-sky-500/20 text-sky-400' : 'text-slate-400'}`}>
-                  <Icon className="w-4 h-4" />
-                </div>
-                <span className="text-[10px] mt-0.5 tracking-tight">{item.shortLabel}</span>
-              </button>
-            );
-          })}
+        <nav className="grid grid-cols-5 items-center h-15 px-1">
+          {/* 1. Ana Sayfa (Dashboard) */}
+          <button
+            onClick={() => setActiveTab('dashboard')}
+            className={`flex flex-col items-center justify-center py-1 rounded-xl transition-all cursor-pointer ${
+              activeTab === 'dashboard' ? 'text-sky-400 font-bold' : 'text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            <div className={`p-1 rounded-lg ${activeTab === 'dashboard' ? 'bg-sky-500/20 text-sky-400' : 'text-slate-400'}`}>
+              <LayoutDashboard className="w-4 h-4" />
+            </div>
+            <span className="text-[10px] mt-0.5 tracking-tight font-medium">Ana Sayfa</span>
+          </button>
+
+          {/* 2. Projeler */}
+          <button
+            onClick={() => setActiveTab('projects')}
+            className={`flex flex-col items-center justify-center py-1 rounded-xl transition-all cursor-pointer ${
+              activeTab === 'projects' ? 'text-sky-400 font-bold' : 'text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            <div className={`p-1 rounded-lg ${activeTab === 'projects' ? 'bg-sky-500/20 text-sky-400' : 'text-slate-400'}`}>
+              <Briefcase className="w-4 h-4" />
+            </div>
+            <span className="text-[10px] mt-0.5 tracking-tight font-medium">Projeler</span>
+          </button>
+
+          {/* 3. TK Kontrol (Prominent & Dedicated) */}
+          <button
+            onClick={() => setActiveTab('phone-control')}
+            className={`flex flex-col items-center justify-center py-1 rounded-xl transition-all cursor-pointer ${
+              activeTab === 'phone-control' ? 'text-indigo-400 font-bold' : 'text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            <div className={`p-1 rounded-lg ${activeTab === 'phone-control' ? 'bg-indigo-500/25 text-indigo-400 ring-1 ring-indigo-500/50' : 'text-slate-400'}`}>
+              <PhoneCall className="w-4 h-4" />
+            </div>
+            <span className="text-[10px] mt-0.5 tracking-tight font-medium">TK Kontrol</span>
+          </button>
+
+          {/* 4. Saha Rapor */}
+          <button
+            onClick={() => setActiveTab('daily-reports')}
+            className={`flex flex-col items-center justify-center py-1 rounded-xl transition-all cursor-pointer ${
+              activeTab === 'daily-reports' ? 'text-sky-400 font-bold' : 'text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            <div className={`p-1 rounded-lg ${activeTab === 'daily-reports' ? 'bg-sky-500/20 text-sky-400' : 'text-slate-400'}`}>
+              <ClipboardList className="w-4 h-4" />
+            </div>
+            <span className="text-[10px] mt-0.5 tracking-tight font-medium">Saha Rapor</span>
+          </button>
+
+          {/* 5. Menü / Daha Fazla */}
+          <button
+            onClick={() => setIsMobileMenuOpen(true)}
+            className={`flex flex-col items-center justify-center py-1 rounded-xl transition-all cursor-pointer ${
+              isOtherTabActive ? 'text-amber-400 font-bold' : 'text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            <div className={`p-1 rounded-lg ${isOtherTabActive ? 'bg-amber-500/20 text-amber-400' : 'text-slate-400'}`}>
+              <Menu className="w-4 h-4" />
+            </div>
+            <span className="text-[10px] mt-0.5 tracking-tight font-medium">
+              {isOtherTabActive ? 'Diğer (*)' : 'Menü'}
+            </span>
+          </button>
         </nav>
       </div>
+
+      {/* MOBILE FULL MENU BOTTOM SHEET */}
+      {isMobileMenuOpen && (
+        <div className="sm:hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex flex-col justify-end">
+          <div className="bg-slate-900 border-t border-slate-800 rounded-t-3xl p-5 space-y-4 max-h-[85vh] overflow-y-auto">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+              <div className="flex items-center gap-2">
+                <div className="p-2 rounded-xl bg-sky-500/20 text-sky-400">
+                  <Sparkles className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-white">Tüm Modüller & Menü</h3>
+                  <p className="text-[11px] text-slate-400">{currentUser?.fullName} ({currentUser?.role === 'admin' ? 'Müdür' : 'SPV'})</p>
+                </div>
+              </div>
+              <button 
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="p-1.5 rounded-xl bg-slate-800 text-slate-400 hover:text-white"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Nav Items Grid */}
+            <div className="grid grid-cols-2 gap-2.5">
+              {visibleNavItems.map((item) => {
+                const Icon = item.icon;
+                const isActive = activeTab === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => {
+                      setActiveTab(item.id);
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className={`flex items-center gap-2.5 p-3 rounded-2xl border text-left transition-all cursor-pointer ${
+                      isActive
+                        ? 'bg-sky-500/20 border-sky-500/40 text-sky-300 font-bold'
+                        : 'bg-slate-950 border-slate-800 text-slate-300 hover:bg-slate-800'
+                    }`}
+                  >
+                    <div className={`p-2 rounded-xl ${isActive ? 'bg-sky-500 text-white' : 'bg-slate-900 text-slate-400'}`}>
+                      <Icon className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <div className="text-xs font-semibold">{item.label}</div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Quick Actions in Mobile Drawer */}
+            <div className="pt-2 border-t border-slate-800 flex gap-2">
+              <button
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  setIsBackupModalOpen(true);
+                }}
+                className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-emerald-400 text-xs font-semibold"
+              >
+                <Database className="w-3.5 h-3.5" />
+                <span>Yedekleme</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  setIsPasswordModalOpen(true);
+                }}
+                className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-sky-400 text-xs font-semibold"
+              >
+                <KeyRound className="w-3.5 h-3.5" />
+                <span>Şifre</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Change Password Modal */}
       <ChangePasswordModal 

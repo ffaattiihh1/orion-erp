@@ -6,7 +6,7 @@ export type BusinessModel = 'model_a_macro' | 'model_b_micro';
 
 export type ProjectStatus = 'draft' | 'feasibility' | 'active' | 'completed' | 'cancelled';
 
-export type PersonnelRole = 'anketor' | 'gozlemci' | 'gizli_musteri' | 'cevirici' | 'girisci';
+export type PersonnelRole = 'anketor' | 'gozlemci' | 'gizli_musteri' | 'cevirici' | 'girisci' | 'telefon_kontrolcu';
 
 export type ExpenseCategory = 'yakit' | 'yemek' | 'konaklama' | 'kargo' | 'diger';
 
@@ -187,11 +187,65 @@ export interface Project {
   totalAdvances?: number;
 }
 
+export type FieldStatus = 'started' | 'delayed' | 'ongoing' | 'completed' | 'paused';
+
+export interface DailyFieldWorker {
+  id: string;
+  personnelId?: string;
+  personnelName: string;
+  onBehalfOf?: string; // Şu kişi şunun adına çalıştı (örn: "Mehmet Kaya adına")
+  dailyWage: number; // Günlük yevmiye / ücret (TL)
+  surveysCompleted?: number; // Bugün yaptığı anket sayısı
+  role?: string; // Anketör, Gözlemci, Yedek vb.
+  notes?: string;
+}
+
+export interface DailyFieldReport {
+  id: string;
+  projectId: string;
+  projectCode: string;
+  projectTitle?: string;
+  reportDate: string; // YYYY-MM-DD
+  locations: string; // Bugün anket yapılan noktalar (örn: "Kadıköy Rıhtım, Moda Sahil, Altıyol")
+  status: FieldStatus;
+  statusReason?: string; // Şundan dolayı saha başlayamadı veya gecikti açıklaması
+  actualStartDate?: string; // Saha bu tarihte başladı
+  workers: DailyFieldWorker[]; // Çalışan kişiler, adına çalışanlar ve günlük ücretleri
+  totalDailyWage: number; // Günlük toplam anketör maliyeti
+  totalDailySurveys: number; // Bugün sahada toplanan toplam anket
+  notes?: string; // Genel saha notu / bugün neler yapıldı
+  createdById?: string;
+  createdByName?: string;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export interface PhoneControlRecord {
+  id: string;
+  projectId: string;
+  projectCode: string;
+  projectTitle?: string;
+  controllerId?: string;
+  controllerName: string; // TK'cı adı
+  controlDate: string; // YYYY-MM-DD
+  dailyWage: number; // TK'cı günlük ücreti (Örn: 1000 TL, 1500 TL)
+  totalCalled: number; // Kaç kişi / anket arandı
+  totalApproved: number; // Kaç kişiden okey / onay alındı
+  totalRejected: number; // Red / İptal sayısı
+  totalUnreachable?: number; // Ulaşılamadı / Cevapsız
+  approvalRate?: number; // Yüzde okey oranı
+  notes?: string; // Notlar (Örn: '12 nolu anketörde tutarsızlık var')
+  createdById?: string;
+  createdByName?: string;
+  createdAt: string;
+}
+
 export interface OfflineSyncItem {
   id: string;
-  type: 'EXPENSE' | 'ADVANCE' | 'SURVEY_COUNT' | 'BATCH_SETTLEMENTS';
+  type: 'EXPENSE' | 'ADVANCE' | 'SURVEY_COUNT' | 'BATCH_SETTLEMENTS' | 'DAILY_REPORT' | 'PHONE_CONTROL';
   payload: any;
   timestamp: number;
   status: 'PENDING' | 'SYNCED' | 'FAILED';
   errorMessage?: string;
 }
+

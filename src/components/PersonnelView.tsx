@@ -135,7 +135,8 @@ export default function PersonnelView() {
     gozlemci: 'Gözlemci',
     gizli_musteri: 'Gizli Müşteri',
     cevirici: 'Çevirici (Stüdyo)',
-    girisci: 'Girişçi (PC Başı)'
+    girisci: 'Girişçi (PC Başı)',
+    telefon_kontrolcu: 'Telefon Kontrolcüsü (TK)'
   };
 
   return (
@@ -178,6 +179,7 @@ export default function PersonnelView() {
           >
             <option value="all">Tüm Roller</option>
             <option value="anketor">Anketör</option>
+            <option value="telefon_kontrolcu">Telefon Kontrolcüsü (TK)</option>
             <option value="gozlemci">Gözlemci</option>
             <option value="gizli_musteri">Gizli Müşteri</option>
             <option value="cevirici">Çevirici</option>
@@ -406,6 +408,7 @@ export default function PersonnelView() {
                     className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white"
                   >
                     <option value="anketor">Anketör</option>
+                    <option value="telefon_kontrolcu">Telefon Kontrolcüsü (TK)</option>
                     <option value="gozlemci">Gözlemci</option>
                     <option value="gizli_musteri">Gizli Müşteri</option>
                     <option value="cevirici">Çevirici</option>

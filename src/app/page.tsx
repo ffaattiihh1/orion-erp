@@ -4,17 +4,20 @@ import React, { useState } from 'react';
 import { useApp } from '@/context/AppContext';
 import LoginWall from '@/components/LoginWall';
 import Navbar from '@/components/Navbar';
+import DashboardView from '@/components/DashboardView';
 import ProjectsView from '@/components/ProjectsView';
 import SettlementsView from '@/components/SettlementsView';
 import PersonnelView from '@/components/PersonnelView';
 import ExpensesView from '@/components/ExpensesView';
 import AdvancesView from '@/components/AdvancesView';
 import InvoicesView from '@/components/InvoicesView';
+import DailyReportsView from '@/components/DailyReportsView';
+import PhoneControlView from '@/components/PhoneControlView';
 import FeasibilitySimulatorModal from '@/components/FeasibilitySimulatorModal';
 
 export default function HomePage() {
   const { currentUser } = useApp();
-  const [activeTab, setActiveTab] = useState<string>('projects');
+  const [activeTab, setActiveTab] = useState<string>('dashboard');
   const [isFeasibilityOpen, setIsFeasibilityOpen] = useState<boolean>(false);
 
   // 1. Login Wall (Zero registration, closed circuit)
@@ -28,10 +31,19 @@ export default function HomePage() {
       <Navbar activeTab={activeTab} setActiveTab={setActiveTab} />
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 pt-4 pb-22 sm:py-8">
+        {activeTab === 'dashboard' && (
+          <DashboardView 
+            onNavigate={(tab) => setActiveTab(tab)} 
+            onOpenFeasibility={() => setIsFeasibilityOpen(true)} 
+          />
+        )}
+
         {activeTab === 'projects' && (
           <ProjectsView onOpenFeasibility={() => setIsFeasibilityOpen(true)} />
         )}
 
+        {activeTab === 'daily-reports' && <DailyReportsView />}
+        {activeTab === 'phone-control' && <PhoneControlView />}
         {activeTab === 'settlements' && <SettlementsView />}
         {activeTab === 'personnel' && <PersonnelView />}
         {activeTab === 'expenses' && <ExpensesView />}

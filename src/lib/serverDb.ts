@@ -9,7 +9,9 @@ import {
   Advance, 
   Settlement, 
   ClientInvoice, 
-  UserProfile 
+  UserProfile,
+  DailyFieldReport,
+  PhoneControlRecord
 } from '@/types';
 
 export interface DatabaseSchema {
@@ -20,6 +22,8 @@ export interface DatabaseSchema {
   advances: Advance[];
   settlements: Settlement[];
   clientInvoices: ClientInvoice[];
+  dailyReports?: DailyFieldReport[];
+  phoneControlRecords?: PhoneControlRecord[];
   users?: UserProfile[];
   lastUpdated: string;
   version: number;
@@ -44,6 +48,8 @@ const INITIAL_DB: DatabaseSchema = {
   advances: [],
   settlements: [],
   clientInvoices: [],
+  dailyReports: [],
+  phoneControlRecords: [],
   lastUpdated: new Date().toISOString(),
   version: 1
 };
@@ -84,6 +90,8 @@ export function readDatabase(): DatabaseSchema {
       advances: Array.isArray(parsed.advances) ? parsed.advances : [],
       settlements: Array.isArray(parsed.settlements) ? parsed.settlements : [],
       clientInvoices: Array.isArray(parsed.clientInvoices) ? parsed.clientInvoices : [],
+      dailyReports: Array.isArray(parsed.dailyReports) ? parsed.dailyReports : [],
+      phoneControlRecords: Array.isArray(parsed.phoneControlRecords) ? parsed.phoneControlRecords : [],
       users: parsed.users,
       lastUpdated: parsed.lastUpdated || new Date().toISOString(),
       version: parsed.version || 1
@@ -108,6 +116,8 @@ export function writeDatabase(data: Partial<DatabaseSchema>): DatabaseSchema {
       advances: data.advances !== undefined ? data.advances : current.advances,
       settlements: data.settlements !== undefined ? data.settlements : current.settlements,
       clientInvoices: data.clientInvoices !== undefined ? data.clientInvoices : current.clientInvoices,
+      dailyReports: data.dailyReports !== undefined ? data.dailyReports : current.dailyReports,
+      phoneControlRecords: data.phoneControlRecords !== undefined ? data.phoneControlRecords : current.phoneControlRecords,
       users: data.users !== undefined ? data.users : current.users,
       lastUpdated: new Date().toISOString(),
       version: (current.version || 1) + 1
@@ -134,3 +144,4 @@ export function writeDatabase(data: Partial<DatabaseSchema>): DatabaseSchema {
     throw error;
   }
 }
+

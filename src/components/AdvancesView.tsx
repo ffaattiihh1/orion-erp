@@ -43,6 +43,30 @@ export default function AdvancesView() {
   return (
     <div className="space-y-6">
       
+      {/* Top Header Banner */}
+      <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-slate-900 to-slate-950 border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-md">
+        <div className="flex items-center gap-3">
+          <div className="p-2.5 rounded-xl bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+            <Banknote className="w-5 h-5" />
+          </div>
+          <div>
+            <h1 className="text-lg sm:text-xl font-black text-white tracking-tight">Canlı Avanslar</h1>
+            <p className="text-xs text-slate-400">Personele verilen ve hakedişten düşülecek canlı nakit/IBAN avansları</p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 text-xs">
+          <div className="px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-800">
+            <span className="text-slate-400">İşlem Sayısı: </span>
+            <strong className="text-white font-mono">{advances.length}</strong>
+          </div>
+          <div className="px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-800">
+            <span className="text-slate-400">Toplam Avans: </span>
+            <strong className="text-amber-400 font-mono">₺{advances.reduce((sum, a) => sum + Number(a.amount || 0), 0).toLocaleString('tr-TR')}</strong>
+          </div>
+        </div>
+      </div>
+
       {/* Control Bar */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-4 rounded-2xl bg-slate-900 border border-slate-800">
         <div className="flex flex-wrap items-center gap-2">
