@@ -2,16 +2,16 @@
 
 import React, { useState } from 'react';
 import { useApp } from '@/context/AppContext';
-import { ShieldCheck, Lock, ArrowRight, KeyRound, Mail, AlertCircle, X } from 'lucide-react';
+import { Lock, ArrowRight, KeyRound, Mail, AlertCircle, X, Eye, EyeOff } from 'lucide-react';
 
 export default function LoginWall() {
   const { loginWithCredentials, sendPasswordReset } = useApp();
   
   const [usernameOrEmail, setUsernameOrEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   
-  // Forgot Password Modal
   const [isForgotModalOpen, setIsForgotModalOpen] = useState(false);
   const [forgotInput, setForgotInput] = useState('');
   const [forgotSuccess, setForgotSuccess] = useState<string | null>(null);
@@ -20,10 +20,9 @@ export default function LoginWall() {
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-
     const res = loginWithCredentials(usernameOrEmail, password);
     if (!res.success) {
-      setError(res.error || 'Giriş yapılamadı. Lütfen bilgilerinizi kontrol edin.');
+      setError(res.error || 'Kullanıcı adı veya şifre hatalı.');
     }
   };
 
@@ -31,7 +30,6 @@ export default function LoginWall() {
     e.preventDefault();
     setForgotSuccess(null);
     setForgotError(null);
-
     const res = sendPasswordReset(forgotInput);
     if (res.success) {
       setForgotSuccess(res.message);
@@ -41,74 +39,68 @@ export default function LoginWall() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-4 relative overflow-hidden text-slate-100">
-      {/* Glow Orbs */}
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
 
-      {/* Main Card */}
-      <div className="w-full max-w-md bg-slate-900/90 border border-slate-800 rounded-3xl shadow-2xl backdrop-blur-xl p-6 sm:p-8 relative z-10">
-        
-        {/* Brand / Logo */}
-        <div className="flex flex-col items-center text-center mb-6">
-          <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-sky-500/25 mb-3.5 border border-sky-400/30">
-            <Lock className="w-7 h-7 sm:w-8 sm:h-8 text-white" />
+      {/* Card */}
+      <div className="w-full max-w-sm bg-white rounded-2xl shadow-lg border border-gray-100 p-6 sm:p-8">
+
+        {/* Logo & Brand */}
+        <div className="flex flex-col items-center text-center mb-7">
+          <div className="w-14 h-14 rounded-2xl bg-blue-600 flex items-center justify-center shadow-md mb-4">
+            <span className="text-white font-black text-2xl">O</span>
           </div>
-          <h1 className="text-xl sm:text-2xl font-black tracking-tight text-white flex items-center gap-2">
-            Orion Proje Takip
-          </h1>
-          <p className="text-xs text-sky-400 font-semibold tracking-wide mt-1">Saha Yönetim Sistemi</p>
-          
-          <div className="mt-3 flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-500/10 border border-sky-500/20 text-sky-300 text-[11px] font-medium">
-            <ShieldCheck className="w-3.5 h-3.5 text-sky-400" />
-            <span>Kullanıcı Kodu / Şifreli Güvenli Giriş</span>
-          </div>
+          <h1 className="text-xl font-black text-gray-900 tracking-tight">Orion Proje Takip</h1>
+          <p className="text-sm text-gray-500 mt-1">Saha Yönetim Sistemi</p>
         </div>
 
-        {/* Login Form */}
+        {/* Form */}
         <form onSubmit={handleLogin} className="space-y-4">
           <div>
-            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-              Kullanıcı Adı veya E-Posta
+            <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+              Kullanıcı Adı
             </label>
             <input
               type="text"
               required
               value={usernameOrEmail}
               onChange={(e) => setUsernameOrEmail(e.target.value)}
-              placeholder="Kullanıcı adı veya e-posta"
-              className="w-full px-4 py-3 rounded-xl bg-slate-950/70 border border-slate-700/80 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-500 text-sm transition-all"
+              placeholder="kullanici.adi"
+              className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm transition-all"
             />
           </div>
 
           <div>
             <div className="flex justify-between items-center mb-1.5">
-              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider">
-                Şifre
-              </label>
+              <label className="block text-sm font-semibold text-gray-700">Şifre</label>
               <button
                 type="button"
-                onClick={() => {
-                  setForgotInput(usernameOrEmail);
-                  setIsForgotModalOpen(true);
-                }}
-                className="text-[11px] text-sky-400 hover:text-sky-300 hover:underline cursor-pointer"
+                onClick={() => { setForgotInput(usernameOrEmail); setIsForgotModalOpen(true); }}
+                className="text-xs text-blue-600 hover:underline cursor-pointer"
               >
-                Şifremi Unuttum?
+                Şifremi unuttum
               </button>
             </div>
-            <input
-              type="password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••••••"
-              className="w-full px-4 py-3 rounded-xl bg-slate-950/70 border border-slate-700/80 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-500 text-sm transition-all"
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Şifrenizi girin"
+                className="w-full px-4 py-3 pr-11 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm transition-all"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-3.5 text-gray-400 hover:text-gray-600 cursor-pointer"
+              >
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
           </div>
 
           {error && (
-            <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs flex items-center gap-2">
+            <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-600 text-sm flex items-center gap-2">
               <AlertCircle className="w-4 h-4 flex-shrink-0" />
               <span>{error}</span>
             </div>
@@ -116,71 +108,61 @@ export default function LoginWall() {
 
           <button
             type="submit"
-            className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-bold text-sm shadow-lg shadow-sky-500/20 transition-all flex items-center justify-center gap-2 group cursor-pointer"
+            className="w-full py-3 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer"
           >
             <span>Giriş Yap</span>
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+            <ArrowRight className="w-4 h-4" />
           </button>
         </form>
 
-        <p className="mt-5 text-center text-[11px] text-slate-500">
-          Cihazınızda oturum açtıktan sonra çıkış yapana kadar oturumunuz korunur.
+        <p className="mt-5 text-center text-xs text-gray-400">
+          Giriş yaptıktan sonra oturumunuz bu cihazda korunur.
         </p>
       </div>
 
-      {/* FORGOT PASSWORD MODAL */}
+      {/* Forgot Password Modal */}
       {isForgotModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
-          <div className="w-full max-w-sm bg-slate-900 border border-slate-800 rounded-3xl p-6 text-slate-100 shadow-2xl">
-            <div className="flex justify-between items-center pb-3 border-b border-slate-800">
-              <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                <KeyRound className="w-4 h-4 text-sky-400" />
-                <span>Şifre Sıfırlama Talebi</span>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30 backdrop-blur-sm">
+          <div className="w-full max-w-sm bg-white rounded-2xl border border-gray-200 shadow-xl p-6">
+            <div className="flex justify-between items-center pb-3 border-b border-gray-100 mb-4">
+              <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2">
+                <KeyRound className="w-4 h-4 text-blue-600" />
+                Şifre Sıfırlama
               </h3>
-              <button onClick={() => setIsForgotModalOpen(false)} className="p-1 text-slate-400 hover:text-white cursor-pointer">
+              <button onClick={() => setIsForgotModalOpen(false)} className="p-1 text-gray-400 hover:text-gray-600 cursor-pointer">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleForgotPasswordSubmit} className="space-y-4 mt-4">
-              <p className="text-xs text-slate-300">
-                Kullanıcı adınızı veya kurumsal e-postanızı girdiğinizde şifre sıfırlama bağlantısı adresinize iletilecektir.
+            <form onSubmit={handleForgotPasswordSubmit} className="space-y-4">
+              <p className="text-sm text-gray-600">
+                Kullanıcı adınızı veya e-postanızı girin, şifre sıfırlama bağlantısı gönderilecek.
               </p>
 
-              <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">
-                  Kullanıcı Adı veya E-Posta
-                </label>
-                <div className="relative">
-                  <input
-                    type="text"
-                    required
-                    value={forgotInput}
-                    onChange={(e) => setForgotInput(e.target.value)}
-                    placeholder="Kullanıcı adı veya e-posta"
-                    className="w-full px-3.5 py-2.5 pl-9 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
-                  />
-                  <Mail className="w-4 h-4 text-slate-500 absolute left-3 top-3" />
-                </div>
+              <div className="relative">
+                <input
+                  type="text"
+                  required
+                  value={forgotInput}
+                  onChange={(e) => setForgotInput(e.target.value)}
+                  placeholder="Kullanıcı adı veya e-posta"
+                  className="w-full px-4 py-3 pl-10 rounded-xl bg-gray-50 border border-gray-200 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <Mail className="w-4 h-4 text-gray-400 absolute left-3 top-3.5" />
               </div>
 
               {forgotSuccess && (
-                <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs">
-                  {forgotSuccess}
-                </div>
+                <div className="p-3 rounded-xl bg-green-50 border border-green-200 text-green-700 text-sm">{forgotSuccess}</div>
               )}
-
               {forgotError && (
-                <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs">
-                  {forgotError}
-                </div>
+                <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-600 text-sm">{forgotError}</div>
               )}
 
               <button
                 type="submit"
-                className="w-full py-2.5 px-4 rounded-xl bg-sky-500 hover:bg-sky-400 text-white font-bold text-xs shadow-lg shadow-sky-500/20 transition-all cursor-pointer"
+                className="w-full py-2.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm transition-all cursor-pointer"
               >
-                Sıfırlama Bağlantısı Gönder
+                Bağlantı Gönder
               </button>
             </form>
           </div>

@@ -27,7 +27,7 @@ export default function HomePage() {
 
   // 2. Full Unified Dashboard (SPV & Admin have the same clean layout, role-isolated metrics)
   return (
-    <div className="min-h-screen bg-slate-950 flex flex-col text-slate-100">
+    <div className="min-h-screen bg-gray-50 flex flex-col text-gray-900">
       <Navbar activeTab={activeTab} setActiveTab={setActiveTab} />
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 pt-4 pb-22 sm:py-8">
