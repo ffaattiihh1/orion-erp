@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState } from 'react';
 import { useApp } from '@/context/AppContext';
@@ -39,7 +39,10 @@ export default function Navbar({ activeTab, setActiveTab }: NavbarProps) {
     users, 
     isOnline, 
     offlineQueueCount, 
-    syncOfflineQueue 
+    syncOfflineQueue,
+    syncWithServer,
+    isSyncing,
+    lastSyncedAt
   } = useApp();
 
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
@@ -126,6 +129,19 @@ export default function Navbar({ activeTab, setActiveTab }: NavbarProps) {
 
             {/* Right side actions */}
             <div className="flex items-center gap-1.5">
+
+              {/* Cloud Sync Status & Manual Trigger */}
+              <button
+                onClick={() => syncWithServer()}
+                disabled={isSyncing}
+                title={lastSyncedAt ? `Son bulut senkronizasyonu: ${lastSyncedAt}` : 'Bulut ile senkronize et'}
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-700 text-[11px] transition-all cursor-pointer disabled:opacity-60"
+              >
+                <RefreshCw className={`w-3 h-3 ${isSyncing ? 'animate-spin text-blue-600' : 'text-blue-500'}`} />
+                <span className="hidden sm:inline font-semibold">
+                  {isSyncing ? 'Senkronize ediliyor...' : 'Bulut Eşitle'}
+                </span>
+              </button>
 
               {/* Online status */}
               <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-gray-50 border border-gray-200 text-[11px]">

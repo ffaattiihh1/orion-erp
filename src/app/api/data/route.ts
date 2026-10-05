@@ -12,7 +12,7 @@ function getDb() {
 const COLLECTIONS = [
   'projects', 'personnel', 'projectPersonnel', 'expenses',
   'advances', 'settlements', 'clientInvoices', 'dailyReports',
-  'phoneControlRecords', 'users'
+  'phoneControlRecords', 'users', 'deleted_ids'
 ];
 
 export async function GET() {

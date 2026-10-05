@@ -160,6 +160,10 @@ interface AppContextType {
   
   getPersonnelNetAdvance: (projectId: string, personnelIdOrName: string, identityNumber?: string) => number;
   getProjectsForPersonnel: (personnelId: string) => Project[];
+  
+  syncWithServer: () => Promise<void>;
+  isSyncing: boolean;
+  lastSyncedAt: string | null;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -194,20 +198,159 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [dailyReports, setDailyReports] = useState<DailyFieldReport[]>(() => getInitialState('orion_daily_reports', []));
   const [phoneControlRecords, setPhoneControlRecords] = useState<PhoneControlRecord[]>(() => getInitialState('orion_phone_control_records', []));
   
+  // Sync & Status States
+  const [isSyncing, setIsSyncing] = useState<boolean>(false);
+  const [lastSyncedAt, setLastSyncedAt] = useState<string | null>(null);
+  const isLoadedRef = React.useRef<boolean>(false);
+  const isSyncingServerRef = React.useRef<boolean>(false);
+
   // localStorage = fast cache (instant load). Neon = cross-device persistent storage.
   const saveLocal = (key: string, value: unknown) => {
     if (typeof window === 'undefined') return;
     try { localStorage.setItem(key, JSON.stringify(value)); } catch {}
   };
 
+  const getDeletedIds = (): Set<string> => {
+    if (typeof window === 'undefined') return new Set();
+    try {
+      const saved = localStorage.getItem('orion_deleted_ids');
+      return saved ? new Set(JSON.parse(saved)) : new Set();
+    } catch {
+      return new Set();
+    }
+  };
+
+  const markAsDeleted = (id: string) => {
+    if (typeof window === 'undefined') return;
+    const current = getDeletedIds();
+    current.add(id);
+    const arr = Array.from(current);
+    try { localStorage.setItem('orion_deleted_ids', JSON.stringify(arr)); } catch {}
+    pushToServer({ deleted_ids: arr });
+  };
+
   const pushToServer = async (payload: Record<string, unknown>) => {
     try {
-      await fetch('/api/data', {
+      const res = await fetch('/api/data', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
+      if (res.ok) {
+        setLastSyncedAt(new Date().toLocaleTimeString('tr-TR'));
+      }
     } catch { /* offline - localStorage still has the data */ }
+  };
+
+  // Pull latest from Neon with intelligent merge (never loses local projects)
+  const loadFromServer = async () => {
+    if (isSyncingServerRef.current) return;
+    isSyncingServerRef.current = true;
+    setIsSyncing(true);
+
+    try {
+      const res = await fetch('/api/data', { cache: 'no-store' });
+      if (!res.ok) return;
+      const json = await res.json();
+      if (!json.success || !json.data) return;
+      const d = json.data;
+
+      // Sync deleted IDs
+      const localDeleted = getDeletedIds();
+      const serverDeleted = Array.isArray(d.deleted_ids) ? (d.deleted_ids as string[]) : [];
+      const combinedDeleted = new Set([...localDeleted, ...serverDeleted]);
+      if (typeof window !== 'undefined') {
+        try { localStorage.setItem('orion_deleted_ids', JSON.stringify(Array.from(combinedDeleted))); } catch {}
+      }
+
+      const toPush: Record<string, unknown> = {};
+
+      const mergeAndSync = <T extends { id: string }>(
+        serverArr: unknown,
+        storageKey: string,
+        setter: React.Dispatch<React.SetStateAction<T[]>>
+      ): T[] => {
+        const serverItems = (Array.isArray(serverArr) ? (serverArr as T[]) : []).filter(
+          item => item && item.id && !combinedDeleted.has(item.id)
+        );
+
+        let localItems: T[] = [];
+        if (typeof window !== 'undefined') {
+          try {
+            const raw = localStorage.getItem(storageKey);
+            if (raw) {
+              const parsed = JSON.parse(raw);
+              if (Array.isArray(parsed)) {
+                localItems = parsed.filter(item => item && item.id && !combinedDeleted.has(item.id));
+              }
+            }
+          } catch {}
+        }
+
+        // Case 1: Server empty, local has data -> Seed server with local data!
+        if (serverItems.length === 0 && localItems.length > 0) {
+          setter(localItems);
+          saveLocal(storageKey, localItems);
+          toPush[storageKey.replace('orion_', '')] = localItems;
+          return localItems;
+        }
+
+        // Case 2: Server has data -> Merge any local items that don't exist on server (prevent data loss)
+        if (serverItems.length > 0) {
+          const serverIdSet = new Set(serverItems.map(item => item.id));
+          const extraLocal = localItems.filter(item => !serverIdSet.has(item.id));
+          if (extraLocal.length > 0) {
+            const merged = [...serverItems, ...extraLocal];
+            setter(merged);
+            saveLocal(storageKey, merged);
+            toPush[storageKey.replace('orion_', '')] = merged;
+            return merged;
+          } else {
+            setter(serverItems);
+            saveLocal(storageKey, serverItems);
+            return serverItems;
+          }
+        }
+
+        // Case 3: Fallback if local exists
+        if (localItems.length > 0) {
+          setter(localItems);
+          saveLocal(storageKey, localItems);
+          toPush[storageKey.replace('orion_', '')] = localItems;
+          return localItems;
+        }
+
+        return [];
+      };
+
+      mergeAndSync(d.projects, 'orion_projects', setProjects);
+      mergeAndSync(d.personnel, 'orion_personnel', setPersonnel);
+      mergeAndSync(d.projectPersonnel, 'orion_project_personnel', setProjectPersonnel);
+      mergeAndSync(d.expenses, 'orion_expenses', setExpenses);
+      mergeAndSync(d.advances, 'orion_advances', setAdvances);
+      mergeAndSync(d.settlements, 'orion_settlements', setSettlements);
+      mergeAndSync(d.clientInvoices, 'orion_client_invoices', setClientInvoices);
+      mergeAndSync(d.dailyReports, 'orion_daily_reports', setDailyReports);
+      mergeAndSync(d.phoneControlRecords, 'orion_phone_control_records', setPhoneControlRecords);
+
+      // If local had extra items or server was seeded, push merged data to Neon
+      if (Object.keys(toPush).length > 0) {
+        toPush.deleted_ids = Array.from(combinedDeleted);
+        await pushToServer(toPush);
+      }
+
+      setLastSyncedAt(new Date().toLocaleTimeString('tr-TR'));
+    } catch {
+      /* offline or network error - continue using local */
+    } finally {
+      isSyncingServerRef.current = false;
+      setIsSyncing(false);
+      isLoadedRef.current = true;
+    }
+  };
+
+  const syncWithServer = async () => {
+    await loadFromServer();
   };
 
   // On mount: restore from localStorage immediately, then load latest from Neon
@@ -224,49 +367,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       }
     } catch {}
 
-    // Pull latest from Neon (overrides localStorage with server truth)
-    const loadFromServer = async () => {
-      try {
-        const res = await fetch('/api/data', { cache: 'no-store' });
-        if (!res.ok) return;
-        const json = await res.json();
-        if (!json.success || !json.data) return;
-        const d = json.data;
-
-        if (Array.isArray(d.projects) && d.projects.length > 0) {
-          setProjects(d.projects); saveLocal('orion_projects', d.projects);
-        }
-        if (Array.isArray(d.personnel) && d.personnel.length > 0) {
-          setPersonnel(d.personnel); saveLocal('orion_personnel', d.personnel);
-        }
-        if (Array.isArray(d.projectPersonnel) && d.projectPersonnel.length > 0) {
-          setProjectPersonnel(d.projectPersonnel); saveLocal('orion_project_personnel', d.projectPersonnel);
-        }
-        if (Array.isArray(d.expenses) && d.expenses.length > 0) {
-          setExpenses(d.expenses); saveLocal('orion_expenses', d.expenses);
-        }
-        if (Array.isArray(d.advances) && d.advances.length > 0) {
-          setAdvances(d.advances); saveLocal('orion_advances', d.advances);
-        }
-        if (Array.isArray(d.settlements) && d.settlements.length > 0) {
-          setSettlements(d.settlements); saveLocal('orion_settlements', d.settlements);
-        }
-        if (Array.isArray(d.clientInvoices) && d.clientInvoices.length > 0) {
-          setClientInvoices(d.clientInvoices); saveLocal('orion_client_invoices', d.clientInvoices);
-        }
-        if (Array.isArray(d.dailyReports) && d.dailyReports.length > 0) {
-          setDailyReports(d.dailyReports); saveLocal('orion_daily_reports', d.dailyReports);
-        }
-        if (Array.isArray(d.phoneControlRecords) && d.phoneControlRecords.length > 0) {
-          setPhoneControlRecords(d.phoneControlRecords); saveLocal('orion_phone_control_records', d.phoneControlRecords);
-        }
-      } catch { /* use localStorage cache */ }
-    };
-
     loadFromServer();
 
-    // Poll every 30s for cross-device updates
-    const interval = setInterval(loadFromServer, 30000);
+    // Auto-poll every 20s for cross-device updates
+    const interval = setInterval(loadFromServer, 20000);
     const onFocus = () => loadFromServer();
     window.addEventListener('focus', onFocus);
     return () => { clearInterval(interval); window.removeEventListener('focus', onFocus); };
@@ -282,6 +386,25 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => { saveLocal('orion_daily_reports', dailyReports); }, [dailyReports]);
   useEffect(() => { saveLocal('orion_phone_control_records', phoneControlRecords); }, [phoneControlRecords]);
   useEffect(() => { saveLocal('orion_client_invoices', clientInvoices); }, [clientInvoices]);
+
+  // Debounced auto-sync to Neon whenever state changes
+  useEffect(() => {
+    if (!isLoadedRef.current) return;
+    const timer = setTimeout(() => {
+      pushToServer({
+        projects,
+        personnel,
+        projectPersonnel,
+        expenses,
+        advances,
+        settlements,
+        clientInvoices,
+        dailyReports,
+        phoneControlRecords,
+      });
+    }, 1200);
+    return () => clearTimeout(timer);
+  }, [projects, personnel, projectPersonnel, expenses, advances, settlements, clientInvoices, dailyReports, phoneControlRecords]);
 
   const setCurrentUser = (user: UserProfile | null) => {
     setCurrentUserState(user);
@@ -510,45 +633,43 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   };
 
   const deleteProject = (id: string) => {
-    setProjects(prev => {
-      const updated = prev.filter(p => p.id !== id);
-      try { localStorage.setItem('orion_projects', JSON.stringify(updated)); } catch {}
-            return updated;
-    });
-    setProjectPersonnel(prev => {
-      const updated = prev.filter(pp => pp.projectId !== id);
-      try { localStorage.setItem('orion_project_personnel', JSON.stringify(updated)); } catch {}
-      return updated;
-    });
-    setExpenses(prev => {
-      const updated = prev.filter(e => e.projectId !== id);
-      try { localStorage.setItem('orion_expenses', JSON.stringify(updated)); } catch {}
-      return updated;
-    });
-    setAdvances(prev => {
-      const updated = prev.filter(a => a.projectId !== id);
-      try { localStorage.setItem('orion_advances', JSON.stringify(updated)); } catch {}
-      return updated;
-    });
-    setSettlements(prev => {
-      const updated = prev.filter(s => s.projectId !== id);
-      try { localStorage.setItem('orion_settlements', JSON.stringify(updated)); } catch {}
-      return updated;
-    });
-    setClientInvoices(prev => {
-      const updated = prev.filter(inv => inv.projectId !== id);
-      try { localStorage.setItem('orion_client_invoices', JSON.stringify(updated)); } catch {}
-      return updated;
-    });
-    setDailyReports(prev => {
-      const updated = prev.filter(r => r.projectId !== id);
-      try { localStorage.setItem('orion_daily_reports', JSON.stringify(updated)); } catch {}
-      return updated;
-    });
-    setPhoneControlRecords(prev => {
-      const updated = prev.filter(p => p.projectId !== id);
-      try { localStorage.setItem('orion_phone_control_records', JSON.stringify(updated)); } catch {}
-      return updated;
+    markAsDeleted(id);
+    const updatedProjects = projects.filter(p => p.id !== id);
+    const updatedPP = projectPersonnel.filter(pp => pp.projectId !== id);
+    const updatedExp = expenses.filter(e => e.projectId !== id);
+    const updatedAdv = advances.filter(a => a.projectId !== id);
+    const updatedSet = settlements.filter(s => s.projectId !== id);
+    const updatedInv = clientInvoices.filter(inv => inv.projectId !== id);
+    const updatedRep = dailyReports.filter(r => r.projectId !== id);
+    const updatedTk = phoneControlRecords.filter(p => p.projectId !== id);
+
+    setProjects(updatedProjects);
+    saveLocal('orion_projects', updatedProjects);
+    setProjectPersonnel(updatedPP);
+    saveLocal('orion_project_personnel', updatedPP);
+    setExpenses(updatedExp);
+    saveLocal('orion_expenses', updatedExp);
+    setAdvances(updatedAdv);
+    saveLocal('orion_advances', updatedAdv);
+    setSettlements(updatedSet);
+    saveLocal('orion_settlements', updatedSet);
+    setClientInvoices(updatedInv);
+    saveLocal('orion_client_invoices', updatedInv);
+    setDailyReports(updatedRep);
+    saveLocal('orion_daily_reports', updatedRep);
+    setPhoneControlRecords(updatedTk);
+    saveLocal('orion_phone_control_records', updatedTk);
+
+    pushToServer({
+      projects: updatedProjects,
+      projectPersonnel: updatedPP,
+      expenses: updatedExp,
+      advances: updatedAdv,
+      settlements: updatedSet,
+      clientInvoices: updatedInv,
+      dailyReports: updatedRep,
+      phoneControlRecords: updatedTk,
+      deleted_ids: Array.from(getDeletedIds())
     });
   };
 
@@ -1109,7 +1230,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       toggleSettlementPaid,
       updateInvoiceStatus,
       getPersonnelNetAdvance,
-      getProjectsForPersonnel
+      getProjectsForPersonnel,
+      syncWithServer,
+      isSyncing,
+      lastSyncedAt
     }}>
       {children}
     </AppContext.Provider>
