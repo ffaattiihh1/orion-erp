@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useState } from 'react';
 import { useApp } from '@/context/AppContext';
@@ -70,7 +70,7 @@ export default function DashboardView({ onNavigate, onOpenFeasibility }: Dashboa
       <div className="bg-white rounded-2xl border border-gray-200 p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center text-white font-black text-base flex-shrink-0">
+            <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center text-gray-900 font-black text-base flex-shrink-0">
               {currentUser?.fullName?.charAt(0) || 'U'}
             </div>
             <div>
@@ -84,7 +84,7 @@ export default function DashboardView({ onNavigate, onOpenFeasibility }: Dashboa
         <div className="flex items-center gap-2 flex-wrap">
           <button
             onClick={() => onNavigate('daily-reports')}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold transition-all cursor-pointer shadow-sm"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-gray-900 text-sm font-semibold transition-all cursor-pointer shadow-sm"
           >
             <Plus className="w-4 h-4" />
             <span>Saha Raporu Gir</span>
@@ -215,7 +215,7 @@ export default function DashboardView({ onNavigate, onOpenFeasibility }: Dashboa
               <p className="text-sm text-gray-500">Bugün için saha raporu girilmemiş.</p>
               <button
                 onClick={() => onNavigate('daily-reports')}
-                className="mt-3 px-4 py-1.5 rounded-xl bg-blue-600 text-white text-xs font-semibold cursor-pointer"
+                className="mt-3 px-4 py-1.5 rounded-xl bg-blue-600 text-gray-900 text-xs font-semibold cursor-pointer"
               >
                 + Rapor Gir
               </button>
@@ -278,7 +278,7 @@ export default function DashboardView({ onNavigate, onOpenFeasibility }: Dashboa
               <p className="text-sm text-gray-500">Bugün için TK kaydı girilmemiş.</p>
               <button
                 onClick={() => onNavigate('phone-control')}
-                className="mt-3 px-4 py-1.5 rounded-xl bg-indigo-600 text-white text-xs font-semibold cursor-pointer"
+                className="mt-3 px-4 py-1.5 rounded-xl bg-indigo-600 text-gray-900 text-xs font-semibold cursor-pointer"
               >
                 + TK Kaydı Gir
               </button>
@@ -335,3 +335,5 @@ export default function DashboardView({ onNavigate, onOpenFeasibility }: Dashboa
     </div>
   );
 }
+
+

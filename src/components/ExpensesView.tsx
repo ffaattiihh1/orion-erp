@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useState } from 'react';
 import { useApp } from '@/context/AppContext';
@@ -39,37 +39,37 @@ export default function ExpensesView() {
     <div className="space-y-6">
       
       {/* Top Header Banner */}
-      <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-slate-900 to-slate-950 border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-md">
+      <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-slate-900 to-slate-950 border border-gray-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-md">
         <div className="flex items-center gap-3">
           <div className="p-2.5 rounded-xl bg-amber-500/15 text-amber-400 border border-amber-500/30">
             <Receipt className="w-5 h-5" />
           </div>
           <div>
-            <h1 className="text-lg sm:text-xl font-black text-white tracking-tight">Saha Masrafları</h1>
-            <p className="text-xs text-slate-400">Yakıt, konaklama, yemek ve lojistik harcamalarının denetimi</p>
+            <h1 className="text-lg sm:text-xl font-black text-gray-900 tracking-tight">Saha Masrafları</h1>
+            <p className="text-xs text-gray-500">Yakıt, konaklama, yemek ve lojistik harcamalarının denetimi</p>
           </div>
         </div>
 
         <div className="flex items-center gap-2 text-xs">
-          <div className="px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-800">
-            <span className="text-slate-400">Toplam Fiş: </span>
-            <strong className="text-white font-mono">{expenses.length}</strong>
+          <div className="px-3 py-1.5 rounded-xl bg-white border border-gray-200">
+            <span className="text-gray-500">Toplam Fiş: </span>
+            <strong className="text-gray-900 font-mono">{expenses.length}</strong>
           </div>
-          <div className="px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-800">
-            <span className="text-slate-400">Toplam Tutar: </span>
+          <div className="px-3 py-1.5 rounded-xl bg-white border border-gray-200">
+            <span className="text-gray-500">Toplam Tutar: </span>
             <strong className="text-emerald-400 font-mono">₺{expenses.reduce((sum, e) => sum + Number(e.amount || 0), 0).toLocaleString('tr-TR')}</strong>
           </div>
         </div>
       </div>
 
       {/* Control Bar */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-4 rounded-2xl bg-slate-900 border border-slate-800">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-4 rounded-2xl bg-white border border-gray-200">
         <div className="flex flex-wrap items-center gap-2">
           {/* Project Filter */}
           <select
             value={projectFilter}
             onChange={(e) => setProjectFilter(e.target.value)}
-            className="px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-700 text-xs text-slate-200"
+            className="px-3 py-1.5 rounded-xl bg-white border border-gray-200 text-xs text-gray-800"
           >
             <option value="all">Tüm Projeler</option>
             {projects.map(p => (
@@ -81,7 +81,7 @@ export default function ExpensesView() {
           <select
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value)}
-            className="px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-700 text-xs text-slate-200"
+            className="px-3 py-1.5 rounded-xl bg-white border border-gray-200 text-xs text-gray-800"
           >
             <option value="all">Tüm Kategoriler</option>
             <option value="yakit">Yakıt / Mazot</option>
@@ -94,13 +94,13 @@ export default function ExpensesView() {
 
         <div className="flex items-center gap-3">
           <div className="text-right">
-            <span className="text-[10px] text-slate-400 uppercase tracking-wider block">Filtrelenen Toplam Gider</span>
+            <span className="text-[10px] text-gray-500 uppercase tracking-wider block">Filtrelenen Toplam Gider</span>
             <span className="text-sm font-bold font-mono text-emerald-400">₺{totalExpenseSum.toLocaleString('tr-TR')}</span>
           </div>
 
           <button
             onClick={handleExport}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition-all border border-slate-700 cursor-pointer"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs font-semibold transition-all border border-gray-200 cursor-pointer"
           >
             <FileSpreadsheet className="w-4 h-4 text-emerald-400" />
             <span>Excel'e Aktar</span>
@@ -109,10 +109,10 @@ export default function ExpensesView() {
       </div>
 
       {/* Expenses Table */}
-      <div className="rounded-2xl bg-slate-900 border border-slate-800 overflow-hidden shadow-xl">
+      <div className="rounded-2xl bg-white border border-gray-200 overflow-hidden shadow-xl">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs text-slate-300">
-            <thead className="bg-slate-950/80 text-slate-400 uppercase tracking-wider text-[11px] border-b border-slate-800">
+          <table className="w-full text-left text-xs text-gray-700">
+            <thead className="bg-gray-50 text-gray-500 uppercase tracking-wider text-[11px] border-b border-gray-200">
               <tr>
                 <th className="py-3 px-4 font-semibold">Tarih & Fiş</th>
                 <th className="py-3 px-4 font-semibold">Proje</th>
@@ -126,14 +126,14 @@ export default function ExpensesView() {
             <tbody className="divide-y divide-slate-800/80">
               {filteredExpenses.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="py-8 text-center text-slate-500">
+                  <td colSpan={7} className="py-8 text-center text-gray-400">
                     Kayıtlı masraf fişi bulunamadı.
                   </td>
                 </tr>
               ) : (
                 filteredExpenses.map((exp) => (
-                  <tr key={exp.id} className="hover:bg-slate-800/40 transition-colors">
-                    <td className="py-3.5 px-4 font-mono text-slate-400">
+                  <tr key={exp.id} className="hover:bg-gray-100 transition-colors">
+                    <td className="py-3.5 px-4 font-mono text-gray-500">
                       {exp.expenseDate}
                     </td>
 
@@ -142,12 +142,12 @@ export default function ExpensesView() {
                     </td>
 
                     <td className="py-3.5 px-4">
-                      <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">
+                      <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-gray-100 text-gray-700 border border-gray-200">
                         {exp.category}
                       </span>
                     </td>
 
-                    <td className="py-3.5 px-4 font-medium text-white max-w-xs truncate">
+                    <td className="py-3.5 px-4 font-medium text-gray-900 max-w-xs truncate">
                       {exp.description}
                     </td>
 
@@ -157,7 +157,7 @@ export default function ExpensesView() {
                       </span>
                     </td>
 
-                    <td className="py-3.5 px-4 text-right font-mono font-bold text-white text-sm">
+                    <td className="py-3.5 px-4 text-right font-mono font-bold text-gray-900 text-sm">
                       ₺{exp.amount.toLocaleString('tr-TR')}
                     </td>
 
@@ -184,19 +184,19 @@ export default function ExpensesView() {
 
       {/* Image Preview Modal */}
       {previewImage && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
-          <div className="relative max-w-lg w-full bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-2xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+          <div className="relative max-w-lg w-full bg-white border border-gray-200 rounded-2xl p-4 shadow-2xl">
             <button
               onClick={() => setPreviewImage(null)}
-              className="absolute top-4 right-4 p-2 rounded-full bg-slate-950/80 text-white hover:bg-slate-800"
+              className="absolute top-4 right-4 p-2 rounded-full bg-gray-50 text-gray-900 hover:bg-gray-100"
             >
               <X className="w-5 h-5" />
             </button>
-            <h3 className="text-sm font-bold text-white mb-3 flex items-center gap-2">
+            <h3 className="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
               <ImageIcon className="w-4 h-4 text-sky-400" />
               <span>Saha Fişi / Makbuz İnceleme</span>
             </h3>
-            <div className="rounded-xl overflow-hidden border border-slate-800">
+            <div className="rounded-xl overflow-hidden border border-gray-200">
               <img src={previewImage} alt="Fiş Görseli" className="w-full h-auto object-contain max-h-[70vh]" />
             </div>
           </div>
@@ -206,3 +206,5 @@ export default function ExpensesView() {
     </div>
   );
 }
+
+

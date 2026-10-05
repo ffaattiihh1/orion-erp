@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useState } from 'react';
 import { useApp } from '@/context/AppContext';
@@ -143,23 +143,23 @@ export default function PersonnelView() {
     <div className="space-y-6">
       
       {/* Header Banner */}
-      <div className="p-5 rounded-2xl bg-gradient-to-r from-slate-900 to-slate-950 border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="p-5 rounded-2xl bg-gradient-to-r from-slate-900 to-slate-950 border border-gray-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <div className="p-3 rounded-xl bg-sky-500/10 text-sky-400 border border-sky-500/20">
             <Users className="w-6 h-6" />
           </div>
           <div>
-            <h2 className="text-lg font-bold text-white tracking-tight">Personel Listesi</h2>
-            <p className="text-xs text-slate-400">Saha araştırmacısı, anketör, çevirici ve uzman kadro havuzu</p>
+            <h2 className="text-lg font-bold text-gray-900 tracking-tight">Personel Listesi</h2>
+            <p className="text-xs text-gray-500">Saha araştırmacısı, anketör, çevirici ve uzman kadro havuzu</p>
           </div>
         </div>
 
-        <div className="flex items-center gap-4 text-xs text-slate-400">
-          <div className="px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-800">
+        <div className="flex items-center gap-4 text-xs text-gray-500">
+          <div className="px-3 py-1.5 rounded-xl bg-white border border-gray-200">
             <span>Kayıtlı Personel: </span>
-            <strong className="text-white font-mono">{personnel.length} Kişi</strong>
+            <strong className="text-gray-900 font-mono">{personnel.length} Kişi</strong>
           </div>
-          <div className="px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-800">
+          <div className="px-3 py-1.5 rounded-xl bg-white border border-gray-200">
             <span>Aktif Kadro: </span>
             <strong className="text-emerald-400 font-mono">{personnel.filter(p => !p.isBlacklisted).length} Kişi</strong>
           </div>
@@ -167,7 +167,7 @@ export default function PersonnelView() {
       </div>
 
       {/* Control Bar */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-4 rounded-2xl bg-slate-900 border border-slate-800">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-4 rounded-2xl bg-white border border-gray-200">
         
         {/* Filters */}
         <div className="flex flex-wrap items-center gap-2">
@@ -175,7 +175,7 @@ export default function PersonnelView() {
           <select
             value={roleFilter}
             onChange={(e) => setRoleFilter(e.target.value)}
-            className="px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-700 text-xs text-slate-200"
+            className="px-3 py-1.5 rounded-xl bg-white border border-gray-200 text-xs text-gray-800"
           >
             <option value="all">Tüm Roller</option>
             <option value="anketor">Anketör</option>
@@ -190,7 +190,7 @@ export default function PersonnelView() {
           <select
             value={blacklistFilter}
             onChange={(e) => setBlacklistFilter(e.target.value)}
-            className="px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-700 text-xs text-slate-200"
+            className="px-3 py-1.5 rounded-xl bg-white border border-gray-200 text-xs text-gray-800"
           >
             <option value="all">Tüm Durumlar</option>
             <option value="active">Yalnızca Aktifler</option>
@@ -199,13 +199,13 @@ export default function PersonnelView() {
 
           {/* Search */}
           <div className="relative">
-            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <Search className="w-3.5 h-3.5 text-gray-500 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               placeholder="İsim, telefon veya şehir ara..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-8 pr-3 py-1.5 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+              className="pl-8 pr-3 py-1.5 rounded-xl bg-white border border-gray-200 text-xs text-gray-900 placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
             />
           </div>
         </div>
@@ -214,7 +214,7 @@ export default function PersonnelView() {
         <div className="flex items-center gap-2">
           <button
             onClick={handleExport}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition-all border border-slate-700 cursor-pointer"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs font-semibold transition-all border border-gray-200 cursor-pointer"
           >
             <FileSpreadsheet className="w-4 h-4 text-emerald-400" />
             <span>Excel'e Aktar</span>
@@ -222,7 +222,7 @@ export default function PersonnelView() {
 
           <button
             onClick={() => setIsAddModalOpen(true)}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-white text-xs font-bold shadow-lg shadow-sky-500/20 transition-all cursor-pointer"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-gray-900 text-xs font-bold shadow-lg shadow-sky-500/20 transition-all cursor-pointer"
           >
             <Plus className="w-4 h-4" />
             <span>Yeni Personel Ekle</span>
@@ -241,7 +241,7 @@ export default function PersonnelView() {
               className={`p-5 rounded-2xl border transition-all flex flex-col justify-between ${
                 person.isBlacklisted
                   ? 'bg-rose-950/20 border-rose-900/60 shadow-lg shadow-rose-950/20'
-                  : 'bg-slate-900 border-slate-800 hover:border-slate-700'
+                  : 'bg-white border-gray-200 hover:border-gray-200'
               }`}
             >
               <div>
@@ -266,39 +266,39 @@ export default function PersonnelView() {
 
                 {/* Name & TC */}
                 <div className="flex items-baseline justify-between">
-                  <h3 className={`text-base font-bold ${person.isBlacklisted ? 'text-rose-200 line-through' : 'text-white'}`}>
+                  <h3 className={`text-base font-bold ${person.isBlacklisted ? 'text-rose-200 line-through' : 'text-gray-900'}`}>
                     {person.fullName}
                   </h3>
                   {person.identityNumber && (
-                    <span className="font-mono text-[11px] text-slate-500">TC: {person.identityNumber}</span>
+                    <span className="font-mono text-[11px] text-gray-400">TC: {person.identityNumber}</span>
                   )}
                 </div>
 
                 {/* Contact details */}
-                <div className="mt-2 text-xs text-slate-400 space-y-1">
+                <div className="mt-2 text-xs text-gray-500 space-y-1">
                   <div className="flex items-center gap-2">
-                    <Phone className="w-3.5 h-3.5 text-slate-500" />
-                    <span className="text-slate-200 font-mono">{person.phone}</span>
+                    <Phone className="w-3.5 h-3.5 text-gray-400" />
+                    <span className="text-gray-800 font-mono">{person.phone}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <MapPin className="w-3.5 h-3.5 text-slate-500" />
+                    <MapPin className="w-3.5 h-3.5 text-gray-400" />
                     <span>{person.city}</span>
                   </div>
                 </div>
 
                 {/* Worked Projects List (Çalıştığı Projeler) */}
-                <div className="mt-3 pt-2.5 border-t border-slate-800/80">
-                  <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block mb-1.5">
+                <div className="mt-3 pt-2.5 border-t border-gray-200">
+                  <span className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider block mb-1.5">
                     Görev Aldığı Projeler ({workedProjects.length}):
                   </span>
                   {workedProjects.length === 0 ? (
-                    <span className="text-[11px] text-slate-500 italic">Henüz bir projede görev almadı</span>
+                    <span className="text-[11px] text-gray-400 italic">Henüz bir projede görev almadı</span>
                   ) : (
                     <div className="flex flex-wrap gap-1">
                       {workedProjects.map(proj => (
                         <span 
                           key={proj.id}
-                          className="px-2 py-0.5 rounded bg-slate-950 border border-slate-800 text-[10px] font-mono text-sky-400 font-bold"
+                          className="px-2 py-0.5 rounded bg-white border border-gray-200 text-[10px] font-mono text-sky-400 font-bold"
                           title={proj.title}
                         >
                           {proj.code}
@@ -321,9 +321,9 @@ export default function PersonnelView() {
               </div>
 
               {/* Bottom Actions */}
-              <div className="mt-4 pt-3 border-t border-slate-800 flex items-center justify-between gap-2">
-                <span className="text-[11px] text-slate-500">
-                  Tarife: <strong className="text-slate-300 font-mono">₺{person.defaultUnitPrice}</strong>
+              <div className="mt-4 pt-3 border-t border-gray-200 flex items-center justify-between gap-2">
+                <span className="text-[11px] text-gray-400">
+                  Tarife: <strong className="text-gray-700 font-mono">₺{person.defaultUnitPrice}</strong>
                 </span>
 
                 {/* Blacklist Toggle Button */}
@@ -337,8 +337,8 @@ export default function PersonnelView() {
                   }}
                   className={`py-1 px-3 rounded-lg text-xs font-semibold transition-all border cursor-pointer ${
                     person.isBlacklisted
-                      ? 'bg-slate-800 text-emerald-400 border-slate-700 hover:bg-emerald-950/30'
-                      : 'bg-slate-800 text-rose-400 border-slate-700 hover:bg-rose-950/30'
+                      ? 'bg-gray-100 text-emerald-400 border-gray-200 hover:bg-emerald-950/30'
+                      : 'bg-gray-100 text-rose-400 border-gray-200 hover:bg-rose-950/30'
                   }`}
                 >
                   {person.isBlacklisted ? 'Aktifleştir' : 'Engelle'}
@@ -351,61 +351,61 @@ export default function PersonnelView() {
 
       {/* MODAL 1: ADD NEW PERSONNEL */}
       {isAddModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
-          <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-2xl p-6 text-slate-100 shadow-2xl">
-            <div className="flex justify-between items-center pb-3 border-b border-slate-800">
-              <h3 className="text-base font-bold text-white flex items-center gap-2">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+          <div className="w-full max-w-md bg-white border border-gray-200 rounded-2xl p-6 text-gray-900 shadow-2xl">
+            <div className="flex justify-between items-center pb-3 border-b border-gray-200">
+              <h3 className="text-base font-bold text-gray-900 flex items-center gap-2">
                 <Users className="w-5 h-5 text-sky-400" />
                 <span>Yeni Personel Kaydı</span>
               </h3>
-              <button onClick={() => setIsAddModalOpen(false)} className="p-1 text-slate-400 hover:text-white">
+              <button onClick={() => setIsAddModalOpen(false)} className="p-1 text-gray-500 hover:text-gray-900">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             <form onSubmit={handleCreatePersonnel} className="space-y-4 mt-4">
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">Ad Soyad</label>
+                <label className="block text-xs font-semibold text-gray-700 mb-1">Ad Soyad</label>
                 <input
                   type="text"
                   required
                   value={newName}
                   onChange={(e) => setNewName(e.target.value)}
                   placeholder="Örn: Serkan Yıldız"
-                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white"
+                  className="w-full px-3 py-2 rounded-xl bg-white border border-gray-200 text-xs text-gray-900"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Telefon</label>
+                  <label className="block text-xs font-semibold text-gray-700 mb-1">Telefon</label>
                   <input
                     type="tel"
                     required
                     value={newPhone}
                     onChange={(e) => setNewPhone(e.target.value)}
                     placeholder="05XX XXX XX XX"
-                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white"
+                    className="w-full px-3 py-2 rounded-xl bg-white border border-gray-200 text-xs text-gray-900"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Şehir</label>
+                  <label className="block text-xs font-semibold text-gray-700 mb-1">Şehir</label>
                   <input
                     type="text"
                     value={newCity}
                     onChange={(e) => setNewCity(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white"
+                    className="w-full px-3 py-2 rounded-xl bg-white border border-gray-200 text-xs text-gray-900"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Uzmanlık Rolü</label>
+                  <label className="block text-xs font-semibold text-gray-700 mb-1">Uzmanlık Rolü</label>
                   <select
                     value={newRole}
                     onChange={(e) => setNewRole(e.target.value as PersonnelRole)}
-                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white"
+                    className="w-full px-3 py-2 rounded-xl bg-white border border-gray-200 text-xs text-gray-900"
                   >
                     <option value="anketor">Anketör</option>
                     <option value="telefon_kontrolcu">Telefon Kontrolcüsü (TK)</option>
@@ -416,30 +416,30 @@ export default function PersonnelView() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Standart Fiyat (TL)</label>
+                  <label className="block text-xs font-semibold text-gray-700 mb-1">Standart Fiyat (TL)</label>
                   <input
                     type="number"
                     value={newDefaultPrice}
                     onChange={(e) => setNewDefaultPrice(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white font-mono"
+                    className="w-full px-3 py-2 rounded-xl bg-white border border-gray-200 text-xs text-gray-900 font-mono"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">Notlar / Tecrübe</label>
+                <label className="block text-xs font-semibold text-gray-700 mb-1">Notlar / Tecrübe</label>
                 <input
                   type="text"
                   value={newNotes}
                   onChange={(e) => setNewNotes(e.target.value)}
                   placeholder="Örn: 5 yıllık saha tecrübesi, b sınıfı ehliyet"
-                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white"
+                  className="w-full px-3 py-2 rounded-xl bg-white border border-gray-200 text-xs text-gray-900"
                 />
               </div>
 
               <button
                 type="submit"
-                className="w-full py-3 rounded-xl bg-sky-500 hover:bg-sky-400 text-white font-bold text-xs shadow-lg shadow-sky-500/20 transition-all cursor-pointer"
+                className="w-full py-3 rounded-xl bg-sky-500 hover:bg-sky-400 text-gray-900 font-bold text-xs shadow-lg shadow-sky-500/20 transition-all cursor-pointer"
               >
                 Personeli Havuza Kaydet
               </button>
@@ -450,21 +450,21 @@ export default function PersonnelView() {
 
       {/* MODAL 2: BLACKLIST REASON ENTRY */}
       {blacklistTarget && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
-          <div className="w-full max-w-md bg-slate-900 border border-rose-800 rounded-2xl p-6 text-slate-100 shadow-2xl">
-            <div className="flex justify-between items-center pb-3 border-b border-slate-800">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+          <div className="w-full max-w-md bg-white border border-rose-800 rounded-2xl p-6 text-gray-900 shadow-2xl">
+            <div className="flex justify-between items-center pb-3 border-b border-gray-200">
               <h3 className="text-base font-bold text-rose-400 flex items-center gap-2">
                 <ShieldAlert className="w-5 h-5 text-rose-500" />
                 <span>Kara Listeye Alma Onayı</span>
               </h3>
-              <button onClick={() => setBlacklistTarget(null)} className="p-1 text-slate-400 hover:text-white">
+              <button onClick={() => setBlacklistTarget(null)} className="p-1 text-gray-500 hover:text-gray-900">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             <div className="mt-4 space-y-3">
-              <p className="text-xs text-slate-300">
-                <strong className="text-white">{blacklistTarget.fullName}</strong> isimli personeli kara listeye almak üzeresiniz. Kara listedeki personel hiçbir yeni projeye seçilemez.
+              <p className="text-xs text-gray-700">
+                <strong className="text-gray-900">{blacklistTarget.fullName}</strong> isimli personeli kara listeye almak üzeresiniz. Kara listedeki personel hiçbir yeni projeye seçilemez.
               </p>
 
               <div>
@@ -477,7 +477,7 @@ export default function PersonnelView() {
                   value={blacklistReasonInput}
                   onChange={(e) => setBlacklistReasonInput(e.target.value)}
                   placeholder="Örn: Mükerrer anket girişi, sahada devamsızlık veya etik kural ihlali..."
-                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-rose-900/60 text-xs text-white focus:outline-none focus:ring-1 focus:ring-rose-500"
+                  className="w-full px-3 py-2 rounded-xl bg-white border border-rose-900/60 text-xs text-gray-900 focus:outline-none focus:ring-1 focus:ring-rose-500"
                 />
               </div>
 
@@ -485,14 +485,14 @@ export default function PersonnelView() {
                 <button
                   type="button"
                   onClick={() => setBlacklistTarget(null)}
-                  className="flex-1 py-2.5 rounded-xl bg-slate-800 text-xs font-semibold text-slate-300 hover:bg-slate-700"
+                  className="flex-1 py-2.5 rounded-xl bg-gray-100 text-xs font-semibold text-gray-700 hover:bg-gray-200"
                 >
                   İptal
                 </button>
                 <button
                   type="button"
                   onClick={handleConfirmBlacklist}
-                  className="flex-1 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-xs font-bold text-white shadow-lg shadow-rose-600/30"
+                  className="flex-1 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-xs font-bold text-gray-900 shadow-lg shadow-rose-600/30"
                 >
                   Kara Listeye Al
                 </button>
@@ -504,31 +504,31 @@ export default function PersonnelView() {
 
       {/* MODAL 3: ASSIGN TO PROJECT & OVERRIDE PRICE */}
       {assignTarget && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
-          <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-2xl p-6 text-slate-100 shadow-2xl">
-            <div className="flex justify-between items-center pb-3 border-b border-slate-800">
-              <h3 className="text-base font-bold text-white flex items-center gap-2">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+          <div className="w-full max-w-md bg-white border border-gray-200 rounded-2xl p-6 text-gray-900 shadow-2xl">
+            <div className="flex justify-between items-center pb-3 border-b border-gray-200">
+              <h3 className="text-base font-bold text-gray-900 flex items-center gap-2">
                 <Layers className="w-5 h-5 text-sky-400" />
                 <span>Projeye Atama & Fiyat Override</span>
               </h3>
-              <button onClick={() => setAssignTarget(null)} className="p-1 text-slate-400 hover:text-white">
+              <button onClick={() => setAssignTarget(null)} className="p-1 text-gray-500 hover:text-gray-900">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             <form onSubmit={handleConfirmAssignment} className="space-y-4 mt-4">
               <div>
-                <span className="text-xs text-slate-400">Seçili Personel:</span>
-                <p className="text-sm font-bold text-white">{assignTarget.fullName} ({assignTarget.defaultRole})</p>
-                <p className="text-[11px] text-slate-500">Standart Birim Fiyatı: ₺{assignTarget.defaultUnitPrice}</p>
+                <span className="text-xs text-gray-500">Seçili Personel:</span>
+                <p className="text-sm font-bold text-gray-900">{assignTarget.fullName} ({assignTarget.defaultRole})</p>
+                <p className="text-[11px] text-gray-400">Standart Birim Fiyatı: ₺{assignTarget.defaultUnitPrice}</p>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">Atanacak Proje</label>
+                <label className="block text-xs font-semibold text-gray-700 mb-1">Atanacak Proje</label>
                 <select
                   value={targetProjectId}
                   onChange={(e) => setTargetProjectId(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white"
+                  className="w-full px-3 py-2 rounded-xl bg-white border border-gray-200 text-xs text-gray-900"
                 >
                   {projects.filter(p => p.businessModel === 'model_b_micro').map(p => (
                     <option key={p.id} value={p.id}>{p.code} - {p.title}</option>
@@ -546,15 +546,15 @@ export default function PersonnelView() {
                   min="1"
                   value={overridePriceInput}
                   onChange={(e) => setOverridePriceInput(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-sky-500/50 text-base font-mono font-bold text-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                  className="w-full px-4 py-2.5 rounded-xl bg-white border border-sky-500/50 text-base font-mono font-bold text-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-500"
                 />
-                <p className="text-[11px] text-slate-400 mt-1">
+                <p className="text-[11px] text-gray-500 mt-1">
                   Bu personelin hakedişi bu projede standart 180 TL yerine girdiğiniz <strong>₺{overridePriceInput}</strong> üzerinden hesaplanacaktır.
                 </p>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">
+                <label className="block text-xs font-semibold text-gray-700 mb-1">
                   Günlük Yemek Bedeli (TL - Opsiyonel)
                 </label>
                 <input
@@ -562,13 +562,13 @@ export default function PersonnelView() {
                   min="0"
                   value={foodAllowanceInput}
                   onChange={(e) => setFoodAllowanceInput(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white font-mono"
+                  className="w-full px-3 py-2 rounded-xl bg-white border border-gray-200 text-xs text-gray-900 font-mono"
                 />
               </div>
 
               <button
                 type="submit"
-                className="w-full py-3 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-bold text-xs shadow-lg shadow-sky-500/20 transition-all cursor-pointer"
+                className="w-full py-3 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-gray-900 font-bold text-xs shadow-lg shadow-sky-500/20 transition-all cursor-pointer"
               >
                 Projeye Ata & Fiyatı Tanımla
               </button>
@@ -580,3 +580,5 @@ export default function PersonnelView() {
     </div>
   );
 }
+
+

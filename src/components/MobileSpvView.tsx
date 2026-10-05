@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useState } from 'react';
 import { useApp } from '@/context/AppContext';
@@ -155,11 +155,11 @@ export default function MobileSpvView() {
   const recentSpvAdvances = advances.filter(a => a.projectId === activeProject?.id);
 
   return (
-    <div className="max-w-md mx-auto px-4 py-6 pb-24 text-slate-100">
+    <div className="max-w-md mx-auto px-4 py-6 pb-24 text-gray-900">
       
       {/* Toast Notification */}
       {successToast && (
-        <div className="fixed top-4 left-4 right-4 z-50 p-4 rounded-2xl bg-emerald-500 text-white shadow-2xl flex items-center gap-3 animate-bounce">
+        <div className="fixed top-4 left-4 right-4 z-50 p-4 rounded-2xl bg-emerald-500 text-gray-900 shadow-2xl flex items-center gap-3 animate-bounce">
           <CheckCircle2 className="w-5 h-5 flex-shrink-0" />
           <span className="text-xs font-bold">{successToast}</span>
         </div>
@@ -181,7 +181,7 @@ export default function MobileSpvView() {
       {/* SPV Active Project Header (RLS Filtered) */}
       <div 
         onClick={() => setSelectedProjectForDetail(activeProject)}
-        className="p-5 rounded-3xl bg-gradient-to-br from-slate-900 to-slate-950 border border-slate-800 hover:border-sky-500/40 shadow-xl relative overflow-hidden mb-6 cursor-pointer group transition-all"
+        className="p-5 rounded-3xl bg-gradient-to-br from-slate-900 to-slate-950 border border-gray-200 hover:border-sky-500/40 shadow-xl relative overflow-hidden mb-6 cursor-pointer group transition-all"
       >
         <div className="flex justify-between items-start">
           <div>
@@ -189,12 +189,12 @@ export default function MobileSpvView() {
               <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
                 Saha Ekip Lideri Modu
               </span>
-              <span className="text-xs font-mono text-slate-400">{activeProject?.code}</span>
+              <span className="text-xs font-mono text-gray-500">{activeProject?.code}</span>
             </div>
-            <h2 className="text-lg font-bold text-white tracking-tight group-hover:text-sky-300 transition-colors">
+            <h2 className="text-lg font-bold text-gray-900 tracking-tight group-hover:text-sky-300 transition-colors">
               {activeProject?.title}
             </h2>
-            <p className="text-xs text-slate-400 mt-0.5">Müşteri: {activeProject?.clientName}</p>
+            <p className="text-xs text-gray-500 mt-0.5">Müşteri: {activeProject?.clientName}</p>
           </div>
 
           <button
@@ -210,12 +210,12 @@ export default function MobileSpvView() {
         </div>
 
         {/* Project Target Bar */}
-        <div className="mt-4 pt-3 border-t border-slate-800">
-          <div className="flex justify-between text-xs text-slate-300 font-medium mb-1">
+        <div className="mt-4 pt-3 border-t border-gray-200">
+          <div className="flex justify-between text-xs text-gray-700 font-medium mb-1">
             <span>Saha İlerlemesi</span>
             <span className="font-mono">{activeProject?.completedSurveys || 0} / {activeProject?.targetSurveys} Anket</span>
           </div>
-          <div className="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden">
+          <div className="w-full bg-gray-100 h-2.5 rounded-full overflow-hidden">
             <div 
               className="bg-emerald-500 h-full rounded-full transition-all duration-500"
               style={{ width: `${Math.min(((activeProject?.completedSurveys || 0) / (activeProject?.targetSurveys || 1)) * 100, 100)}%` }}
@@ -230,58 +230,58 @@ export default function MobileSpvView() {
         {/* Button 1: Live Cash Advance */}
         <button
           onClick={() => setIsAdvanceModalOpen(true)}
-          className="w-full p-4 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 active:scale-98 text-white font-bold shadow-lg shadow-orange-500/25 flex items-center justify-between transition-all cursor-pointer"
+          className="w-full p-4 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 active:scale-98 text-gray-900 font-bold shadow-lg shadow-orange-500/25 flex items-center justify-between transition-all cursor-pointer"
         >
           <div className="flex items-center gap-3">
             <div className="p-2.5 rounded-xl bg-white/20">
-              <Banknote className="w-6 h-6 text-white" />
+              <Banknote className="w-6 h-6 text-gray-900" />
             </div>
             <div className="text-left">
               <p className="text-base font-extrabold leading-tight">Avans Ver & Canlı Düş</p>
               <p className="text-xs text-amber-100 font-normal">Anketörün hakedişinden anında eksi bakiye</p>
             </div>
           </div>
-          <PlusCircle className="w-6 h-6 text-white/80" />
+          <PlusCircle className="w-6 h-6 text-gray-900/80" />
         </button>
 
         {/* Button 2: Photo Expense & Receipt */}
         <button
           onClick={() => setIsExpenseModalOpen(true)}
-          className="w-full p-4 rounded-2xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 active:scale-98 text-white font-bold shadow-lg shadow-sky-500/25 flex items-center justify-between transition-all cursor-pointer"
+          className="w-full p-4 rounded-2xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 active:scale-98 text-gray-900 font-bold shadow-lg shadow-sky-500/25 flex items-center justify-between transition-all cursor-pointer"
         >
           <div className="flex items-center gap-3">
             <div className="p-2.5 rounded-xl bg-white/20">
-              <Camera className="w-6 h-6 text-white" />
+              <Camera className="w-6 h-6 text-gray-900" />
             </div>
             <div className="text-left">
               <p className="text-base font-extrabold leading-tight">Fiş Çek & Masraf Gir</p>
               <p className="text-xs text-sky-100 font-normal">Yakıt, yemek fişini merkeze saniyesinde ilet</p>
             </div>
           </div>
-          <PlusCircle className="w-6 h-6 text-white/80" />
+          <PlusCircle className="w-6 h-6 text-gray-900/80" />
         </button>
 
         {/* Button 3: Close Surveys (Hakediş Hesapla) */}
         <button
           onClick={() => setIsSurveyModalOpen(true)}
-          className="w-full p-4 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-500 hover:to-teal-600 active:scale-98 text-white font-bold shadow-lg shadow-emerald-600/25 flex items-center justify-between transition-all cursor-pointer"
+          className="w-full p-4 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-500 hover:to-teal-600 active:scale-98 text-gray-900 font-bold shadow-lg shadow-emerald-600/25 flex items-center justify-between transition-all cursor-pointer"
         >
           <div className="flex items-center gap-3">
             <div className="p-2.5 rounded-xl bg-white/20">
-              <ClipboardCheck className="w-6 h-6 text-white" />
+              <ClipboardCheck className="w-6 h-6 text-gray-900" />
             </div>
             <div className="text-left">
               <p className="text-base font-extrabold leading-tight">Anket Sayısı Gir & Kapa</p>
               <p className="text-xs text-emerald-100 font-normal">Toplam - İptal ile anında net hakediş hesapla</p>
             </div>
           </div>
-          <PlusCircle className="w-6 h-6 text-white/80" />
+          <PlusCircle className="w-6 h-6 text-gray-900/80" />
         </button>
       </div>
 
       {/* Field Personnel Active Balances */}
       <div className="mb-6">
-        <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">
+        <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">
           Saha Ekibi & Alınan Avanslar
         </h3>
         <div className="space-y-2">
@@ -292,16 +292,16 @@ export default function MobileSpvView() {
             return (
               <div 
                 key={person.id}
-                className="p-3.5 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between"
+                className="p-3.5 rounded-xl bg-white border border-gray-200 flex items-center justify-between"
               >
                 <div>
-                  <p className="text-sm font-bold text-white">{person.fullName}</p>
-                  <p className="text-[11px] text-slate-400">
+                  <p className="text-sm font-bold text-gray-900">{person.fullName}</p>
+                  <p className="text-[11px] text-gray-500">
                     Özel Fiyat: <span className="text-sky-400 font-semibold">{assignment?.customUnitPrice || person.defaultUnitPrice} TL</span> / Anket
                   </p>
                 </div>
                 <div className="text-right">
-                  <span className="text-xs text-slate-400 block">Toplam Avans</span>
+                  <span className="text-xs text-gray-500 block">Toplam Avans</span>
                   <span className="text-xs font-bold font-mono text-amber-400">
                     ₺{netAdvance.toLocaleString('tr-TR')}
                   </span>
@@ -314,22 +314,22 @@ export default function MobileSpvView() {
 
       {/* Recent Field Expenses */}
       <div>
-        <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">
+        <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">
           Son Girilen Fişler ({recentSpvExpenses.length})
         </h3>
         <div className="space-y-2">
           {recentSpvExpenses.slice(0, 4).map(exp => (
-            <div key={exp.id} className="p-3 rounded-xl bg-slate-900/80 border border-slate-800 flex items-center justify-between text-xs">
+            <div key={exp.id} className="p-3 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-between text-xs">
               <div className="flex items-center gap-2.5">
                 <div className="p-2 rounded-lg bg-sky-500/10 text-sky-400">
                   <Receipt className="w-4 h-4" />
                 </div>
                 <div>
-                  <p className="font-semibold text-white">{exp.description}</p>
-                  <p className="text-[10px] text-slate-400">{exp.expenseDate} • {exp.category.toUpperCase()}</p>
+                  <p className="font-semibold text-gray-900">{exp.description}</p>
+                  <p className="text-[10px] text-gray-500">{exp.expenseDate} • {exp.category.toUpperCase()}</p>
                 </div>
               </div>
-              <span className="font-mono font-bold text-white">₺{exp.amount.toLocaleString('tr-TR')}</span>
+              <span className="font-mono font-bold text-gray-900">₺{exp.amount.toLocaleString('tr-TR')}</span>
             </div>
           ))}
         </div>
@@ -337,25 +337,25 @@ export default function MobileSpvView() {
 
       {/* ----------------- MODAL 1: ADVANCE ENTRY ----------------- */}
       {isAdvanceModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-950/80 backdrop-blur-sm">
-          <div className="w-full max-w-sm bg-slate-900 border border-slate-800 rounded-t-3xl sm:rounded-2xl p-6 text-slate-100 animate-in slide-in-from-bottom">
-            <div className="flex justify-between items-center pb-3 border-b border-slate-800">
-              <h3 className="text-base font-bold text-white flex items-center gap-2">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/40 backdrop-blur-sm">
+          <div className="w-full max-w-sm bg-white border border-gray-200 rounded-t-3xl sm:rounded-2xl p-6 text-gray-900 animate-in slide-in-from-bottom">
+            <div className="flex justify-between items-center pb-3 border-b border-gray-200">
+              <h3 className="text-base font-bold text-gray-900 flex items-center gap-2">
                 <Banknote className="w-5 h-5 text-amber-400" />
                 <span>Canlı Avans Ver</span>
               </h3>
-              <button onClick={() => setIsAdvanceModalOpen(false)} className="p-1 text-slate-400 hover:text-white">
+              <button onClick={() => setIsAdvanceModalOpen(false)} className="p-1 text-gray-500 hover:text-gray-900">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             <form onSubmit={handleAdvanceSubmit} className="space-y-4 mt-4">
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">Anketör Seçin</label>
+                <label className="block text-xs font-semibold text-gray-700 mb-1">Anketör Seçin</label>
                 <select
                   value={advancePersonnelId}
                   onChange={(e) => setAdvancePersonnelId(e.target.value)}
-                  className="w-full px-3 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-sm text-white"
+                  className="w-full px-3 py-2.5 rounded-xl bg-white border border-gray-200 text-sm text-gray-900"
                 >
                   {availablePersonnel.map(p => (
                     <option key={p.id} value={p.id}>{p.fullName} ({p.phone})</option>
@@ -364,7 +364,7 @@ export default function MobileSpvView() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">Avans Tutarı (TL)</label>
+                <label className="block text-xs font-semibold text-gray-700 mb-1">Avans Tutarı (TL)</label>
                 <input
                   type="number"
                   required
@@ -372,18 +372,18 @@ export default function MobileSpvView() {
                   value={advanceAmount}
                   onChange={(e) => setAdvanceAmount(e.target.value)}
                   placeholder="Örn: 500"
-                  className="w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-700 text-lg font-mono font-bold text-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                  className="w-full px-4 py-3 rounded-xl bg-white border border-gray-200 text-lg font-mono font-bold text-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-500"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">Ödeme Yöntemi</label>
+                <label className="block text-xs font-semibold text-gray-700 mb-1">Ödeme Yöntemi</label>
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     type="button"
                     onClick={() => setAdvanceMethod('nakit')}
                     className={`py-2 rounded-xl text-xs font-bold border cursor-pointer ${
-                      advanceMethod === 'nakit' ? 'bg-amber-500/20 border-amber-500 text-amber-300' : 'bg-slate-950 border-slate-800 text-slate-400'
+                      advanceMethod === 'nakit' ? 'bg-amber-500/20 border-amber-500 text-amber-300' : 'bg-white border-gray-200 text-gray-500'
                     }`}
                   >
                     Nakit (Elden)
@@ -392,7 +392,7 @@ export default function MobileSpvView() {
                     type="button"
                     onClick={() => setAdvanceMethod('havale')}
                     className={`py-2 rounded-xl text-xs font-bold border cursor-pointer ${
-                      advanceMethod === 'havale' ? 'bg-amber-500/20 border-amber-500 text-amber-300' : 'bg-slate-950 border-slate-800 text-slate-400'
+                      advanceMethod === 'havale' ? 'bg-amber-500/20 border-amber-500 text-amber-300' : 'bg-white border-gray-200 text-gray-500'
                     }`}
                   >
                     IBAN / Havale
@@ -401,13 +401,13 @@ export default function MobileSpvView() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">Açıklama / Not</label>
+                <label className="block text-xs font-semibold text-gray-700 mb-1">Açıklama / Not</label>
                 <input
                   type="text"
                   value={advanceNote}
                   onChange={(e) => setAdvanceNote(e.target.value)}
                   placeholder="Örn: Yol & yemek avansı"
-                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white"
+                  className="w-full px-3 py-2 rounded-xl bg-white border border-gray-200 text-xs text-gray-900"
                 />
               </div>
 
@@ -424,25 +424,25 @@ export default function MobileSpvView() {
 
       {/* ----------------- MODAL 2: EXPENSE & RECEIPT PHOTO ----------------- */}
       {isExpenseModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-950/80 backdrop-blur-sm">
-          <div className="w-full max-w-sm bg-slate-900 border border-slate-800 rounded-t-3xl sm:rounded-2xl p-6 text-slate-100 animate-in slide-in-from-bottom">
-            <div className="flex justify-between items-center pb-3 border-b border-slate-800">
-              <h3 className="text-base font-bold text-white flex items-center gap-2">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/40 backdrop-blur-sm">
+          <div className="w-full max-w-sm bg-white border border-gray-200 rounded-t-3xl sm:rounded-2xl p-6 text-gray-900 animate-in slide-in-from-bottom">
+            <div className="flex justify-between items-center pb-3 border-b border-gray-200">
+              <h3 className="text-base font-bold text-gray-900 flex items-center gap-2">
                 <Receipt className="w-5 h-5 text-sky-400" />
                 <span>Saha Fişi / Masraf Ekle</span>
               </h3>
-              <button onClick={() => setIsExpenseModalOpen(false)} className="p-1 text-slate-400 hover:text-white">
+              <button onClick={() => setIsExpenseModalOpen(false)} className="p-1 text-gray-500 hover:text-gray-900">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             <form onSubmit={handleExpenseSubmit} className="space-y-4 mt-4">
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">Gider Kategorisi</label>
+                <label className="block text-xs font-semibold text-gray-700 mb-1">Gider Kategorisi</label>
                 <select
                   value={expenseCategory}
                   onChange={(e) => setExpenseCategory(e.target.value as ExpenseCategory)}
-                  className="w-full px-3 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-sm text-white"
+                  className="w-full px-3 py-2.5 rounded-xl bg-white border border-gray-200 text-sm text-gray-900"
                 >
                   <option value="yakit">Yakıt / Mazot</option>
                   <option value="yemek">Yemek & İkram</option>
@@ -453,7 +453,7 @@ export default function MobileSpvView() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">Fiş Tutarı (TL)</label>
+                <label className="block text-xs font-semibold text-gray-700 mb-1">Fiş Tutarı (TL)</label>
                 <input
                   type="number"
                   required
@@ -461,20 +461,20 @@ export default function MobileSpvView() {
                   value={expenseAmount}
                   onChange={(e) => setExpenseAmount(e.target.value)}
                   placeholder="Örn: 850"
-                  className="w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-700 text-lg font-mono font-bold text-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                  className="w-full px-4 py-3 rounded-xl bg-white border border-gray-200 text-lg font-mono font-bold text-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-500"
                 />
               </div>
 
               {/* Receipt Camera Simulator */}
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">Fiş Fotoğrafı</label>
+                <label className="block text-xs font-semibold text-gray-700 mb-1">Fiş Fotoğrafı</label>
                 {receiptImage ? (
                   <div className="relative rounded-xl overflow-hidden border border-emerald-500/50">
                     <img src={receiptImage} alt="Fiş" className="w-full h-32 object-cover" />
                     <button
                       type="button"
                       onClick={() => setReceiptImage(null)}
-                      className="absolute top-2 right-2 p-1 rounded-full bg-slate-950/80 text-white"
+                      className="absolute top-2 right-2 p-1 rounded-full bg-gray-50 text-gray-900"
                     >
                       <X className="w-4 h-4" />
                     </button>
@@ -483,7 +483,7 @@ export default function MobileSpvView() {
                   <button
                     type="button"
                     onClick={handleSimulateCameraCapture}
-                    className="w-full py-4 rounded-xl border-2 border-dashed border-slate-700 hover:border-sky-500 bg-slate-950 flex flex-col items-center justify-center gap-1.5 text-slate-400 hover:text-sky-400 transition-colors cursor-pointer"
+                    className="w-full py-4 rounded-xl border-2 border-dashed border-gray-200 hover:border-sky-500 bg-white flex flex-col items-center justify-center gap-1.5 text-gray-500 hover:text-sky-400 transition-colors cursor-pointer"
                   >
                     <Camera className="w-6 h-6" />
                     <span className="text-xs font-medium">Kamerayı Aç / Fiş Çek</span>
@@ -492,19 +492,19 @@ export default function MobileSpvView() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">Açıklama</label>
+                <label className="block text-xs font-semibold text-gray-700 mb-1">Açıklama</label>
                 <input
                   type="text"
                   value={expenseDescription}
                   onChange={(e) => setExpenseDescription(e.target.value)}
                   placeholder="Örn: Shell Kadıköy mazot fişi"
-                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white"
+                  className="w-full px-3 py-2 rounded-xl bg-white border border-gray-200 text-xs text-gray-900"
                 />
               </div>
 
               <button
                 type="submit"
-                className="w-full py-3.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-white font-bold text-sm shadow-lg shadow-sky-500/20 transition-all cursor-pointer"
+                className="w-full py-3.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-gray-900 font-bold text-sm shadow-lg shadow-sky-500/20 transition-all cursor-pointer"
               >
                 Fişi Merkeze Gönder
               </button>
@@ -515,25 +515,25 @@ export default function MobileSpvView() {
 
       {/* ----------------- MODAL 3: SURVEY CLOSE (HAKEDİŞ HESAPLA) ----------------- */}
       {isSurveyModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-950/80 backdrop-blur-sm">
-          <div className="w-full max-w-sm bg-slate-900 border border-slate-800 rounded-t-3xl sm:rounded-2xl p-6 text-slate-100 animate-in slide-in-from-bottom">
-            <div className="flex justify-between items-center pb-3 border-b border-slate-800">
-              <h3 className="text-base font-bold text-white flex items-center gap-2">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/40 backdrop-blur-sm">
+          <div className="w-full max-w-sm bg-white border border-gray-200 rounded-t-3xl sm:rounded-2xl p-6 text-gray-900 animate-in slide-in-from-bottom">
+            <div className="flex justify-between items-center pb-3 border-b border-gray-200">
+              <h3 className="text-base font-bold text-gray-900 flex items-center gap-2">
                 <ClipboardCheck className="w-5 h-5 text-emerald-400" />
                 <span>Anket Sayısı Gir & Kapa</span>
               </h3>
-              <button onClick={() => setIsSurveyModalOpen(false)} className="p-1 text-slate-400 hover:text-white">
+              <button onClick={() => setIsSurveyModalOpen(false)} className="p-1 text-gray-500 hover:text-gray-900">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             <form onSubmit={handleSurveySubmit} className="space-y-4 mt-4">
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">Personel</label>
+                <label className="block text-xs font-semibold text-gray-700 mb-1">Personel</label>
                 <select
                   value={surveyPersonnelId}
                   onChange={(e) => setSurveyPersonnelId(e.target.value)}
-                  className="w-full px-3 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-sm text-white"
+                  className="w-full px-3 py-2.5 rounded-xl bg-white border border-gray-200 text-sm text-gray-900"
                 >
                   {availablePersonnel.map(p => (
                     <option key={p.id} value={p.id}>{p.fullName}</option>
@@ -543,7 +543,7 @@ export default function MobileSpvView() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Toplam Yapılan</label>
+                  <label className="block text-xs font-semibold text-gray-700 mb-1">Toplam Yapılan</label>
                   <input
                     type="number"
                     required
@@ -551,7 +551,7 @@ export default function MobileSpvView() {
                     value={totalSurveysInput}
                     onChange={(e) => setTotalSurveysInput(e.target.value)}
                     placeholder="Örn: 150"
-                    className="w-full px-3 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-base font-mono font-bold text-white"
+                    className="w-full px-3 py-2.5 rounded-xl bg-white border border-gray-200 text-base font-mono font-bold text-gray-900"
                   />
                 </div>
                 <div>
@@ -562,16 +562,16 @@ export default function MobileSpvView() {
                     value={invalidSurveysInput}
                     onChange={(e) => setInvalidSurveysInput(e.target.value)}
                     placeholder="Örn: 5"
-                    className="w-full px-3 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-base font-mono font-bold text-rose-400"
+                    className="w-full px-3 py-2.5 rounded-xl bg-white border border-gray-200 text-base font-mono font-bold text-rose-400"
                   />
                 </div>
               </div>
 
               {/* Formula Preview Callout */}
-              <div className="p-3 rounded-xl bg-slate-950/70 border border-slate-800 text-[11px] text-slate-400 space-y-1">
+              <div className="p-3 rounded-xl bg-gray-50 border border-gray-200 text-[11px] text-gray-500 space-y-1">
                 <div className="flex justify-between">
                   <span>Geçerli Anket:</span>
-                  <span className="font-bold text-white font-mono">
+                  <span className="font-bold text-gray-900 font-mono">
                     {Math.max(0, Number(totalSurveysInput || 0) - Number(invalidSurveysInput || 0))} Adet
                   </span>
                 </div>
@@ -585,7 +585,7 @@ export default function MobileSpvView() {
 
               <button
                 type="submit"
-                className="w-full py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-sm shadow-lg shadow-emerald-600/20 transition-all cursor-pointer"
+                className="w-full py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-gray-900 font-black text-sm shadow-lg shadow-emerald-600/20 transition-all cursor-pointer"
               >
                 Hakedişi Hesapla & Kapat
               </button>
@@ -604,3 +604,5 @@ export default function MobileSpvView() {
     </div>
   );
 }
+
+

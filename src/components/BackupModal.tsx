@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useState, useRef } from 'react';
 import { useApp } from '@/context/AppContext';
@@ -70,53 +70,53 @@ export default function BackupModal({ isOpen, onClose }: BackupModalProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md">
-      <div className="w-full max-w-lg bg-slate-900 border border-slate-800 rounded-3xl p-6 text-slate-100 shadow-2xl space-y-5 animate-in fade-in zoom-in-95">
+    <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-black/40 backdrop-blur-md">
+      <div className="w-full max-w-lg bg-white border border-gray-200 rounded-3xl p-6 text-gray-900 shadow-2xl space-y-5 animate-in fade-in zoom-in-95">
         
         {/* Header */}
-        <div className="flex items-start justify-between pb-3 border-b border-slate-800">
+        <div className="flex items-start justify-between pb-3 border-b border-gray-200">
           <div className="flex items-center gap-2.5">
             <div className="p-2.5 rounded-2xl bg-sky-500/15 text-sky-400 border border-sky-500/30">
               <Database className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-white tracking-tight">Veri Güvenliği & Sistem Yedeği</h3>
-              <p className="text-xs text-slate-400">Tüm projelerinizi, personelleri, saha raporlarını ve hakedişleri yedekleyin</p>
+              <h3 className="text-base font-bold text-gray-900 tracking-tight">Veri Güvenliği & Sistem Yedeği</h3>
+              <p className="text-xs text-gray-500">Tüm projelerinizi, personelleri, saha raporlarını ve hakedişleri yedekleyin</p>
             </div>
           </div>
-          <button onClick={onClose} className="text-slate-400 hover:text-white p-1">
+          <button onClick={onClose} className="text-gray-500 hover:text-gray-900 p-1">
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Current Database Stats */}
-        <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-2">
-          <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider block">
+        <div className="p-4 rounded-2xl bg-white border border-gray-200 space-y-2">
+          <span className="text-[10px] uppercase font-bold text-gray-500 tracking-wider block">
             Mevcut Sistem Verisi Özeti
           </span>
           <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 text-center text-xs">
-            <div className="p-2 rounded-xl bg-slate-900 border border-slate-800">
-              <span className="text-slate-400 text-[10px] block">Projeler</span>
-              <strong className="text-white text-sm font-mono">{projects.length}</strong>
+            <div className="p-2 rounded-xl bg-white border border-gray-200">
+              <span className="text-gray-500 text-[10px] block">Projeler</span>
+              <strong className="text-gray-900 text-sm font-mono">{projects.length}</strong>
             </div>
-            <div className="p-2 rounded-xl bg-slate-900 border border-slate-800">
-              <span className="text-slate-400 text-[10px] block">Personel</span>
-              <strong className="text-white text-sm font-mono">{personnel.length}</strong>
+            <div className="p-2 rounded-xl bg-white border border-gray-200">
+              <span className="text-gray-500 text-[10px] block">Personel</span>
+              <strong className="text-gray-900 text-sm font-mono">{personnel.length}</strong>
             </div>
-            <div className="p-2 rounded-xl bg-slate-900 border border-slate-800">
-              <span className="text-slate-400 text-[10px] block">Hakediş</span>
+            <div className="p-2 rounded-xl bg-white border border-gray-200">
+              <span className="text-gray-500 text-[10px] block">Hakediş</span>
               <strong className="text-emerald-400 text-sm font-mono">{settlements.length}</strong>
             </div>
-            <div className="p-2 rounded-xl bg-slate-900 border border-slate-800">
-              <span className="text-slate-400 text-[10px] block">Saha Rapor</span>
+            <div className="p-2 rounded-xl bg-white border border-gray-200">
+              <span className="text-gray-500 text-[10px] block">Saha Rapor</span>
               <strong className="text-sky-400 text-sm font-mono">{dailyReports.length}</strong>
             </div>
-            <div className="p-2 rounded-xl bg-slate-900 border border-slate-800">
-              <span className="text-slate-400 text-[10px] block">TK Kaydı</span>
+            <div className="p-2 rounded-xl bg-white border border-gray-200">
+              <span className="text-gray-500 text-[10px] block">TK Kaydı</span>
               <strong className="text-indigo-400 text-sm font-mono">{phoneControlRecords.length}</strong>
             </div>
-            <div className="p-2 rounded-xl bg-slate-900 border border-slate-800">
-              <span className="text-slate-400 text-[10px] block">Gider/Avans</span>
+            <div className="p-2 rounded-xl bg-white border border-gray-200">
+              <span className="text-gray-500 text-[10px] block">Gider/Avans</span>
               <strong className="text-amber-400 text-sm font-mono">{expenses.length + advances.length}</strong>
             </div>
           </div>
@@ -131,13 +131,13 @@ export default function BackupModal({ isOpen, onClose }: BackupModalProps) {
                 <Download className="w-4 h-4" />
                 <span>Yedek İndir (.json)</span>
               </div>
-              <p className="text-[11px] text-slate-400">
+              <p className="text-[11px] text-gray-500">
                 Tüm verilerinizi tek bir JSON dosyasında güvenle saklayın.
               </p>
             </div>
             <button
               onClick={handleDownload}
-              className="w-full py-2.5 px-3 rounded-xl bg-sky-500 hover:bg-sky-400 text-white font-bold text-xs shadow-md shadow-sky-500/20 transition-all cursor-pointer flex items-center justify-center gap-1.5"
+              className="w-full py-2.5 px-3 rounded-xl bg-sky-500 hover:bg-sky-400 text-gray-900 font-bold text-xs shadow-md shadow-sky-500/20 transition-all cursor-pointer flex items-center justify-center gap-1.5"
             >
               <Download className="w-3.5 h-3.5" />
               <span>Yedek Dosyası İndir</span>
@@ -151,7 +151,7 @@ export default function BackupModal({ isOpen, onClose }: BackupModalProps) {
                 <Upload className="w-4 h-4" />
                 <span>Yedekten Geri Yükle</span>
               </div>
-              <p className="text-[11px] text-slate-400">
+              <p className="text-[11px] text-gray-500">
                 Önceden aldığınız bir JSON yedek dosyasını sisteme aktarın.
               </p>
             </div>
@@ -165,7 +165,7 @@ export default function BackupModal({ isOpen, onClose }: BackupModalProps) {
               />
               <button
                 onClick={() => fileInputRef.current?.click()}
-                className="w-full py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md shadow-emerald-600/20 transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                className="w-full py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-gray-900 font-bold text-xs shadow-md shadow-emerald-600/20 transition-all cursor-pointer flex items-center justify-center gap-1.5"
               >
                 <Upload className="w-3.5 h-3.5" />
                 <span>Yedek Dosyası Seç</span>
@@ -194,3 +194,5 @@ export default function BackupModal({ isOpen, onClose }: BackupModalProps) {
     </div>
   );
 }
+
+

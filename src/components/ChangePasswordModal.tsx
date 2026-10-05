@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useState } from 'react';
 import { useApp } from '@/context/AppContext';
@@ -51,25 +51,25 @@ export default function ChangePasswordModal({ isOpen, onClose }: ChangePasswordM
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-6 text-slate-100 shadow-2xl relative">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-in fade-in duration-200">
+      <div className="w-full max-w-md bg-white border border-gray-200 rounded-3xl p-6 text-gray-900 shadow-2xl relative">
         
         {/* Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-slate-800">
+        <div className="flex items-center justify-between pb-4 border-b border-gray-200">
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400">
               <KeyRound className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-white">Şifre Değiştir</h3>
-              <p className="text-xs text-slate-400">
+              <h3 className="text-base font-bold text-gray-900">Şifre Değiştir</h3>
+              <p className="text-xs text-gray-500">
                 {currentUser.fullName} ({currentUser.role === 'admin' ? 'Müdür' : 'SPV'})
               </p>
             </div>
           </div>
           <button 
             onClick={onClose} 
-            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
+            className="p-1.5 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -91,7 +91,7 @@ export default function ChangePasswordModal({ isOpen, onClose }: ChangePasswordM
           )}
 
           <div>
-            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
+            <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
               Mevcut Şifre
             </label>
             <div className="relative">
@@ -101,14 +101,14 @@ export default function ChangePasswordModal({ isOpen, onClose }: ChangePasswordM
                 value={currentPassword}
                 onChange={(e) => setCurrentPassword(e.target.value)}
                 placeholder="Mevcut şifrenizi girin"
-                className="w-full px-4 py-2.5 pl-10 rounded-xl bg-slate-950/70 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-500 text-xs"
+                className="w-full px-4 py-2.5 pl-10 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-500 text-xs"
               />
-              <Lock className="w-4 h-4 text-slate-500 absolute left-3.5 top-3" />
+              <Lock className="w-4 h-4 text-gray-400 absolute left-3.5 top-3" />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
+            <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
               Yeni Şifre
             </label>
             <div className="relative">
@@ -118,14 +118,14 @@ export default function ChangePasswordModal({ isOpen, onClose }: ChangePasswordM
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 placeholder="En az 3 karakter yeni şifre"
-                className="w-full px-4 py-2.5 pl-10 rounded-xl bg-slate-950/70 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-500 text-xs font-mono"
+                className="w-full px-4 py-2.5 pl-10 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-500 text-xs font-mono"
               />
-              <KeyRound className="w-4 h-4 text-slate-500 absolute left-3.5 top-3" />
+              <KeyRound className="w-4 h-4 text-gray-400 absolute left-3.5 top-3" />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
+            <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
               Yeni Şifre (Tekrar)
             </label>
             <div className="relative">
@@ -135,16 +135,16 @@ export default function ChangePasswordModal({ isOpen, onClose }: ChangePasswordM
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="Yeni şifrenizi tekrar yazın"
-                className="w-full px-4 py-2.5 pl-10 rounded-xl bg-slate-950/70 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-500 text-xs font-mono"
+                className="w-full px-4 py-2.5 pl-10 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-500 text-xs font-mono"
               />
-              <ShieldCheck className="w-4 h-4 text-slate-500 absolute left-3.5 top-3" />
+              <ShieldCheck className="w-4 h-4 text-gray-400 absolute left-3.5 top-3" />
             </div>
           </div>
 
           <div className="pt-2">
             <button
               type="submit"
-              className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-bold text-xs shadow-lg shadow-sky-500/20 transition-all cursor-pointer flex items-center justify-center gap-2"
+              className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-gray-900 font-bold text-xs shadow-lg shadow-sky-500/20 transition-all cursor-pointer flex items-center justify-center gap-2"
             >
               <CheckCircle2 className="w-4 h-4" />
               <span>Şifreyi Güncelle & Kaydet</span>
@@ -155,3 +155,5 @@ export default function ChangePasswordModal({ isOpen, onClose }: ChangePasswordM
     </div>
   );
 }
+
+

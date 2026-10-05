@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useState } from 'react';
 import { useApp } from '@/context/AppContext';
@@ -220,45 +220,45 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
     <div className="space-y-6">
       
       {/* Clean Page Title & Stats Banner */}
-      <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-slate-900 to-slate-950 border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-md">
+      <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-slate-900 to-slate-950 border border-gray-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-md">
         <div className="flex items-center gap-3">
           <div className="p-2.5 rounded-xl bg-sky-500/15 text-sky-400 border border-sky-500/30">
             <Briefcase className="w-5 h-5" />
           </div>
           <div>
-            <h1 className="text-lg sm:text-xl font-black text-white tracking-tight">Projeler</h1>
-            <p className="text-xs text-slate-400">Aktif, tamamlanan ve saha araştırma projeleri</p>
+            <h1 className="text-lg sm:text-xl font-black text-gray-900 tracking-tight">Projeler</h1>
+            <p className="text-xs text-gray-500">Aktif, tamamlanan ve saha araştırma projeleri</p>
           </div>
         </div>
 
         <div className="flex items-center gap-2 text-xs">
-          <div className="px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-800">
-            <span className="text-slate-400">Toplam: </span>
-            <strong className="text-white font-mono">{projects.length}</strong>
+          <div className="px-3 py-1.5 rounded-xl bg-white border border-gray-200">
+            <span className="text-gray-500">Toplam: </span>
+            <strong className="text-gray-900 font-mono">{projects.length}</strong>
           </div>
-          <div className="px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-800">
-            <span className="text-slate-400">Aktif: </span>
+          <div className="px-3 py-1.5 rounded-xl bg-white border border-gray-200">
+            <span className="text-gray-500">Aktif: </span>
             <strong className="text-sky-400 font-mono">{projects.filter(p => !p.isArchived && p.status === 'active').length}</strong>
           </div>
-          <div className="px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-800">
-            <span className="text-slate-400">Tamamlanan: </span>
+          <div className="px-3 py-1.5 rounded-xl bg-white border border-gray-200">
+            <span className="text-gray-500">Tamamlanan: </span>
             <strong className="text-emerald-400 font-mono">{projects.filter(p => p.status === 'completed').length}</strong>
           </div>
         </div>
       </div>
 
       {/* Control Bar */}
-      <div className="flex flex-col xl:flex-row items-stretch xl:items-center justify-between gap-3 p-3.5 sm:p-4 rounded-2xl bg-slate-900 border border-slate-800">
+      <div className="flex flex-col xl:flex-row items-stretch xl:items-center justify-between gap-3 p-3.5 sm:p-4 rounded-2xl bg-white border border-gray-200">
         
         {/* Filters Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 flex-1">
           {/* Period Filter */}
           <div>
-            <label className="block text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Dönem</label>
+            <label className="block text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1">Dönem</label>
             <select
               value={filterPeriod}
               onChange={(e) => setFilterPeriod(e.target.value)}
-              className="w-full px-2.5 py-1.5 rounded-xl bg-slate-950 border border-slate-700 text-xs text-slate-200 font-medium cursor-pointer"
+              className="w-full px-2.5 py-1.5 rounded-xl bg-white border border-gray-200 text-xs text-gray-800 font-medium cursor-pointer"
             >
               <option value="all">Tüm Zamanlar</option>
               <option value="1m">Son 1 Ay (30 Gün)</option>
@@ -270,11 +270,11 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
 
           {/* Archive / Visibility Filter */}
           <div>
-            <label className="block text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Görünüm / Arşiv</label>
+            <label className="block text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1">Görünüm / Arşiv</label>
             <select
               value={filterArchive}
               onChange={(e) => setFilterArchive(e.target.value)}
-              className="w-full px-2.5 py-1.5 rounded-xl bg-slate-950 border border-slate-700 text-xs text-slate-200 font-medium cursor-pointer"
+              className="w-full px-2.5 py-1.5 rounded-xl bg-white border border-gray-200 text-xs text-gray-800 font-medium cursor-pointer"
             >
               <option value="active">Aktif Projeler</option>
               <option value="archived">Gizlenen / Arşivdekiler</option>
@@ -284,11 +284,11 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
 
           {/* Status Filter */}
           <div>
-            <label className="block text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Durum</label>
+            <label className="block text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1">Durum</label>
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
-              className="w-full px-2.5 py-1.5 rounded-xl bg-slate-950 border border-slate-700 text-xs text-slate-200 font-medium cursor-pointer"
+              className="w-full px-2.5 py-1.5 rounded-xl bg-white border border-gray-200 text-xs text-gray-800 font-medium cursor-pointer"
             >
               <option value="all">Tüm Durumlar</option>
               <option value="active">Aktif</option>
@@ -302,7 +302,7 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
         <div className="flex items-center gap-2 self-end xl:self-center">
           <button
             onClick={handleExport}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition-all border border-slate-700 cursor-pointer"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs font-semibold transition-all border border-gray-200 cursor-pointer"
             title="Tüm proje listesini Excel formatında indirin"
           >
             <FileSpreadsheet className="w-4 h-4 text-emerald-400" />
@@ -312,7 +312,7 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
           {isAdmin && (
             <button
               onClick={onOpenFeasibility}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white text-xs font-bold shadow-lg shadow-sky-500/20 transition-all cursor-pointer"
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-gray-900 text-xs font-bold shadow-lg shadow-sky-500/20 transition-all cursor-pointer"
             >
               <Sparkles className="w-4 h-4" />
               <span className="hidden sm:inline">Fizibilite Simülatörü</span>
@@ -321,7 +321,7 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
 
           <button
             onClick={() => setIsNewProjectModalOpen(true)}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-white text-xs font-bold shadow-lg shadow-sky-500/20 transition-all cursor-pointer"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-gray-900 text-xs font-bold shadow-lg shadow-sky-500/20 transition-all cursor-pointer"
           >
             <Plus className="w-4 h-4" />
             <span>+ Proje Ekle</span>
@@ -331,12 +331,12 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
 
       {/* Projects Grid (Ultra-Clean Modern Cards) */}
       {filteredProjects.length === 0 ? (
-        <div className="p-12 text-center rounded-3xl bg-slate-900 border border-slate-800 text-slate-400 space-y-3">
+        <div className="p-12 text-center rounded-3xl bg-white border border-gray-200 text-gray-500 space-y-3">
           <Briefcase className="w-12 h-12 mx-auto text-slate-600" />
-          <h3 className="text-base font-bold text-white">
+          <h3 className="text-base font-bold text-gray-900">
             {filterArchive === 'archived' ? 'Arşivde Proje Bulunmuyor' : 'Kriterlere Uygun Proje Yok'}
           </h3>
-          <p className="text-xs text-slate-400 max-w-sm mx-auto">
+          <p className="text-xs text-gray-500 max-w-sm mx-auto">
             {filterArchive === 'archived' 
               ? 'Gizlenen veya arşivlenen proje bulunmamaktadır.'
               : 'Filtre kriterlerini temizleyebilir veya yeni proje tanımlayabilirsiniz.'}
@@ -344,7 +344,7 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
           {filterArchive !== 'archived' && (
             <button
               onClick={() => setIsNewProjectModalOpen(true)}
-              className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-white text-xs font-bold shadow-lg shadow-sky-500/20 transition-all cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-gray-900 text-xs font-bold shadow-lg shadow-sky-500/20 transition-all cursor-pointer"
             >
               <Plus className="w-4 h-4" />
               <span>+ Yeni Proje Tanımla</span>
@@ -360,10 +360,10 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
               <div 
                 key={project.id}
                 onClick={() => setSelectedProject(project)}
-                className={`p-5 sm:p-6 rounded-2xl bg-slate-900 border transition-all flex flex-col justify-between relative group cursor-pointer ${
+                className={`p-5 sm:p-6 rounded-2xl bg-white border transition-all flex flex-col justify-between relative group cursor-pointer ${
                   project.isArchived 
-                    ? 'border-amber-500/30 bg-slate-900/60 opacity-80 hover:opacity-100 hover:border-amber-500/60'
-                    : 'border-slate-800 hover:border-sky-500/50 hover:shadow-xl hover:shadow-sky-500/5'
+                    ? 'border-amber-500/30 bg-gray-50 opacity-80 hover:opacity-100 hover:border-amber-500/60'
+                    : 'border-gray-200 hover:border-sky-500/50 hover:shadow-xl hover:shadow-sky-500/5'
                 }`}
               >
                 <div>
@@ -379,7 +379,7 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
                         <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded border ${
                           project.projectType === 'nokta'
                             ? 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30'
-                            : 'bg-slate-800 text-slate-300 border-slate-700'
+                            : 'bg-gray-100 text-gray-700 border-gray-200'
                         }`}>
                           {getProjectTypeLabel(project.projectType)}
                         </span>
@@ -405,11 +405,11 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
                         )}
                       </div>
 
-                      <h3 className="text-base font-bold text-white tracking-tight group-hover:text-sky-300 transition-colors truncate">
+                      <h3 className="text-base font-bold text-gray-900 tracking-tight group-hover:text-sky-300 transition-colors truncate">
                         {project.title}
                       </h3>
-                      <p className="text-xs text-slate-400 mt-0.5">
-                        Müşteri: <strong className="text-slate-200">{project.clientName}</strong>
+                      <p className="text-xs text-gray-500 mt-0.5">
+                        Müşteri: <strong className="text-gray-800">{project.clientName}</strong>
                       </p>
                     </div>
 
@@ -417,7 +417,7 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
                     {isAdmin ? (
                       project.simulatedMarginPercent ? (
                         <div className="text-right flex-shrink-0">
-                          <span className="text-[10px] text-slate-400 block">Kâr Marjı</span>
+                          <span className="text-[10px] text-gray-500 block">Kâr Marjı</span>
                           <span className="text-base font-black font-mono text-emerald-400">
                             %{project.simulatedMarginPercent}
                           </span>
@@ -425,7 +425,7 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
                       ) : null
                     ) : (
                       <div className="text-right flex-shrink-0">
-                        <span className="text-[10px] text-slate-400 block">Anketör Fiyat</span>
+                        <span className="text-[10px] text-gray-500 block">Anketör Fiyat</span>
                         <span className="text-base font-black font-mono text-sky-400">
                           ₺{project.defaultPersonnelRate || project.clientUnitPrice}
                         </span>
@@ -437,18 +437,18 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
                   <div className="flex flex-wrap items-center gap-1.5 my-2.5">
                     {project.cityPricing && project.cityPricing.length > 0 ? (
                       <>
-                        <MapPin className="w-3.5 h-3.5 text-slate-500 flex-shrink-0" />
+                        <MapPin className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
                         {project.cityPricing.map((cp, idx) => (
-                          <span key={idx} className="text-[10px] px-2 py-0.5 rounded-md bg-slate-800 text-slate-300 border border-slate-700 font-mono">
+                          <span key={idx} className="text-[10px] px-2 py-0.5 rounded-md bg-gray-100 text-gray-700 border border-gray-200 font-mono">
                             {cp.city}: <strong className="text-sky-400 font-bold">₺{cp.unitPrice}</strong>
                           </span>
                         ))}
                       </>
                     ) : project.cities && project.cities.length > 0 ? (
                       <>
-                        <MapPin className="w-3.5 h-3.5 text-slate-500 flex-shrink-0" />
+                        <MapPin className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
                         {project.cities.map((city, idx) => (
-                          <span key={idx} className="text-[10px] px-2 py-0.5 rounded-md bg-slate-800 text-slate-300 border border-slate-700">
+                          <span key={idx} className="text-[10px] px-2 py-0.5 rounded-md bg-gray-100 text-gray-700 border border-gray-200">
                             {city}
                           </span>
                         ))}
@@ -465,13 +465,13 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
 
                   {/* Progress Bar */}
                   <div className="mt-3">
-                    <div className="flex justify-between text-xs text-slate-400 mb-1">
+                    <div className="flex justify-between text-xs text-gray-500 mb-1">
                       <span>Saha İlerlemesi</span>
-                      <span className="font-mono text-slate-200 font-bold">
+                      <span className="font-mono text-gray-800 font-bold">
                         {project.completedSurveys || 0} / {project.targetSurveys} Anket (%{progressPercent.toFixed(0)})
                       </span>
                     </div>
-                    <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                    <div className="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
                       <div 
                         className="h-full rounded-full transition-all bg-sky-500"
                         style={{ width: `${progressPercent}%` }}
@@ -481,8 +481,8 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
                 </div>
 
                 {/* Card Footer & Action Buttons */}
-                <div className="mt-5 pt-4 border-t border-slate-800 flex flex-wrap items-center justify-between gap-2 text-xs">
-                  <div className="flex items-center gap-1.5 text-slate-400">
+                <div className="mt-5 pt-4 border-t border-gray-200 flex flex-wrap items-center justify-between gap-2 text-xs">
+                  <div className="flex items-center gap-1.5 text-gray-500">
                     <Calendar className="w-3.5 h-3.5" />
                     <span>{project.startDate} - {project.endDate}</span>
                   </div>
@@ -497,7 +497,7 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
                       className={`flex items-center gap-1 px-2.5 py-1.5 rounded-xl font-bold text-xs border transition-all cursor-pointer ${
                         project.isArchived
                           ? 'bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border-amber-500/30'
-                          : 'bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-slate-200 border-slate-700'
+                          : 'bg-gray-100 hover:bg-gray-200 text-gray-500 hover:text-gray-800 border-gray-200'
                       }`}
                       title={project.isArchived ? "Projeyi görünür yap" : "Projeyi gizle / arşive kaldır"}
                     >
@@ -511,7 +511,7 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
                         e.stopPropagation();
                         setEditingProject(project);
                       }}
-                      className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white font-bold text-xs border border-slate-700 transition-all cursor-pointer"
+                      className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 hover:text-gray-900 font-bold text-xs border border-gray-200 transition-all cursor-pointer"
                       title="Proje bilgilerini veya birim fiyatlarını düzenle"
                     >
                       <Edit3 className="w-3.5 h-3.5 text-sky-400" />
@@ -552,14 +552,14 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
 
       {/* NEW PROJECT DEFINITION MODAL (Flexible & Optional Pricing) */}
       {isNewProjectModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm overflow-y-auto">
-          <div className="w-full max-w-lg bg-slate-900 border border-slate-800 rounded-3xl p-6 text-slate-100 shadow-2xl my-8 max-h-[92vh] overflow-y-auto">
-            <div className="flex justify-between items-center pb-3 border-b border-slate-800">
-              <h3 className="text-base font-bold text-white flex items-center gap-2">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm overflow-y-auto">
+          <div className="w-full max-w-lg bg-white border border-gray-200 rounded-3xl p-6 text-gray-900 shadow-2xl my-8 max-h-[92vh] overflow-y-auto">
+            <div className="flex justify-between items-center pb-3 border-b border-gray-200">
+              <h3 className="text-base font-bold text-gray-900 flex items-center gap-2">
                 <Briefcase className="w-5 h-5 text-sky-400" />
                 <span>Yeni Proje Tanımla</span>
               </h3>
-              <button onClick={() => setIsNewProjectModalOpen(false)} className="p-1 text-slate-400 hover:text-white">
+              <button onClick={() => setIsNewProjectModalOpen(false)} className="p-1 text-gray-500 hover:text-gray-900">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -567,47 +567,47 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
             <form onSubmit={handleCreateProjectSubmit} className="space-y-4 mt-4 text-xs">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-semibold text-slate-300 mb-1">Proje Kodu</label>
+                  <label className="block font-semibold text-gray-700 mb-1">Proje Kodu</label>
                   <input
                     type="text"
                     required
                     value={newCode}
                     onChange={(e) => setNewCode(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 font-mono text-sky-400 font-bold"
+                    className="w-full px-3 py-2 rounded-xl bg-white border border-gray-200 font-mono text-sky-400 font-bold"
                   />
                 </div>
                 <div>
-                  <label className="block font-semibold text-slate-300 mb-1">Müşteri Adı</label>
+                  <label className="block font-semibold text-gray-700 mb-1">Müşteri Adı</label>
                   <input
                     type="text"
                     required
                     value={newClient}
                     onChange={(e) => setNewClient(e.target.value)}
                     placeholder="Örn: Ipsos, GfK, Unilever"
-                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white"
+                    className="w-full px-3 py-2 rounded-xl bg-white border border-gray-200 text-gray-900"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block font-semibold text-slate-300 mb-1">Proje Başlığı / Adı</label>
+                <label className="block font-semibold text-gray-700 mb-1">Proje Başlığı / Adı</label>
                 <input
                   type="text"
                   required
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
                   placeholder="Örn: Ankara Tüketici Saha Anketi"
-                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white font-medium"
+                  className="w-full px-3 py-2 rounded-xl bg-white border border-gray-200 text-gray-900 font-medium"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-semibold text-slate-300 mb-1">Proje Tipi</label>
+                  <label className="block font-semibold text-gray-700 mb-1">Proje Tipi</label>
                   <select
                     value={newType}
                     onChange={(e) => setNewType(e.target.value as ProjectType)}
-                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white"
+                    className="w-full px-3 py-2 rounded-xl bg-white border border-gray-200 text-gray-900"
                   >
                     <option value="saha">Saha Araştırması (Yüz Yüze)</option>
                     <option value="nokta">Nokta Projesi (Anketör & Gözlemci)</option>
@@ -618,22 +618,22 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
                 </div>
 
                 <div>
-                  <label className="block font-semibold text-slate-300 mb-1">Toplam Hedef Anket</label>
+                  <label className="block font-semibold text-gray-700 mb-1">Toplam Hedef Anket</label>
                   <input
                     type="number"
                     required
                     min="1"
                     value={newTargetSurveys}
                     onChange={(e) => setNewTargetSurveys(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white font-mono"
+                    className="w-full px-3 py-2 rounded-xl bg-white border border-gray-200 text-gray-900 font-mono"
                   />
                 </div>
               </div>
 
               {/* FİYATLANDIRMA BÖLÜMÜ (İsteğe Bağlı / Sonradan da Düzenlenebilir) */}
-              <div className="p-3.5 rounded-2xl bg-slate-950/70 border border-slate-800 space-y-3">
+              <div className="p-3.5 rounded-2xl bg-gray-50 border border-gray-200 space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="font-bold text-white flex items-center gap-1.5">
+                  <span className="font-bold text-gray-900 flex items-center gap-1.5">
                     <Banknote className="w-4 h-4 text-emerald-400" />
                     <span>Birim Fiyatlandırma (Opsiyonel / Sonradan da Girilebilir)</span>
                   </span>
@@ -648,7 +648,7 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
                       value={newUnitPrice}
                       onChange={(e) => setNewUnitPrice(e.target.value)}
                       placeholder="320"
-                      className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-sky-400 font-mono font-bold"
+                      className="w-full px-3 py-1.5 rounded-xl bg-white border border-gray-200 text-sky-400 font-mono font-bold"
                     />
                   </div>
 
@@ -660,7 +660,7 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
                       value={newObserverPrice}
                       onChange={(e) => setNewObserverPrice(e.target.value)}
                       placeholder="450"
-                      className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-indigo-300 font-mono font-bold"
+                      className="w-full px-3 py-1.5 rounded-xl bg-white border border-gray-200 text-indigo-300 font-mono font-bold"
                     />
                   </div>
 
@@ -673,7 +673,7 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
                         value={newClientUnitPrice}
                         onChange={(e) => setNewClientUnitPrice(e.target.value)}
                         placeholder="550"
-                        className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-emerald-400 font-mono font-bold"
+                        className="w-full px-3 py-1.5 rounded-xl bg-white border border-gray-200 text-emerald-400 font-mono font-bold"
                       />
                     </div>
                   )}
@@ -681,14 +681,14 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
               </div>
 
               {/* DYNAMIC CITIES & CITY-BASED UNIT PRICES */}
-              <div className="p-3.5 rounded-2xl bg-slate-950/70 border border-slate-800 space-y-3">
+              <div className="p-3.5 rounded-2xl bg-gray-50 border border-gray-200 space-y-3">
                 <div className="flex items-center justify-between">
                   <div>
-                    <span className="font-bold text-white flex items-center gap-1.5">
+                    <span className="font-bold text-gray-900 flex items-center gap-1.5">
                       <MapPin className="w-3.5 h-3.5 text-sky-400" />
                       <span>Çalışılacak İller</span>
                     </span>
-                    <p className="text-[11px] text-slate-400">Her ile özel anketör birim fiyatı belirleyebilirsiniz</p>
+                    <p className="text-[11px] text-gray-500">Her ile özel anketör birim fiyatı belirleyebilirsiniz</p>
                   </div>
                   <button
                     type="button"
@@ -709,7 +709,7 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
                         placeholder="İl Adı (Örn: Ankara)"
                         value={cp.city}
                         onChange={(e) => handleCityChange(idx, 'city', e.target.value)}
-                        className="flex-1 px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white"
+                        className="flex-1 px-3 py-1.5 rounded-xl bg-white border border-gray-200 text-gray-900"
                       />
                       <div className="w-28 relative">
                         <input
@@ -718,15 +718,15 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
                           placeholder="Fiyat (TL)"
                           value={cp.unitPrice}
                           onChange={(e) => handleCityChange(idx, 'unitPrice', e.target.value)}
-                          className="w-full px-3 py-1.5 pl-6 rounded-xl bg-slate-900 border border-slate-700 text-emerald-400 font-mono font-bold"
+                          className="w-full px-3 py-1.5 pl-6 rounded-xl bg-white border border-gray-200 text-emerald-400 font-mono font-bold"
                         />
-                        <span className="text-[11px] text-slate-500 absolute left-2 top-2">₺</span>
+                        <span className="text-[11px] text-gray-400 absolute left-2 top-2">₺</span>
                       </div>
                       {cityPricingList.length > 1 && (
                         <button
                           type="button"
                           onClick={() => handleRemoveCityRow(idx)}
-                          className="p-1.5 text-slate-500 hover:text-rose-400 hover:bg-slate-800 rounded-lg transition-colors cursor-pointer"
+                          className="p-1.5 text-gray-400 hover:text-rose-400 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
@@ -738,29 +738,29 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-semibold text-slate-300 mb-1">Başlangıç Tarihi</label>
+                  <label className="block font-semibold text-gray-700 mb-1">Başlangıç Tarihi</label>
                   <input
                     type="date"
                     required
                     value={newStartDate}
                     onChange={(e) => setNewStartDate(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white"
+                    className="w-full px-3 py-2 rounded-xl bg-white border border-gray-200 text-gray-900"
                   />
                 </div>
                 <div>
-                  <label className="block font-semibold text-slate-300 mb-1">Bitiş Tarihi</label>
+                  <label className="block font-semibold text-gray-700 mb-1">Bitiş Tarihi</label>
                   <input
                     type="date"
                     value={newEndDate}
                     onChange={(e) => setNewEndDate(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white"
+                    className="w-full px-3 py-2 rounded-xl bg-white border border-gray-200 text-gray-900"
                   />
                 </div>
               </div>
 
               <button
                 type="submit"
-                className="w-full py-3 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-bold text-xs shadow-lg shadow-sky-500/20 transition-all cursor-pointer"
+                className="w-full py-3 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-gray-900 font-bold text-xs shadow-lg shadow-sky-500/20 transition-all cursor-pointer"
               >
                 Projeyi Oluştur
               </button>
@@ -804,3 +804,5 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
     </div>
   );
 }
+
+

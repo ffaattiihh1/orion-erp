@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useState } from 'react';
 import { useApp } from '@/context/AppContext';
@@ -346,11 +346,11 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-slate-950/85 backdrop-blur-md overflow-y-auto">
-      <div className="w-full max-w-5xl bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl p-5 sm:p-7 my-6 text-slate-100 flex flex-col max-h-[92vh] overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/40 backdrop-blur-md overflow-y-auto">
+      <div className="w-full max-w-5xl bg-white border border-gray-200 rounded-3xl shadow-2xl p-5 sm:p-7 my-6 text-gray-900 flex flex-col max-h-[92vh] overflow-y-auto">
         
         {/* Top Header */}
-        <div className="flex items-start justify-between pb-4 border-b border-slate-800 gap-3">
+        <div className="flex items-start justify-between pb-4 border-b border-gray-200 gap-3">
           <div>
             <div className="flex flex-wrap items-center gap-2 mb-1.5">
               <span className="text-xs font-mono font-bold px-2.5 py-0.5 rounded-md bg-sky-500/10 text-sky-400 border border-sky-500/20">
@@ -360,7 +360,7 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
               <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded border ${
                 project.projectType === 'nokta'
                   ? 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30'
-                  : 'bg-slate-800 text-slate-300 border-slate-700'
+                  : 'bg-gray-100 text-gray-700 border-gray-200'
               }`}>
                 {project.projectType === 'nokta' 
                   ? 'Nokta Projesi' 
@@ -378,16 +378,16 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
               </span>
             </div>
 
-            <h1 className="text-xl font-black text-white tracking-tight">{project.title}</h1>
-            <p className="text-xs text-slate-400 mt-0.5">
-              Ana Müşteri: <strong className="text-slate-200">{project.clientName}</strong> • {project.startDate} / {project.endDate}
+            <h1 className="text-xl font-black text-gray-900 tracking-tight">{project.title}</h1>
+            <p className="text-xs text-gray-500 mt-0.5">
+              Ana Müşteri: <strong className="text-gray-800">{project.clientName}</strong> • {project.startDate} / {project.endDate}
             </p>
           </div>
 
           <div className="flex items-center gap-2">
             <button
               onClick={() => setIsEditModalOpen(true)}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition-all border border-slate-700 cursor-pointer"
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs font-semibold transition-all border border-gray-200 cursor-pointer"
               title="Proje adı, hedefi, birim fiyatları veya illerini düzenle"
             >
               <Edit3 className="w-4 h-4 text-sky-400" />
@@ -396,7 +396,7 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
 
             <button
               onClick={handleExportProjectSheet}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition-all border border-slate-700 cursor-pointer"
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs font-semibold transition-all border border-gray-200 cursor-pointer"
               title="Bu projenin detaylı Excel tablosunu indir"
             >
               <FileSpreadsheet className="w-4 h-4 text-emerald-400" />
@@ -405,7 +405,7 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
 
             <button 
               onClick={onClose}
-              className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
+              className="p-2 rounded-xl text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
@@ -414,40 +414,40 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
 
         {/* Quick KPI Ribbon */}
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 my-4">
-          <div className="p-3.5 rounded-2xl bg-slate-950/70 border border-slate-800">
-            <span className="text-[10px] text-slate-400 uppercase tracking-wider block">Hedef Anket Sayısı</span>
-            <span className="text-lg font-black font-mono text-white">{project.targetSurveys} <span className="text-xs font-normal text-slate-500">Anket</span></span>
-            <span className="text-[10px] text-slate-500 block">Birim: ₺{project.clientUnitPrice}</span>
+          <div className="p-3.5 rounded-2xl bg-gray-50 border border-gray-200">
+            <span className="text-[10px] text-gray-500 uppercase tracking-wider block">Hedef Anket Sayısı</span>
+            <span className="text-lg font-black font-mono text-gray-900">{project.targetSurveys} <span className="text-xs font-normal text-gray-400">Anket</span></span>
+            <span className="text-[10px] text-gray-400 block">Birim: ₺{project.clientUnitPrice}</span>
           </div>
 
-          <div className="p-3.5 rounded-2xl bg-slate-950/70 border border-slate-800">
-            <span className="text-[10px] text-slate-400 uppercase tracking-wider block">Tamamlanan / Geçerli</span>
-            <span className="text-lg font-black font-mono text-sky-400">{totalValidSurveysDone} <span className="text-xs font-normal text-slate-500">/ {project.targetSurveys}</span></span>
-            <span className="text-[10px] text-slate-500 block">%{Math.min((totalValidSurveysDone / (project.targetSurveys || 1)) * 100, 100).toFixed(0)} Tamamlanma</span>
+          <div className="p-3.5 rounded-2xl bg-gray-50 border border-gray-200">
+            <span className="text-[10px] text-gray-500 uppercase tracking-wider block">Tamamlanan / Geçerli</span>
+            <span className="text-lg font-black font-mono text-sky-400">{totalValidSurveysDone} <span className="text-xs font-normal text-gray-400">/ {project.targetSurveys}</span></span>
+            <span className="text-[10px] text-gray-400 block">%{Math.min((totalValidSurveysDone / (project.targetSurveys || 1)) * 100, 100).toFixed(0)} Tamamlanma</span>
           </div>
 
-          <div className="p-3.5 rounded-2xl bg-slate-950/70 border border-slate-800">
-            <span className="text-[10px] text-slate-400 uppercase tracking-wider block">Saha Rapor & Yevmiye</span>
-            <span className="text-lg font-black font-mono text-emerald-400">{projectDailyReports.length} <span className="text-xs font-normal text-slate-500">Rapor</span></span>
-            <span className="text-[10px] text-slate-500 block">₺{totalProjectFieldWages.toLocaleString('tr-TR')} Saha Yevmiyesi</span>
+          <div className="p-3.5 rounded-2xl bg-gray-50 border border-gray-200">
+            <span className="text-[10px] text-gray-500 uppercase tracking-wider block">Saha Rapor & Yevmiye</span>
+            <span className="text-lg font-black font-mono text-emerald-400">{projectDailyReports.length} <span className="text-xs font-normal text-gray-400">Rapor</span></span>
+            <span className="text-[10px] text-gray-400 block">₺{totalProjectFieldWages.toLocaleString('tr-TR')} Saha Yevmiyesi</span>
           </div>
 
-          <div className="p-3.5 rounded-2xl bg-slate-950/70 border border-slate-800">
-            <span className="text-[10px] text-slate-400 uppercase tracking-wider block">TK Kontrol & Onay</span>
-            <span className="text-lg font-black font-mono text-indigo-400">{totalProjectTkApproved} <span className="text-xs font-normal text-slate-500">/ {totalProjectTkCalls} Okey</span></span>
-            <span className="text-[10px] text-slate-500 block">₺{totalProjectTkCost.toLocaleString('tr-TR')} TK Maliyeti</span>
+          <div className="p-3.5 rounded-2xl bg-gray-50 border border-gray-200">
+            <span className="text-[10px] text-gray-500 uppercase tracking-wider block">TK Kontrol & Onay</span>
+            <span className="text-lg font-black font-mono text-indigo-400">{totalProjectTkApproved} <span className="text-xs font-normal text-gray-400">/ {totalProjectTkCalls} Okey</span></span>
+            <span className="text-[10px] text-gray-400 block">₺{totalProjectTkCost.toLocaleString('tr-TR')} TK Maliyeti</span>
           </div>
 
-          <div className="p-3.5 rounded-2xl bg-slate-950/70 border border-slate-800 col-span-2 sm:col-span-1">
-            <span className="text-[10px] text-slate-400 uppercase tracking-wider block">Masraf & Avans</span>
+          <div className="p-3.5 rounded-2xl bg-gray-50 border border-gray-200 col-span-2 sm:col-span-1">
+            <span className="text-[10px] text-gray-500 uppercase tracking-wider block">Masraf & Avans</span>
             <span className="text-lg font-black font-mono text-amber-400">₺{(totalProjectExpenses + totalProjectAdvances).toLocaleString('tr-TR')}</span>
-            <span className="text-[10px] text-slate-500 block">₺{totalProjectExpenses} Masraf + ₺{totalProjectAdvances} Avans</span>
+            <span className="text-[10px] text-gray-400 block">₺{totalProjectExpenses} Masraf + ₺{totalProjectAdvances} Avans</span>
           </div>
         </div>
 
         {/* PROJE İÇİ HIZLI İŞLEM BUTONLARI */}
-        <div className="p-3.5 rounded-2xl bg-gradient-to-r from-slate-950 to-slate-900 border border-slate-800 flex flex-wrap items-center gap-2 mb-4">
-          <span className="text-xs font-bold text-slate-400 mr-1 flex items-center gap-1.5">
+        <div className="p-3.5 rounded-2xl bg-gradient-to-r from-slate-950 to-slate-900 border border-gray-200 flex flex-wrap items-center gap-2 mb-4">
+          <span className="text-xs font-bold text-gray-500 mr-1 flex items-center gap-1.5">
             <PlusCircle className="w-4 h-4 text-sky-400" />
             <span>İşlem Ekle:</span>
           </span>
@@ -501,7 +501,7 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
           {/* 4. Masraf / Fiş Ekle */}
           <button
             onClick={() => setIsExpenseModalOpen(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-bold transition-all cursor-pointer"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-800 border border-gray-200 text-xs font-bold transition-all cursor-pointer"
           >
             <Receipt className="w-3.5 h-3.5" />
             <span>+ Masraf / Fiş</span>
@@ -526,7 +526,7 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
                 if (unassignedPersonnel.length > 0) setAssignPersonnelId(unassignedPersonnel[0].id);
                 setIsAssignModalOpen(true);
               }}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-bold transition-all cursor-pointer"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-800 border border-gray-200 text-xs font-bold transition-all cursor-pointer"
             >
               <Users className="w-3.5 h-3.5" />
               <span>+ Personel Ata</span>
@@ -536,7 +536,7 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
           {/* 7. Not Ekle */}
           <button
             onClick={() => setIsNoteModalOpen(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-bold transition-all cursor-pointer"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-800 border border-gray-200 text-xs font-bold transition-all cursor-pointer"
           >
             <StickyNote className="w-3.5 h-3.5" />
             <span>+ Not Ekle</span>
@@ -544,13 +544,13 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
         </div>
 
         {/* Modal Tabs Navigation */}
-        <div className="flex border-b border-slate-800 space-x-2 mb-4 overflow-x-auto">
+        <div className="flex border-b border-gray-200 space-x-2 mb-4 overflow-x-auto">
           <button
             onClick={() => setActiveTab('personnel')}
             className={`pb-2.5 px-3 text-xs font-bold border-b-2 transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
               activeTab === 'personnel'
                 ? 'border-sky-400 text-sky-400'
-                : 'border-transparent text-slate-400 hover:text-slate-200'
+                : 'border-transparent text-gray-500 hover:text-gray-800'
             }`}
           >
             <Users className="w-3.5 h-3.5" />
@@ -562,7 +562,7 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
             className={`pb-2.5 px-3 text-xs font-bold border-b-2 transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
               activeTab === 'daily_reports'
                 ? 'border-sky-400 text-sky-400'
-                : 'border-transparent text-slate-400 hover:text-slate-200'
+                : 'border-transparent text-gray-500 hover:text-gray-800'
             }`}
           >
             <ClipboardList className="w-3.5 h-3.5" />
@@ -574,7 +574,7 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
             className={`pb-2.5 px-3 text-xs font-bold border-b-2 transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
               activeTab === 'phone_control'
                 ? 'border-sky-400 text-sky-400'
-                : 'border-transparent text-slate-400 hover:text-slate-200'
+                : 'border-transparent text-gray-500 hover:text-gray-800'
             }`}
           >
             <PhoneCall className="w-3.5 h-3.5" />
@@ -586,7 +586,7 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
             className={`pb-2.5 px-3 text-xs font-bold border-b-2 transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
               activeTab === 'expenses'
                 ? 'border-sky-400 text-sky-400'
-                : 'border-transparent text-slate-400 hover:text-slate-200'
+                : 'border-transparent text-gray-500 hover:text-gray-800'
             }`}
           >
             <Receipt className="w-3.5 h-3.5" />
@@ -598,7 +598,7 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
             className={`pb-2.5 px-3 text-xs font-bold border-b-2 transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
               activeTab === 'advances'
                 ? 'border-sky-400 text-sky-400'
-                : 'border-transparent text-slate-400 hover:text-slate-200'
+                : 'border-transparent text-gray-500 hover:text-gray-800'
             }`}
           >
             <Banknote className="w-3.5 h-3.5" />
@@ -610,7 +610,7 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
             className={`pb-2.5 px-3 text-xs font-bold border-b-2 transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
               activeTab === 'notes'
                 ? 'border-sky-400 text-sky-400'
-                : 'border-transparent text-slate-400 hover:text-slate-200'
+                : 'border-transparent text-gray-500 hover:text-gray-800'
             }`}
           >
             <StickyNote className="w-3.5 h-3.5" />
@@ -627,28 +627,28 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
                   <Building2 className="w-5 h-5 text-indigo-400" />
                   <h3 className="text-sm font-bold text-indigo-300">İller Hakediş Özeti</h3>
                 </div>
-                <p className="text-slate-300">
+                <p className="text-gray-700">
                   Bu proje İller modeliyle yönetilmektedir. Kişi bazlı avans ve masraf tutulmaz.
                 </p>
                 <div className="grid grid-cols-3 gap-3 pt-2">
-                  <div className="p-3 rounded-xl bg-slate-900 border border-slate-800">
-                    <span className="text-slate-500 block text-[10px]">Taşeron Firma:</span>
-                    <strong className="text-white text-sm">{project.subcontractorName}</strong>
+                  <div className="p-3 rounded-xl bg-white border border-gray-200">
+                    <span className="text-gray-400 block text-[10px]">Taşeron Firma:</span>
+                    <strong className="text-gray-900 text-sm">{project.subcontractorName}</strong>
                   </div>
-                  <div className="p-3 rounded-xl bg-slate-900 border border-slate-800">
-                    <span className="text-slate-500 block text-[10px]">Anket Başı Toplu Fiyat:</span>
+                  <div className="p-3 rounded-xl bg-white border border-gray-200">
+                    <span className="text-gray-400 block text-[10px]">Anket Başı Toplu Fiyat:</span>
                     <strong className="text-indigo-400 text-sm font-mono">₺{project.subcontractorUnitPrice}</strong>
                   </div>
-                  <div className="p-3 rounded-xl bg-slate-900 border border-slate-800">
-                    <span className="text-slate-500 block text-[10px]">Toplam Taşeron Hakedişi:</span>
+                  <div className="p-3 rounded-xl bg-white border border-gray-200">
+                    <span className="text-gray-400 block text-[10px]">Toplam Taşeron Hakedişi:</span>
                     <strong className="text-emerald-400 text-sm font-mono">₺{((project.targetSurveys) * (project.subcontractorUnitPrice || 0)).toLocaleString('tr-TR')}</strong>
                   </div>
                 </div>
               </div>
             ) : (
-              <div className="overflow-x-auto rounded-2xl border border-slate-800">
-                <table className="w-full text-left text-xs text-slate-300">
-                  <thead className="bg-slate-950 text-slate-400 uppercase tracking-wider text-[10px] border-b border-slate-800">
+              <div className="overflow-x-auto rounded-2xl border border-gray-200">
+                <table className="w-full text-left text-xs text-gray-700">
+                  <thead className="bg-white text-gray-500 uppercase tracking-wider text-[10px] border-b border-gray-200">
                     <tr>
                       <th className="py-2.5 px-3">Personel</th>
                       <th className="py-2.5 px-3">Rol</th>
@@ -666,7 +666,7 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
                   <tbody className="divide-y divide-slate-800/80">
                     {projectAssigned.length === 0 ? (
                       <tr>
-                        <td colSpan={11} className="py-6 text-center text-slate-500">
+                        <td colSpan={11} className="py-6 text-center text-gray-400">
                           Bu projeye henüz personel atanmadı. Yukarıdaki <strong>"+ Personel Ata"</strong> butonunu kullanarak personel ekleyebilirsiniz.
                         </td>
                       </tr>
@@ -676,11 +676,11 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
                         const netAdv = getPersonnelNetAdvance(project.id, pp.personnelId);
 
                         return (
-                          <tr key={pp.id} className="hover:bg-slate-800/30 transition-colors">
-                            <td className="py-2.5 px-3 font-bold text-white">
+                          <tr key={pp.id} className="hover:bg-gray-100 transition-colors">
+                            <td className="py-2.5 px-3 font-bold text-gray-900">
                               {pp.personnelName}
                             </td>
-                            <td className="py-2.5 px-3 uppercase text-[10px] font-semibold text-slate-400">
+                            <td className="py-2.5 px-3 uppercase text-[10px] font-semibold text-gray-500">
                               {pp.assignedRole}
                             </td>
                             <td className="py-2.5 px-3 text-right font-mono font-bold text-sky-400">
@@ -718,7 +718,7 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
                                   className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border transition-all cursor-pointer ${
                                     settlement.isPaid
                                       ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40'
-                                      : 'bg-slate-800 text-slate-400 border-slate-700'
+                                      : 'bg-gray-100 text-gray-500 border-gray-200'
                                   }`}
                                 >
                                   {settlement.isPaid ? 'ÖDENDİ' : 'BEKLİYOR'}
@@ -750,7 +750,7 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
         {activeTab === 'daily_reports' && (
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <span className="text-xs text-slate-400 font-semibold">
+              <span className="text-xs text-gray-500 font-semibold">
                 Bu projeye ait kaydedilmiş gün gün saha raporları ve anketör yevmiyeleri
               </span>
               <button
@@ -770,20 +770,20 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
             </div>
 
             {projectDailyReports.length === 0 ? (
-              <div className="p-8 text-center rounded-2xl bg-slate-950 border border-slate-800 text-xs text-slate-500 space-y-2">
+              <div className="p-8 text-center rounded-2xl bg-white border border-gray-200 text-xs text-gray-400 space-y-2">
                 <ClipboardList className="w-8 h-8 text-slate-600 mx-auto" />
                 <p>Bu proje için henüz günlük saha raporu girilmedi.</p>
               </div>
             ) : (
               <div className="space-y-3">
                 {projectDailyReports.map((rep) => (
-                  <div key={rep.id} className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-3 text-xs">
+                  <div key={rep.id} className="p-4 rounded-2xl bg-white border border-gray-200 space-y-3 text-xs">
                     <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-850 pb-2.5">
                       <div className="flex items-center gap-2">
                         <span className="font-mono font-bold text-sky-400 bg-sky-500/10 px-2 py-0.5 rounded border border-sky-500/20">
                           {rep.reportDate}
                         </span>
-                        <span className="font-bold text-white flex items-center gap-1">
+                        <span className="font-bold text-gray-900 flex items-center gap-1">
                           <MapPin className="w-3.5 h-3.5 text-emerald-400" />
                           <span>{rep.locations || 'Nokta belirtilmedi'}</span>
                         </span>
@@ -794,7 +794,7 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
                             ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' 
                             : rep.status === 'delayed' 
                             ? 'bg-rose-500/10 text-rose-400 border-rose-500/30'
-                            : 'bg-slate-800 text-slate-300 border-slate-700'
+                            : 'bg-gray-100 text-gray-700 border-gray-200'
                         }`}>
                           {rep.status === 'started' ? 'Saha Başladı' : rep.status === 'delayed' ? 'Gecikti/Başlayamadı' : rep.status === 'ongoing' ? 'Devam Ediyor' : rep.status}
                         </span>
@@ -804,7 +804,7 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
                               deleteDailyReport(rep.id);
                             }
                           }}
-                          className="p-1 rounded text-slate-500 hover:text-rose-400 cursor-pointer"
+                          className="p-1 rounded text-gray-400 hover:text-rose-400 cursor-pointer"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
@@ -818,16 +818,16 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
                     )}
 
                     {rep.notes && (
-                      <p className="text-slate-300 bg-slate-900/60 p-2.5 rounded-xl border border-slate-800/80">
+                      <p className="text-gray-700 bg-gray-50 p-2.5 rounded-xl border border-gray-200">
                         {rep.notes}
                       </p>
                     )}
 
                     {/* Workers list */}
                     {rep.workers && rep.workers.length > 0 && (
-                      <div className="overflow-x-auto rounded-xl border border-slate-800 bg-slate-900">
-                        <table className="w-full text-left text-[11px] text-slate-300">
-                          <thead className="bg-slate-950 text-slate-400 uppercase text-[9px]">
+                      <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white">
+                        <table className="w-full text-left text-[11px] text-gray-700">
+                          <thead className="bg-white text-gray-500 uppercase text-[9px]">
                             <tr>
                               <th className="py-2 px-3">Anketör</th>
                               <th className="py-2 px-3">Adına Çalıştığı</th>
@@ -838,8 +838,8 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
                           <tbody className="divide-y divide-slate-800/50">
                             {rep.workers.map((w, idx) => (
                               <tr key={w.id || idx}>
-                                <td className="py-1.5 px-3 font-bold text-white">{w.personnelName}</td>
-                                <td className="py-1.5 px-3 text-slate-400">
+                                <td className="py-1.5 px-3 font-bold text-gray-900">{w.personnelName}</td>
+                                <td className="py-1.5 px-3 text-gray-500">
                                   {w.onBehalfOf ? `👉 ${w.onBehalfOf} adına` : '-'}
                                 </td>
                                 <td className="py-1.5 px-3 text-center font-mono font-bold text-sky-400">{w.surveysCompleted || 0}</td>
@@ -851,7 +851,7 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
                       </div>
                     )}
 
-                    <div className="flex justify-between items-center text-[10px] text-slate-500 pt-1">
+                    <div className="flex justify-between items-center text-[10px] text-gray-400 pt-1">
                       <span>Raporu Giren: <strong>{rep.createdByName || 'SPV'}</strong></span>
                       <span className="font-mono font-bold text-amber-400 text-xs">
                         Günün Toplam Yevmiyesi: ₺{(rep.totalDailyWage || 0).toLocaleString('tr-TR')}
@@ -868,7 +868,7 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
         {activeTab === 'phone_control' && (
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <span className="text-xs text-slate-400 font-semibold">
+              <span className="text-xs text-gray-500 font-semibold">
                 Bu projenin telefon kontrol kayıtları, okey alınan anket sayıları ve TK kontrolcü yevmiyeleri
               </span>
               <button
@@ -890,14 +890,14 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
             </div>
 
             {projectPhoneControls.length === 0 ? (
-              <div className="p-8 text-center rounded-2xl bg-slate-950 border border-slate-800 text-xs text-slate-500 space-y-2">
+              <div className="p-8 text-center rounded-2xl bg-white border border-gray-200 text-xs text-gray-400 space-y-2">
                 <PhoneCall className="w-8 h-8 text-slate-600 mx-auto" />
                 <p>Bu proje için henüz telefon kontrol (TK) kaydı girilmedi.</p>
               </div>
             ) : (
-              <div className="overflow-x-auto rounded-2xl border border-slate-800">
-                <table className="w-full text-left text-xs text-slate-300">
-                  <thead className="bg-slate-950 text-slate-400 uppercase tracking-wider text-[10px] border-b border-slate-800">
+              <div className="overflow-x-auto rounded-2xl border border-gray-200">
+                <table className="w-full text-left text-xs text-gray-700">
+                  <thead className="bg-white text-gray-500 uppercase tracking-wider text-[10px] border-b border-gray-200">
                     <tr>
                       <th className="py-2.5 px-3">Tarih</th>
                       <th className="py-2.5 px-3">TK Kontrolcüsü</th>
@@ -912,17 +912,17 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
                   </thead>
                   <tbody className="divide-y divide-slate-800/80 font-medium">
                     {projectPhoneControls.map(rec => (
-                      <tr key={rec.id} className="hover:bg-slate-800/30 transition-colors">
-                        <td className="py-2.5 px-3 font-mono text-slate-400">{rec.controlDate}</td>
-                        <td className="py-2.5 px-3 font-bold text-white">{rec.controllerName}</td>
+                      <tr key={rec.id} className="hover:bg-gray-100 transition-colors">
+                        <td className="py-2.5 px-3 font-mono text-gray-500">{rec.controlDate}</td>
+                        <td className="py-2.5 px-3 font-bold text-gray-900">{rec.controllerName}</td>
                         <td className="py-2.5 px-3 text-right font-mono font-bold text-amber-400">
                           ₺{Number(rec.dailyWage || 0).toLocaleString('tr-TR')}
                         </td>
-                        <td className="py-2.5 px-3 text-center font-mono font-bold text-white">{rec.totalCalled}</td>
+                        <td className="py-2.5 px-3 text-center font-mono font-bold text-gray-900">{rec.totalCalled}</td>
                         <td className="py-2.5 px-3 text-center font-mono font-black text-emerald-400 bg-emerald-500/5">{rec.totalApproved}</td>
                         <td className="py-2.5 px-3 text-center font-mono font-bold text-rose-400">{rec.totalRejected}</td>
                         <td className="py-2.5 px-3 text-center font-mono font-bold text-sky-400">%{rec.approvalRate || 0}</td>
-                        <td className="py-2.5 px-3 text-slate-400 text-[11px] truncate max-w-[160px]" title={rec.notes}>{rec.notes || '-'}</td>
+                        <td className="py-2.5 px-3 text-gray-500 text-[11px] truncate max-w-[160px]" title={rec.notes}>{rec.notes || '-'}</td>
                         <td className="py-2.5 px-3 text-center">
                           <button
                             onClick={() => {
@@ -930,7 +930,7 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
                                 deletePhoneControlRecord(rec.id);
                               }
                             }}
-                            className="p-1 text-slate-500 hover:text-rose-400 cursor-pointer"
+                            className="p-1 text-gray-400 hover:text-rose-400 cursor-pointer"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
@@ -953,28 +953,28 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
                   <Building2 className="w-5 h-5 text-indigo-400" />
                   <h3 className="text-sm font-bold text-indigo-300">İller Hakediş Özeti</h3>
                 </div>
-                <p className="text-slate-300">
+                <p className="text-gray-700">
                   Bu proje İller modeliyle yönetilmektedir. Kişi bazlı avans ve masraf tutulmaz.
                 </p>
                 <div className="grid grid-cols-3 gap-3 pt-2">
-                  <div className="p-3 rounded-xl bg-slate-900 border border-slate-800">
-                    <span className="text-slate-500 block text-[10px]">Taşeron Firma:</span>
-                    <strong className="text-white text-sm">{project.subcontractorName}</strong>
+                  <div className="p-3 rounded-xl bg-white border border-gray-200">
+                    <span className="text-gray-400 block text-[10px]">Taşeron Firma:</span>
+                    <strong className="text-gray-900 text-sm">{project.subcontractorName}</strong>
                   </div>
-                  <div className="p-3 rounded-xl bg-slate-900 border border-slate-800">
-                    <span className="text-slate-500 block text-[10px]">Anket Başı Toplu Fiyat:</span>
+                  <div className="p-3 rounded-xl bg-white border border-gray-200">
+                    <span className="text-gray-400 block text-[10px]">Anket Başı Toplu Fiyat:</span>
                     <strong className="text-indigo-400 text-sm font-mono">₺{project.subcontractorUnitPrice}</strong>
                   </div>
-                  <div className="p-3 rounded-xl bg-slate-900 border border-slate-800">
-                    <span className="text-slate-500 block text-[10px]">Toplam Taşeron Hakedişi:</span>
+                  <div className="p-3 rounded-xl bg-white border border-gray-200">
+                    <span className="text-gray-400 block text-[10px]">Toplam Taşeron Hakedişi:</span>
                     <strong className="text-emerald-400 text-sm font-mono">₺{((project.targetSurveys) * (project.subcontractorUnitPrice || 0)).toLocaleString('tr-TR')}</strong>
                   </div>
                 </div>
               </div>
             ) : (
-              <div className="overflow-x-auto rounded-2xl border border-slate-800">
-                <table className="w-full text-left text-xs text-slate-300">
-                  <thead className="bg-slate-950 text-slate-400 uppercase tracking-wider text-[10px] border-b border-slate-800">
+              <div className="overflow-x-auto rounded-2xl border border-gray-200">
+                <table className="w-full text-left text-xs text-gray-700">
+                  <thead className="bg-white text-gray-500 uppercase tracking-wider text-[10px] border-b border-gray-200">
                     <tr>
                       <th className="py-2.5 px-3">Personel</th>
                       <th className="py-2.5 px-3">Rol</th>
@@ -992,7 +992,7 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
                   <tbody className="divide-y divide-slate-800/80">
                     {projectAssigned.length === 0 ? (
                       <tr>
-                        <td colSpan={11} className="py-6 text-center text-slate-500">
+                        <td colSpan={11} className="py-6 text-center text-gray-400">
                           Bu projeye henüz personel atanmadı. Yukarıdaki <strong>"+ Personel Ata"</strong> butonunu kullanarak personel ekleyebilirsiniz.
                         </td>
                       </tr>
@@ -1002,11 +1002,11 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
                         const netAdv = getPersonnelNetAdvance(project.id, pp.personnelId);
 
                         return (
-                          <tr key={pp.id} className="hover:bg-slate-800/30 transition-colors">
-                            <td className="py-2.5 px-3 font-bold text-white">
+                          <tr key={pp.id} className="hover:bg-gray-100 transition-colors">
+                            <td className="py-2.5 px-3 font-bold text-gray-900">
                               {pp.personnelName}
                             </td>
-                            <td className="py-2.5 px-3 uppercase text-[10px] font-semibold text-slate-400">
+                            <td className="py-2.5 px-3 uppercase text-[10px] font-semibold text-gray-500">
                               {pp.assignedRole}
                             </td>
                             <td className="py-2.5 px-3 text-right font-mono font-bold text-sky-400">
@@ -1044,7 +1044,7 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
                                   className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border transition-all cursor-pointer ${
                                     settlement.isPaid
                                       ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40'
-                                      : 'bg-slate-800 text-slate-400 border-slate-700'
+                                      : 'bg-gray-100 text-gray-500 border-gray-200'
                                   }`}
                                 >
                                   {settlement.isPaid ? 'ÖDENDİ' : 'BEKLİYOR'}
@@ -1076,26 +1076,26 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
         {activeTab === 'expenses' && (
           <div className="space-y-3">
             {projectExpenses.length === 0 ? (
-              <p className="text-center py-6 text-slate-500 text-xs">Bu projeye ait kayıtlı masraf fişi bulunmuyor.</p>
+              <p className="text-center py-6 text-gray-400 text-xs">Bu projeye ait kayıtlı masraf fişi bulunmuyor.</p>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {projectExpenses.map(exp => (
-                  <div key={exp.id} className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-between text-xs">
+                  <div key={exp.id} className="p-3.5 rounded-xl bg-white border border-gray-200 flex items-center justify-between text-xs">
                     <div>
                       <div className="flex items-center gap-1.5 mb-1">
-                        <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-slate-800 text-slate-300">
+                        <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-gray-100 text-gray-700">
                           {exp.category}
                         </span>
-                        <span className="text-[10px] text-slate-500">{exp.expenseDate}</span>
+                        <span className="text-[10px] text-gray-400">{exp.expenseDate}</span>
                       </div>
-                      <p className="font-bold text-white">{exp.description}</p>
+                      <p className="font-bold text-gray-900">{exp.description}</p>
                       <p className="text-[11px] text-emerald-400 mt-0.5">
-                        İşlemi Yapan: <strong className="text-white">{exp.spvName || 'Fatih Sakar'}</strong>
+                        İşlemi Yapan: <strong className="text-gray-900">{exp.spvName || 'Fatih Sakar'}</strong>
                       </p>
                     </div>
 
                     <div className="text-right flex flex-col items-end gap-1">
-                      <span className="font-mono font-bold text-sm text-white">₺{exp.amount.toLocaleString('tr-TR')}</span>
+                      <span className="font-mono font-bold text-sm text-gray-900">₺{exp.amount.toLocaleString('tr-TR')}</span>
                       {exp.receiptImageUrl && (
                         <button
                           onClick={() => setPreviewImage(exp.receiptImageUrl || null)}
@@ -1116,20 +1116,20 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
         {activeTab === 'advances' && (
           <div className="space-y-3">
             {projectAdvances.length === 0 ? (
-              <p className="text-center py-6 text-slate-500 text-xs">Bu projede henüz personele avans verilmedi.</p>
+              <p className="text-center py-6 text-gray-400 text-xs">Bu projede henüz personele avans verilmedi.</p>
             ) : (
-              <div className="divide-y divide-slate-800/80 rounded-2xl border border-slate-800 overflow-hidden">
+              <div className="divide-y divide-slate-800/80 rounded-2xl border border-gray-200 overflow-hidden">
                 {projectAdvances.map(adv => (
-                  <div key={adv.id} className="p-3 bg-slate-950 flex items-center justify-between text-xs">
+                  <div key={adv.id} className="p-3 bg-white flex items-center justify-between text-xs">
                     <div>
-                      <p className="font-bold text-white">{adv.personnelName}</p>
-                      <p className="text-[11px] text-slate-400">
+                      <p className="font-bold text-gray-900">{adv.personnelName}</p>
+                      <p className="text-[11px] text-gray-500">
                         {adv.note || 'Avans'} • İşlemi Yapan: <strong className="text-amber-400">{adv.spvName || 'Fatih Sakar'}</strong>
                       </p>
                     </div>
                     <div className="text-right">
                       <span className="font-mono font-bold text-amber-400 text-sm">₺{adv.amount.toLocaleString('tr-TR')}</span>
-                      <span className="text-[10px] uppercase text-slate-500 block">{adv.paymentMethod}</span>
+                      <span className="text-[10px] uppercase text-gray-400 block">{adv.paymentMethod}</span>
                     </div>
                   </div>
                 ))}
@@ -1143,8 +1143,8 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
           <div className="space-y-4">
             
             {/* Quick Shift / Substitute Action Chips */}
-            <div className="p-3.5 rounded-2xl bg-slate-950/80 border border-slate-800 space-y-2">
-              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
+            <div className="p-3.5 rounded-2xl bg-gray-50 border border-gray-200 space-y-2">
+              <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wider block">
                 Hızlı Saha & Vardiya Şablonları (Tek Tıkla Ekle):
               </span>
               <div className="flex flex-wrap gap-1.5">
@@ -1159,7 +1159,7 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
                     key={idx}
                     type="button"
                     onClick={() => setNewNoteText(template)}
-                    className="text-[11px] px-2.5 py-1 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-sky-300 border border-slate-800 transition-all cursor-pointer"
+                    className="text-[11px] px-2.5 py-1 rounded-xl bg-white hover:bg-gray-100 text-gray-700 hover:text-sky-300 border border-gray-200 transition-all cursor-pointer"
                   >
                     + {template}
                   </button>
@@ -1168,7 +1168,7 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
             </div>
 
             {/* Inline Fast Note Addition Form */}
-            <form onSubmit={handleNoteSubmit} className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-2.5">
+            <form onSubmit={handleNoteSubmit} className="p-4 rounded-2xl bg-white border border-gray-200 space-y-2.5">
               <div className="flex flex-col sm:flex-row gap-2">
                 <input
                   type="text"
@@ -1176,11 +1176,11 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
                   value={newNoteText}
                   onChange={(e) => setNewNoteText(e.target.value)}
                   placeholder={`${currentUser?.fullName || 'Fatih Sakar'} olarak sahaya vardiya veya günlük not ekleyin...`}
-                  className="flex-1 px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+                  className="flex-1 px-3.5 py-2.5 rounded-xl bg-white border border-gray-200 text-xs text-gray-900 placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
                 />
                 <button
                   type="submit"
-                  className="px-5 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-white font-bold text-xs shadow-md transition-all cursor-pointer whitespace-nowrap"
+                  className="px-5 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-gray-900 font-bold text-xs shadow-md transition-all cursor-pointer whitespace-nowrap"
                 >
                   + Notu Kaydet
                 </button>
@@ -1191,51 +1191,51 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
             {project.notesList && project.notesList.length > 0 ? (
               <div className="space-y-2.5">
                 {project.notesList.map((n) => (
-                  <div key={n.id} className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs space-y-1.5">
+                  <div key={n.id} className="p-3.5 rounded-2xl bg-white border border-gray-200 text-xs space-y-1.5">
                     <div className="flex items-center justify-between">
                       <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-sky-500/10 text-sky-400 border border-sky-500/20 font-bold text-[11px]">
                         {n.authorName} {n.authorRole === 'admin' ? '(Müdür)' : '(SPV)'}
                       </span>
-                      <span className="text-[10px] text-slate-500">
+                      <span className="text-[10px] text-gray-400">
                         {new Date(n.createdAt).toLocaleDateString('tr-TR')} {new Date(n.createdAt).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}
                       </span>
                     </div>
-                    <p className="text-slate-200 text-xs leading-relaxed font-sans">{n.text}</p>
+                    <p className="text-gray-800 text-xs leading-relaxed font-sans">{n.text}</p>
                   </div>
                 ))}
               </div>
             ) : project.notes ? (
-              <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 text-xs whitespace-pre-line text-slate-300 leading-relaxed font-mono">
+              <div className="p-4 rounded-2xl bg-white border border-gray-200 text-xs whitespace-pre-line text-gray-700 leading-relaxed font-mono">
                 {project.notes}
               </div>
             ) : (
-              <p className="text-center py-6 text-slate-500 text-xs">Bu proje için henüz saha notu girilmemiş.</p>
+              <p className="text-center py-6 text-gray-400 text-xs">Bu proje için henüz saha notu girilmemiş.</p>
             )}
           </div>
         )}
 
         {/* ---------------- SUB-MODAL 1: ADVANCE ---------------- */}
         {isAdvanceModalOpen && (
-          <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
-            <div className="w-full max-w-sm bg-slate-900 border border-slate-800 rounded-2xl p-5 text-slate-100 shadow-2xl">
-              <div className="flex justify-between items-center pb-2 border-b border-slate-800">
-                <h3 className="text-sm font-bold text-white flex items-center gap-1.5">
+          <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+            <div className="w-full max-w-sm bg-white border border-gray-200 rounded-2xl p-5 text-gray-900 shadow-2xl">
+              <div className="flex justify-between items-center pb-2 border-b border-gray-200">
+                <h3 className="text-sm font-bold text-gray-900 flex items-center gap-1.5">
                   <Banknote className="w-4 h-4 text-amber-400" />
                   <span>{project.code} - Avans Ekle</span>
                 </h3>
-                <button onClick={() => setIsAdvanceModalOpen(false)} className="text-slate-400 hover:text-white">
+                <button onClick={() => setIsAdvanceModalOpen(false)} className="text-gray-500 hover:text-gray-900">
                   <X className="w-4 h-4" />
                 </button>
               </div>
 
               <form onSubmit={handleAdvanceSubmit} className="space-y-3 mt-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Personel</label>
+                  <label className="block text-xs font-semibold text-gray-700 mb-1">Personel</label>
                   <select
                     value={advancePersonnelId}
                     onChange={(e) => setAdvancePersonnelId(e.target.value)}
                     required
-                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white"
+                    className="w-full px-3 py-2 rounded-xl bg-white border border-gray-200 text-xs text-gray-900"
                   >
                     <option value="">-- Personel Seçin --</option>
                     {projectAssigned.map(pp => (
@@ -1245,7 +1245,7 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Avans Tutarı (TL)</label>
+                  <label className="block text-xs font-semibold text-gray-700 mb-1">Avans Tutarı (TL)</label>
                   <input
                     type="number"
                     required
@@ -1253,16 +1253,16 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
                     value={advanceAmount}
                     onChange={(e) => setAdvanceAmount(e.target.value)}
                     placeholder="Örn: 500"
-                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-base font-mono font-bold text-amber-400"
+                    className="w-full px-3 py-2 rounded-xl bg-white border border-gray-200 text-base font-mono font-bold text-amber-400"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Ödeme Yöntemi</label>
+                  <label className="block text-xs font-semibold text-gray-700 mb-1">Ödeme Yöntemi</label>
                   <select
                     value={advanceMethod}
                     onChange={(e) => setAdvanceMethod(e.target.value as 'nakit' | 'havale')}
-                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white"
+                    className="w-full px-3 py-2 rounded-xl bg-white border border-gray-200 text-xs text-gray-900"
                   >
                     <option value="nakit">Nakit (Elden)</option>
                     <option value="havale">Banka / Havale</option>
@@ -1270,13 +1270,13 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Not</label>
+                  <label className="block text-xs font-semibold text-gray-700 mb-1">Not</label>
                   <input
                     type="text"
                     value={advanceNote}
                     onChange={(e) => setAdvanceNote(e.target.value)}
                     placeholder="Örn: Sahaya çıkış avansı"
-                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white"
+                    className="w-full px-3 py-2 rounded-xl bg-white border border-gray-200 text-xs text-gray-900"
                   />
                 </div>
 
@@ -1293,25 +1293,25 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
 
         {/* ---------------- SUB-MODAL 2: EXPENSE ---------------- */}
         {isExpenseModalOpen && (
-          <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
-            <div className="w-full max-w-sm bg-slate-900 border border-slate-800 rounded-2xl p-5 text-slate-100 shadow-2xl">
-              <div className="flex justify-between items-center pb-2 border-b border-slate-800">
-                <h3 className="text-sm font-bold text-white flex items-center gap-1.5">
+          <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+            <div className="w-full max-w-sm bg-white border border-gray-200 rounded-2xl p-5 text-gray-900 shadow-2xl">
+              <div className="flex justify-between items-center pb-2 border-b border-gray-200">
+                <h3 className="text-sm font-bold text-gray-900 flex items-center gap-1.5">
                   <Receipt className="w-4 h-4 text-sky-400" />
                   <span>{project.code} - Masraf Ekle</span>
                 </h3>
-                <button onClick={() => setIsExpenseModalOpen(false)} className="text-slate-400 hover:text-white">
+                <button onClick={() => setIsExpenseModalOpen(false)} className="text-gray-500 hover:text-gray-900">
                   <X className="w-4 h-4" />
                 </button>
               </div>
 
               <form onSubmit={handleExpenseSubmit} className="space-y-3 mt-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Kategori</label>
+                  <label className="block text-xs font-semibold text-gray-700 mb-1">Kategori</label>
                   <select
                     value={expenseCategory}
                     onChange={(e) => setExpenseCategory(e.target.value as ExpenseCategory)}
-                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white"
+                    className="w-full px-3 py-2 rounded-xl bg-white border border-gray-200 text-xs text-gray-900"
                   >
                     <option value="yakit">Yakıt / Mazot</option>
                     <option value="yemek">Yemek</option>
@@ -1322,7 +1322,7 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Tutar (TL)</label>
+                  <label className="block text-xs font-semibold text-gray-700 mb-1">Tutar (TL)</label>
                   <input
                     type="number"
                     required
@@ -1330,24 +1330,24 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
                     value={expenseAmount}
                     onChange={(e) => setExpenseAmount(e.target.value)}
                     placeholder="Örn: 650"
-                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-base font-mono font-bold text-sky-400"
+                    className="w-full px-3 py-2 rounded-xl bg-white border border-gray-200 text-base font-mono font-bold text-sky-400"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Açıklama</label>
+                  <label className="block text-xs font-semibold text-gray-700 mb-1">Açıklama</label>
                   <input
                     type="text"
                     value={expenseDesc}
                     onChange={(e) => setExpenseDesc(e.target.value)}
                     placeholder="Örn: Saha aracı yakıtı"
-                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white"
+                    className="w-full px-3 py-2 rounded-xl bg-white border border-gray-200 text-xs text-gray-900"
                   />
                 </div>
 
                 <button
                   type="submit"
-                  className="w-full py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-white font-bold text-xs shadow transition-all cursor-pointer"
+                  className="w-full py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-gray-900 font-bold text-xs shadow transition-all cursor-pointer"
                 >
                   Masrafı Projeye Kaydet
                 </button>
@@ -1358,26 +1358,26 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
 
         {/* ---------------- SUB-MODAL 3: SURVEY CLOSE ---------------- */}
         {isSurveyModalOpen && (
-          <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
-            <div className="w-full max-w-sm bg-slate-900 border border-slate-800 rounded-2xl p-5 text-slate-100 shadow-2xl">
-              <div className="flex justify-between items-center pb-2 border-b border-slate-800">
-                <h3 className="text-sm font-bold text-white flex items-center gap-1.5">
+          <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+            <div className="w-full max-w-sm bg-white border border-gray-200 rounded-2xl p-5 text-gray-900 shadow-2xl">
+              <div className="flex justify-between items-center pb-2 border-b border-gray-200">
+                <h3 className="text-sm font-bold text-gray-900 flex items-center gap-1.5">
                   <Calculator className="w-4 h-4 text-emerald-400" />
                   <span>Anket Kapama & Net Hakediş</span>
                 </h3>
-                <button onClick={() => setIsSurveyModalOpen(false)} className="text-slate-400 hover:text-white">
+                <button onClick={() => setIsSurveyModalOpen(false)} className="text-gray-500 hover:text-gray-900">
                   <X className="w-4 h-4" />
                 </button>
               </div>
 
               <form onSubmit={handleSurveySubmit} className="space-y-3 mt-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Personel</label>
+                  <label className="block text-xs font-semibold text-gray-700 mb-1">Personel</label>
                   <select
                     value={surveyPersonnelId}
                     onChange={(e) => setSurveyPersonnelId(e.target.value)}
                     required
-                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white"
+                    className="w-full px-3 py-2 rounded-xl bg-white border border-gray-200 text-xs text-gray-900"
                   >
                     <option value="">-- Personel Seçin --</option>
                     {projectAssigned.map(pp => (
@@ -1388,7 +1388,7 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
 
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <label className="block text-xs font-semibold text-slate-300 mb-1">Toplam Yapılan</label>
+                    <label className="block text-xs font-semibold text-gray-700 mb-1">Toplam Yapılan</label>
                     <input
                       type="number"
                       required
@@ -1396,7 +1396,7 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
                       value={surveyTotal}
                       onChange={(e) => setSurveyTotal(e.target.value)}
                       placeholder="100"
-                      className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-sm font-mono font-bold text-white"
+                      className="w-full px-3 py-2 rounded-xl bg-white border border-gray-200 text-sm font-mono font-bold text-gray-900"
                     />
                   </div>
                   <div>
@@ -1407,14 +1407,14 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
                       value={surveyInvalid}
                       onChange={(e) => setSurveyInvalid(e.target.value)}
                       placeholder="0"
-                      className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-sm font-mono font-bold text-rose-400"
+                      className="w-full px-3 py-2 rounded-xl bg-white border border-gray-200 text-sm font-mono font-bold text-rose-400"
                     />
                   </div>
                 </div>
 
                 <button
                   type="submit"
-                  className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow transition-all cursor-pointer"
+                  className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-gray-900 font-bold text-xs shadow transition-all cursor-pointer"
                 >
                   Hakedişi Hesapla & Kapat
                 </button>
@@ -1425,21 +1425,21 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
 
         {/* ---------------- SUB-MODAL 4: ASSIGN PERSONNEL ---------------- */}
         {isAssignModalOpen && (
-          <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
-            <div className="w-full max-w-sm bg-slate-900 border border-slate-800 rounded-2xl p-5 text-slate-100 shadow-2xl">
-              <div className="flex justify-between items-center pb-2 border-b border-slate-800">
-                <h3 className="text-sm font-bold text-white flex items-center gap-1.5">
+          <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+            <div className="w-full max-w-sm bg-white border border-gray-200 rounded-2xl p-5 text-gray-900 shadow-2xl">
+              <div className="flex justify-between items-center pb-2 border-b border-gray-200">
+                <h3 className="text-sm font-bold text-gray-900 flex items-center gap-1.5">
                   <Users className="w-4 h-4 text-indigo-400" />
                   <span>Projeye Personel Ata</span>
                 </h3>
-                <button onClick={() => setIsAssignModalOpen(false)} className="text-slate-400 hover:text-white">
+                <button onClick={() => setIsAssignModalOpen(false)} className="text-gray-500 hover:text-gray-900">
                   <X className="w-4 h-4" />
                 </button>
               </div>
 
               <form onSubmit={handleAssignSubmit} className="space-y-3 mt-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Personel Havuzundan Seçin</label>
+                  <label className="block text-xs font-semibold text-gray-700 mb-1">Personel Havuzundan Seçin</label>
                   <select
                     value={assignPersonnelId}
                     onChange={(e) => {
@@ -1448,7 +1448,7 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
                       if (target) setAssignOverridePrice(String(target.defaultUnitPrice));
                     }}
                     required
-                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white"
+                    className="w-full px-3 py-2 rounded-xl bg-white border border-gray-200 text-xs text-gray-900"
                   >
                     <option value="">-- Personel Seçin --</option>
                     {unassignedPersonnel.map(p => (
@@ -1465,25 +1465,25 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
                     min="1"
                     value={assignOverridePrice}
                     onChange={(e) => setAssignOverridePrice(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-sky-500/50 text-base font-mono font-bold text-sky-400"
+                    className="w-full px-3 py-2 rounded-xl bg-white border border-sky-500/50 text-base font-mono font-bold text-sky-400"
                   />
-                  <p className="text-[10px] text-slate-400 mt-0.5">Bu personelin hakedişi bu fiyattan hesaplanır.</p>
+                  <p className="text-[10px] text-gray-500 mt-0.5">Bu personelin hakedişi bu fiyattan hesaplanır.</p>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Günlük Yemek Bedeli (TL)</label>
+                  <label className="block text-xs font-semibold text-gray-700 mb-1">Günlük Yemek Bedeli (TL)</label>
                   <input
                     type="number"
                     min="0"
                     value={assignFoodAllowance}
                     onChange={(e) => setAssignFoodAllowance(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white font-mono"
+                    className="w-full px-3 py-2 rounded-xl bg-white border border-gray-200 text-xs text-gray-900 font-mono"
                   />
                 </div>
 
                 <button
                   type="submit"
-                  className="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow transition-all cursor-pointer"
+                  className="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-gray-900 font-bold text-xs shadow transition-all cursor-pointer"
                 >
                   Projeye Personeli Ekle
                 </button>
@@ -1494,34 +1494,34 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
 
         {/* ---------------- SUB-MODAL 5: NOTE ---------------- */}
         {isNoteModalOpen && (
-          <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
-            <div className="w-full max-w-sm bg-slate-900 border border-slate-800 rounded-2xl p-5 text-slate-100 shadow-2xl">
-              <div className="flex justify-between items-center pb-2 border-b border-slate-800">
-                <h3 className="text-sm font-bold text-white flex items-center gap-1.5">
+          <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+            <div className="w-full max-w-sm bg-white border border-gray-200 rounded-2xl p-5 text-gray-900 shadow-2xl">
+              <div className="flex justify-between items-center pb-2 border-b border-gray-200">
+                <h3 className="text-sm font-bold text-gray-900 flex items-center gap-1.5">
                   <StickyNote className="w-4 h-4 text-sky-400" />
                   <span>Saha Notu / Güncelleme</span>
                 </h3>
-                <button onClick={() => setIsNoteModalOpen(false)} className="text-slate-400 hover:text-white">
+                <button onClick={() => setIsNoteModalOpen(false)} className="text-gray-500 hover:text-gray-900">
                   <X className="w-4 h-4" />
                 </button>
               </div>
 
               <form onSubmit={handleNoteSubmit} className="space-y-3 mt-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Not Metni</label>
+                  <label className="block text-xs font-semibold text-gray-700 mb-1">Not Metni</label>
                   <textarea
                     rows={4}
                     required
                     value={newNoteText}
                     onChange={(e) => setNewNoteText(e.target.value)}
                     placeholder="Saha operasyonu, izinler veya müşteri ile ilgili not..."
-                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white focus:outline-none focus:ring-1 focus:ring-sky-500"
+                    className="w-full px-3 py-2 rounded-xl bg-white border border-gray-200 text-xs text-gray-900 focus:outline-none focus:ring-1 focus:ring-sky-500"
                   />
                 </div>
 
                 <button
                   type="submit"
-                  className="w-full py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-white font-bold text-xs shadow transition-all cursor-pointer"
+                  className="w-full py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-gray-900 font-bold text-xs shadow transition-all cursor-pointer"
                 >
                   Notu Kaydet
                 </button>
@@ -1532,14 +1532,14 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
 
         {/* ---------------- SUB-MODAL 6: DAILY REPORT ---------------- */}
         {isDailyReportModalOpen && (
-          <div className="fixed inset-0 z-60 flex items-center justify-center p-3 sm:p-4 bg-slate-950/85 backdrop-blur-md overflow-y-auto">
-            <div className="w-full max-w-2xl bg-slate-900 border border-slate-800 rounded-3xl p-5 sm:p-6 text-slate-100 shadow-2xl space-y-4 my-6 max-h-[90vh] overflow-y-auto">
-              <div className="flex justify-between items-center pb-2 border-b border-slate-800">
-                <h3 className="text-sm font-bold text-white flex items-center gap-1.5">
+          <div className="fixed inset-0 z-60 flex items-center justify-center p-3 sm:p-4 bg-black/40 backdrop-blur-md overflow-y-auto">
+            <div className="w-full max-w-2xl bg-white border border-gray-200 rounded-3xl p-5 sm:p-6 text-gray-900 shadow-2xl space-y-4 my-6 max-h-[90vh] overflow-y-auto">
+              <div className="flex justify-between items-center pb-2 border-b border-gray-200">
+                <h3 className="text-sm font-bold text-gray-900 flex items-center gap-1.5">
                   <ClipboardList className="w-4 h-4 text-sky-400" />
                   <span>{project.code} - Saha Günlük Raporu Yaz</span>
                 </h3>
-                <button onClick={() => setIsDailyReportModalOpen(false)} className="text-slate-400 hover:text-white">
+                <button onClick={() => setIsDailyReportModalOpen(false)} className="text-gray-500 hover:text-gray-900">
                   <X className="w-4 h-4" />
                 </button>
               </div>
@@ -1547,21 +1547,21 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
               <form onSubmit={handleDailyReportSubmit} className="space-y-3 mt-2">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-semibold text-slate-300 mb-1">Rapor Tarihi</label>
+                    <label className="block text-xs font-semibold text-gray-700 mb-1">Rapor Tarihi</label>
                     <input
                       type="date"
                       required
                       value={reportDate}
                       onChange={(e) => setReportDate(e.target.value)}
-                      className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white"
+                      className="w-full px-3 py-2 rounded-xl bg-white border border-gray-200 text-xs text-gray-900"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-slate-300 mb-1">Saha Durumu</label>
+                    <label className="block text-xs font-semibold text-gray-700 mb-1">Saha Durumu</label>
                     <select
                       value={reportStatus}
                       onChange={(e) => setReportStatus(e.target.value as FieldStatus)}
-                      className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white"
+                      className="w-full px-3 py-2 rounded-xl bg-white border border-gray-200 text-xs text-gray-900"
                     >
                       <option value="started">Saha Başladı / Aktif</option>
                       <option value="ongoing">Saha Devam Ediyor</option>
@@ -1573,7 +1573,7 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">
+                  <label className="block text-xs font-semibold text-gray-700 mb-1">
                     Anket Yapılan Noktalar & Lokasyonlar <span className="text-rose-400">*</span>
                   </label>
                   <input
@@ -1582,12 +1582,12 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
                     value={reportLocations}
                     onChange={(e) => setReportLocations(e.target.value)}
                     placeholder="Örn: Kadıköy Rıhtım, Moda Sahil, Beşiktaş Çarşı"
-                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white"
+                    className="w-full px-3 py-2 rounded-xl bg-white border border-gray-200 text-xs text-gray-900"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">
+                  <label className="block text-xs font-semibold text-gray-700 mb-1">
                     Gecikme / Başlama Durum Açıklaması (Opsiyonel)
                   </label>
                   <input
@@ -1595,14 +1595,14 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
                     value={reportStatusReason}
                     onChange={(e) => setReportStatusReason(e.target.value)}
                     placeholder="Örn: Yağış sebebiyle saha 13:00'te başlayabildi"
-                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white"
+                    className="w-full px-3 py-2 rounded-xl bg-white border border-gray-200 text-xs text-gray-900"
                   />
                 </div>
 
                 {/* Workers in this project */}
                 <div className="space-y-2 pt-1">
                   <div className="flex items-center justify-between">
-                    <label className="text-xs font-semibold text-white">Çalışan Anketörler & Yevmiyeler</label>
+                    <label className="text-xs font-semibold text-gray-900">Çalışan Anketörler & Yevmiyeler</label>
                     <button
                       type="button"
                       onClick={() => setReportWorkers(prev => [
@@ -1625,7 +1625,7 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
 
                   <div className="space-y-2 max-h-[200px] overflow-y-auto pr-1">
                     {reportWorkers.map((w) => (
-                      <div key={w.id} className="p-2.5 rounded-xl bg-slate-950 border border-slate-800 grid grid-cols-12 gap-2 items-center text-xs">
+                      <div key={w.id} className="p-2.5 rounded-xl bg-white border border-gray-200 grid grid-cols-12 gap-2 items-center text-xs">
                         <div className="col-span-4">
                           <input
                             type="text"
@@ -1633,7 +1633,7 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
                             value={w.personnelName}
                             onChange={(e) => setReportWorkers(prev => prev.map(item => item.id === w.id ? { ...item, personnelName: e.target.value } : item))}
                             placeholder="Anketör adı"
-                            className="w-full px-2 py-1 rounded-lg bg-slate-900 border border-slate-700 text-xs text-white font-bold"
+                            className="w-full px-2 py-1 rounded-lg bg-white border border-gray-200 text-xs text-gray-900 font-bold"
                             list="project-personnel-list"
                           />
                         </div>
@@ -1643,7 +1643,7 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
                             value={w.onBehalfOf || ''}
                             onChange={(e) => setReportWorkers(prev => prev.map(item => item.id === w.id ? { ...item, onBehalfOf: e.target.value } : item))}
                             placeholder="Şunun adına..."
-                            className="w-full px-2 py-1 rounded-lg bg-slate-900 border border-slate-700 text-xs text-indigo-300"
+                            className="w-full px-2 py-1 rounded-lg bg-white border border-gray-200 text-xs text-indigo-300"
                           />
                         </div>
                         <div className="col-span-3">
@@ -1655,7 +1655,7 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
                             value={w.dailyWage}
                             onChange={(e) => setReportWorkers(prev => prev.map(item => item.id === w.id ? { ...item, dailyWage: Number(e.target.value) } : item))}
                             placeholder="1000"
-                            className="w-full px-2 py-1 rounded-lg bg-slate-900 border border-slate-700 text-xs text-amber-400 font-mono font-bold"
+                            className="w-full px-2 py-1 rounded-lg bg-white border border-gray-200 text-xs text-amber-400 font-mono font-bold"
                           />
                         </div>
                         <div className="col-span-2 flex items-center justify-between">
@@ -1665,13 +1665,13 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
                             value={w.surveysCompleted || 0}
                             onChange={(e) => setReportWorkers(prev => prev.map(item => item.id === w.id ? { ...item, surveysCompleted: Number(e.target.value) } : item))}
                             placeholder="Anket"
-                            className="w-full px-1.5 py-1 rounded-lg bg-slate-900 border border-slate-700 text-xs text-sky-300 font-mono text-center"
+                            className="w-full px-1.5 py-1 rounded-lg bg-white border border-gray-200 text-xs text-sky-300 font-mono text-center"
                           />
                           {reportWorkers.length > 1 && (
                             <button
                               type="button"
                               onClick={() => setReportWorkers(prev => prev.filter(item => item.id !== w.id))}
-                              className="p-1 text-slate-500 hover:text-rose-400 ml-1"
+                              className="p-1 text-gray-400 hover:text-rose-400 ml-1"
                             >
                               <Trash2 className="w-3.5 h-3.5" />
                             </button>
@@ -1689,19 +1689,19 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Günün Notu</label>
+                  <label className="block text-xs font-semibold text-gray-700 mb-1">Günün Notu</label>
                   <textarea
                     rows={2}
                     value={reportNotes}
                     onChange={(e) => setReportNotes(e.target.value)}
                     placeholder="Saha notları, yapılan çalışmalar..."
-                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white"
+                    className="w-full px-3 py-2 rounded-xl bg-white border border-gray-200 text-xs text-gray-900"
                   />
                 </div>
 
                 <button
                   type="submit"
-                  className="w-full py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-white font-bold text-xs shadow transition-all cursor-pointer"
+                  className="w-full py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-gray-900 font-bold text-xs shadow transition-all cursor-pointer"
                 >
                   Saha Günlük Raporunu Projeye Kaydet
                 </button>
@@ -1712,14 +1712,14 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
 
         {/* ---------------- SUB-MODAL 7: PHONE CONTROL (TK) ---------------- */}
         {isPhoneControlModalOpen && (
-          <div className="fixed inset-0 z-60 flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-sm">
-            <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-2xl p-5 text-slate-100 shadow-2xl space-y-3">
-              <div className="flex justify-between items-center pb-2 border-b border-slate-800">
-                <h3 className="text-sm font-bold text-white flex items-center gap-1.5">
+          <div className="fixed inset-0 z-60 flex items-center justify-center p-3 sm:p-4 bg-black/40 backdrop-blur-sm">
+            <div className="w-full max-w-md bg-white border border-gray-200 rounded-2xl p-5 text-gray-900 shadow-2xl space-y-3">
+              <div className="flex justify-between items-center pb-2 border-b border-gray-200">
+                <h3 className="text-sm font-bold text-gray-900 flex items-center gap-1.5">
                   <PhoneCall className="w-4 h-4 text-indigo-400" />
                   <span>{project.code} - TK Arama Kaydı Gir</span>
                 </h3>
-                <button onClick={() => setIsPhoneControlModalOpen(false)} className="text-slate-400 hover:text-white">
+                <button onClick={() => setIsPhoneControlModalOpen(false)} className="text-gray-500 hover:text-gray-900">
                   <X className="w-4 h-4" />
                 </button>
               </div>
@@ -1727,24 +1727,24 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
               <form onSubmit={handlePhoneControlSubmit} className="space-y-3 mt-2">
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <label className="block text-xs font-semibold text-slate-300 mb-1">Kontrol Tarihi</label>
+                    <label className="block text-xs font-semibold text-gray-700 mb-1">Kontrol Tarihi</label>
                     <input
                       type="date"
                       required
                       value={tkControlDate}
                       onChange={(e) => setTkControlDate(e.target.value)}
-                      className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white"
+                      className="w-full px-3 py-2 rounded-xl bg-white border border-gray-200 text-xs text-gray-900"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-slate-300 mb-1">TK Kontrolcüsü</label>
+                    <label className="block text-xs font-semibold text-gray-700 mb-1">TK Kontrolcüsü</label>
                     <input
                       type="text"
                       required
                       value={tkControllerName}
                       onChange={(e) => setTkControllerName(e.target.value)}
                       placeholder="Örn: Ayşe TK"
-                      className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white"
+                      className="w-full px-3 py-2 rounded-xl bg-white border border-gray-200 text-xs text-gray-900"
                     />
                   </div>
                 </div>
@@ -1759,7 +1759,7 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
                         type="button"
                         onClick={() => setTkDailyWage(amt)}
                         className={`px-2.5 py-1 rounded-lg text-[11px] font-bold font-mono transition-all ${
-                          tkDailyWage === amt ? 'bg-amber-500 text-slate-950' : 'bg-slate-950 text-slate-300 border border-slate-800'
+                          tkDailyWage === amt ? 'bg-amber-500 text-slate-950' : 'bg-white text-gray-700 border border-gray-200'
                         }`}
                       >
                         ₺{amt}
@@ -1772,20 +1772,20 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
                     min="0"
                     value={tkDailyWage}
                     onChange={(e) => setTkDailyWage(Number(e.target.value))}
-                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs font-mono font-bold text-amber-400"
+                    className="w-full px-3 py-2 rounded-xl bg-white border border-gray-200 text-xs font-mono font-bold text-amber-400"
                   />
                 </div>
 
                 <div className="grid grid-cols-3 gap-2">
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-300 mb-0.5">Aranan</label>
+                    <label className="block text-[10px] font-bold text-gray-700 mb-0.5">Aranan</label>
                     <input
                       type="number"
                       required
                       min="0"
                       value={tkTotalCalled}
                       onChange={(e) => setTkTotalCalled(e.target.value)}
-                      className="w-full px-2 py-1.5 rounded-xl bg-slate-950 border border-slate-700 text-xs font-mono font-bold text-white text-center"
+                      className="w-full px-2 py-1.5 rounded-xl bg-white border border-gray-200 text-xs font-mono font-bold text-gray-900 text-center"
                     />
                   </div>
                   <div>
@@ -1796,7 +1796,7 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
                       min="0"
                       value={tkTotalApproved}
                       onChange={(e) => setTkTotalApproved(e.target.value)}
-                      className="w-full px-2 py-1.5 rounded-xl bg-slate-950 border border-emerald-500/50 text-xs font-mono font-bold text-emerald-400 text-center"
+                      className="w-full px-2 py-1.5 rounded-xl bg-white border border-emerald-500/50 text-xs font-mono font-bold text-emerald-400 text-center"
                     />
                   </div>
                   <div>
@@ -1806,25 +1806,25 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
                       min="0"
                       value={tkTotalRejected}
                       onChange={(e) => setTkTotalRejected(e.target.value)}
-                      className="w-full px-2 py-1.5 rounded-xl bg-slate-950 border border-rose-500/50 text-xs font-mono font-bold text-rose-400 text-center"
+                      className="w-full px-2 py-1.5 rounded-xl bg-white border border-rose-500/50 text-xs font-mono font-bold text-rose-400 text-center"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Kontrol Notu</label>
+                  <label className="block text-xs font-semibold text-gray-700 mb-1">Kontrol Notu</label>
                   <input
                     type="text"
                     value={tkNotes}
                     onChange={(e) => setTkNotes(e.target.value)}
                     placeholder="Örn: 2 nolu anketörde tutarsızlık var"
-                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white"
+                    className="w-full px-3 py-2 rounded-xl bg-white border border-gray-200 text-xs text-gray-900"
                   />
                 </div>
 
                 <button
                   type="submit"
-                  className="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow transition-all cursor-pointer"
+                  className="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-gray-900 font-bold text-xs shadow transition-all cursor-pointer"
                 >
                   TK Kaydını Projeye Ekle
                 </button>
@@ -1835,11 +1835,11 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
 
         {/* Receipt Image Preview Modal */}
         {previewImage && (
-          <div className="fixed inset-0 z-70 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
-            <div className="relative max-w-md w-full bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-2xl">
+          <div className="fixed inset-0 z-70 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+            <div className="relative max-w-md w-full bg-white border border-gray-200 rounded-2xl p-4 shadow-2xl">
               <button
                 onClick={() => setPreviewImage(null)}
-                className="absolute top-4 right-4 p-1.5 rounded-full bg-slate-950/80 text-white"
+                className="absolute top-4 right-4 p-1.5 rounded-full bg-gray-50 text-gray-900"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -1861,3 +1861,5 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
     </div>
   );
 }
+
+

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useState } from 'react';
 import { useApp } from '@/context/AppContext';
@@ -47,7 +47,7 @@ export default function LoginWall() {
         {/* Logo & Brand */}
         <div className="flex flex-col items-center text-center mb-7">
           <div className="w-14 h-14 rounded-2xl bg-blue-600 flex items-center justify-center shadow-md mb-4">
-            <span className="text-white font-black text-2xl">O</span>
+            <span className="text-gray-900 font-black text-2xl">O</span>
           </div>
           <h1 className="text-xl font-black text-gray-900 tracking-tight">Orion Proje Takip</h1>
           <p className="text-sm text-gray-500 mt-1">Saha Yönetim Sistemi</p>
@@ -108,7 +108,7 @@ export default function LoginWall() {
 
           <button
             type="submit"
-            className="w-full py-3 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer"
+            className="w-full py-3 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-gray-900 font-bold text-sm shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer"
           >
             <span>Giriş Yap</span>
             <ArrowRight className="w-4 h-4" />
@@ -160,7 +160,7 @@ export default function LoginWall() {
 
               <button
                 type="submit"
-                className="w-full py-2.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm transition-all cursor-pointer"
+                className="w-full py-2.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-gray-900 font-bold text-sm transition-all cursor-pointer"
               >
                 Bağlantı Gönder
               </button>
@@ -171,3 +171,5 @@ export default function LoginWall() {
     </div>
   );
 }
+
+

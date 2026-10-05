@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useState } from 'react';
 import { useApp } from '@/context/AppContext';
@@ -44,37 +44,37 @@ export default function AdvancesView() {
     <div className="space-y-6">
       
       {/* Top Header Banner */}
-      <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-slate-900 to-slate-950 border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-md">
+      <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-slate-900 to-slate-950 border border-gray-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-md">
         <div className="flex items-center gap-3">
           <div className="p-2.5 rounded-xl bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
             <Banknote className="w-5 h-5" />
           </div>
           <div>
-            <h1 className="text-lg sm:text-xl font-black text-white tracking-tight">Canlı Avanslar</h1>
-            <p className="text-xs text-slate-400">Personele verilen ve hakedişten düşülecek canlı nakit/IBAN avansları</p>
+            <h1 className="text-lg sm:text-xl font-black text-gray-900 tracking-tight">Canlı Avanslar</h1>
+            <p className="text-xs text-gray-500">Personele verilen ve hakedişten düşülecek canlı nakit/IBAN avansları</p>
           </div>
         </div>
 
         <div className="flex items-center gap-2 text-xs">
-          <div className="px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-800">
-            <span className="text-slate-400">İşlem Sayısı: </span>
-            <strong className="text-white font-mono">{advances.length}</strong>
+          <div className="px-3 py-1.5 rounded-xl bg-white border border-gray-200">
+            <span className="text-gray-500">İşlem Sayısı: </span>
+            <strong className="text-gray-900 font-mono">{advances.length}</strong>
           </div>
-          <div className="px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-800">
-            <span className="text-slate-400">Toplam Avans: </span>
+          <div className="px-3 py-1.5 rounded-xl bg-white border border-gray-200">
+            <span className="text-gray-500">Toplam Avans: </span>
             <strong className="text-amber-400 font-mono">₺{advances.reduce((sum, a) => sum + Number(a.amount || 0), 0).toLocaleString('tr-TR')}</strong>
           </div>
         </div>
       </div>
 
       {/* Control Bar */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-4 rounded-2xl bg-slate-900 border border-slate-800">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-4 rounded-2xl bg-white border border-gray-200">
         <div className="flex flex-wrap items-center gap-2">
           {/* Project Filter */}
           <select
             value={projectFilter}
             onChange={(e) => setProjectFilter(e.target.value)}
-            className="px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-700 text-xs text-slate-200"
+            className="px-3 py-1.5 rounded-xl bg-white border border-gray-200 text-xs text-gray-800"
           >
             <option value="all">Tüm Projeler</option>
             {projects.map(p => (
@@ -84,26 +84,26 @@ export default function AdvancesView() {
 
           {/* Search */}
           <div className="relative">
-            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <Search className="w-3.5 h-3.5 text-gray-500 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               placeholder="Personel veya işlemi yapan kişiyi ara..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-8 pr-3 py-1.5 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+              className="pl-8 pr-3 py-1.5 rounded-xl bg-white border border-gray-200 text-xs text-gray-900 placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
             />
           </div>
         </div>
 
         <div className="flex items-center gap-3">
           <div className="text-right">
-            <span className="text-[10px] text-slate-400 uppercase tracking-wider block">Toplam Dağıtılan Avans</span>
+            <span className="text-[10px] text-gray-500 uppercase tracking-wider block">Toplam Dağıtılan Avans</span>
             <span className="text-sm font-bold font-mono text-amber-400">₺{totalAdvanceSum.toLocaleString('tr-TR')}</span>
           </div>
 
           <button
             onClick={handleExport}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition-all border border-slate-700 cursor-pointer"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs font-semibold transition-all border border-gray-200 cursor-pointer"
           >
             <FileSpreadsheet className="w-4 h-4 text-emerald-400" />
             <span>Excel'e Aktar</span>
@@ -112,10 +112,10 @@ export default function AdvancesView() {
       </div>
 
       {/* Advances Table */}
-      <div className="rounded-2xl bg-slate-900 border border-slate-800 overflow-hidden shadow-xl">
+      <div className="rounded-2xl bg-white border border-gray-200 overflow-hidden shadow-xl">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs text-slate-300">
-            <thead className="bg-slate-950/80 text-slate-400 uppercase tracking-wider text-[11px] border-b border-slate-800">
+          <table className="w-full text-left text-xs text-gray-700">
+            <thead className="bg-gray-50 text-gray-500 uppercase tracking-wider text-[11px] border-b border-gray-200">
               <tr>
                 <th className="py-3 px-4 font-semibold">Tarih</th>
                 <th className="py-3 px-4 font-semibold">Proje</th>
@@ -129,14 +129,14 @@ export default function AdvancesView() {
             <tbody className="divide-y divide-slate-800/80">
               {filteredAdvances.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="py-8 text-center text-slate-500">
+                  <td colSpan={7} className="py-8 text-center text-gray-400">
                     Kayıtlı avans hareketi bulunamadı.
                   </td>
                 </tr>
               ) : (
                 filteredAdvances.map((adv) => (
-                  <tr key={adv.id} className="hover:bg-slate-800/40 transition-colors">
-                    <td className="py-3.5 px-4 font-mono text-slate-400 text-[11px]">
+                  <tr key={adv.id} className="hover:bg-gray-100 transition-colors">
+                    <td className="py-3.5 px-4 font-mono text-gray-500 text-[11px]">
                       {new Date(adv.issuedAt).toLocaleDateString('tr-TR')} {new Date(adv.issuedAt).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}
                     </td>
 
@@ -144,7 +144,7 @@ export default function AdvancesView() {
                       {adv.projectCode}
                     </td>
 
-                    <td className="py-3.5 px-4 font-bold text-white">
+                    <td className="py-3.5 px-4 font-bold text-gray-900">
                       {adv.personnelName}
                     </td>
 
@@ -160,7 +160,7 @@ export default function AdvancesView() {
                       </span>
                     </td>
 
-                    <td className="py-3.5 px-4 text-slate-400 max-w-xs truncate">
+                    <td className="py-3.5 px-4 text-gray-500 max-w-xs truncate">
                       {adv.note || '-'}
                     </td>
 
@@ -178,3 +178,5 @@ export default function AdvancesView() {
     </div>
   );
 }
+
+

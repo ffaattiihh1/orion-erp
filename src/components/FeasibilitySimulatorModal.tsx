@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useState } from 'react';
 import { useApp } from '@/context/AppContext';
@@ -113,23 +113,23 @@ export default function FeasibilitySimulatorModal({ isOpen, onClose }: Feasibili
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm overflow-y-auto">
-      <div className="w-full max-w-4xl bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-6 sm:p-8 my-8 text-slate-100 relative">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm overflow-y-auto">
+      <div className="w-full max-w-4xl bg-white border border-gray-200 rounded-2xl shadow-2xl p-6 sm:p-8 my-8 text-gray-900 relative">
         
         {/* Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-slate-800">
+        <div className="flex items-center justify-between pb-4 border-b border-gray-200">
           <div className="flex items-center gap-3">
             <div className="p-2.5 rounded-xl bg-sky-500/10 text-sky-400 border border-sky-500/20">
               <Calculator className="w-6 h-6" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-white tracking-tight">Canlı Fizibilite & Kârlılık Simülatörü</h2>
-              <p className="text-xs text-slate-400">Teklif vermeden önce saha giderlerini ve net kâr marjını hesaplayın</p>
+              <h2 className="text-xl font-bold text-gray-900 tracking-tight">Canlı Fizibilite & Kârlılık Simülatörü</h2>
+              <p className="text-xs text-gray-500">Teklif vermeden önce saha giderlerini ve net kâr marjını hesaplayın</p>
             </div>
           </div>
           <button 
             onClick={onClose}
-            className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
+            className="p-2 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -142,8 +142,8 @@ export default function FeasibilitySimulatorModal({ isOpen, onClose }: Feasibili
           <div className="lg:col-span-7 space-y-4">
             
             {/* Business Model Selector (İller vs İstanbul Ekip) */}
-            <div className="p-3.5 rounded-xl bg-slate-950/60 border border-slate-800">
-              <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
+            <div className="p-3.5 rounded-xl bg-gray-50 border border-gray-200">
+              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
                 İş Modeli Seçimi
               </label>
               <div className="grid grid-cols-2 gap-2">
@@ -152,12 +152,12 @@ export default function FeasibilitySimulatorModal({ isOpen, onClose }: Feasibili
                   onClick={() => setBusinessModel('model_b_micro')}
                   className={`p-3 rounded-lg text-left transition-all border cursor-pointer ${
                     businessModel === 'model_b_micro'
-                      ? 'bg-sky-500/15 border-sky-500/40 text-white'
-                      : 'bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700'
+                      ? 'bg-sky-500/15 border-sky-500/40 text-gray-900'
+                      : 'bg-white border-gray-200 text-gray-500 hover:border-gray-200'
                   }`}
                 >
                   <p className="text-xs font-bold text-sky-300">İstanbul Ekip</p>
-                  <p className="text-[11px] text-slate-400 mt-1">Avanslar, SPV günlüğü, fişli masraflar ve operasyon.</p>
+                  <p className="text-[11px] text-gray-500 mt-1">Avanslar, SPV günlüğü, fişli masraflar ve operasyon.</p>
                 </button>
 
                 <button
@@ -165,12 +165,12 @@ export default function FeasibilitySimulatorModal({ isOpen, onClose }: Feasibili
                   onClick={() => setBusinessModel('model_a_macro')}
                   className={`p-3 rounded-lg text-left transition-all border cursor-pointer ${
                     businessModel === 'model_a_macro'
-                      ? 'bg-indigo-500/15 border-indigo-500/40 text-white'
-                      : 'bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700'
+                      ? 'bg-indigo-500/15 border-indigo-500/40 text-gray-900'
+                      : 'bg-white border-gray-200 text-gray-500 hover:border-gray-200'
                   }`}
                 >
                   <p className="text-xs font-bold text-indigo-300">İller</p>
-                  <p className="text-[11px] text-slate-400 mt-1">İller / Dış ekip tek birim fiyat. Masraf detayı tutulmaz.</p>
+                  <p className="text-[11px] text-gray-500 mt-1">İller / Dış ekip tek birim fiyat. Masraf detayı tutulmaz.</p>
                 </button>
               </div>
             </div>
@@ -178,20 +178,20 @@ export default function FeasibilitySimulatorModal({ isOpen, onClose }: Feasibili
             {/* General Project Info */}
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1">Müşteri Adı</label>
+                <label className="block text-xs font-medium text-gray-700 mb-1">Müşteri Adı</label>
                 <input
                   type="text"
                   value={clientName}
                   onChange={(e) => setClientName(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg bg-slate-950 border border-slate-700 text-sm text-white focus:ring-1 focus:ring-sky-500"
+                  className="w-full px-3 py-2 rounded-lg bg-white border border-gray-200 text-sm text-gray-900 focus:ring-1 focus:ring-sky-500"
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1">Proje Tipi</label>
+                <label className="block text-xs font-medium text-gray-700 mb-1">Proje Tipi</label>
                 <select
                   value={projectType}
                   onChange={(e) => setProjectType(e.target.value as ProjectType)}
-                  className="w-full px-3 py-2 rounded-lg bg-slate-950 border border-slate-700 text-sm text-white focus:ring-1 focus:ring-sky-500"
+                  className="w-full px-3 py-2 rounded-lg bg-white border border-gray-200 text-sm text-gray-900 focus:ring-1 focus:ring-sky-500"
                 >
                   <option value="saha">Saha Araştırması (Yüz Yüze)</option>
                   <option value="studyo">Stüdyo / Odak Grup</option>
@@ -202,29 +202,29 @@ export default function FeasibilitySimulatorModal({ isOpen, onClose }: Feasibili
             </div>
 
             {/* Revenue Drivers */}
-            <div className="p-3.5 rounded-xl bg-slate-950/60 border border-slate-800 space-y-3">
+            <div className="p-3.5 rounded-xl bg-gray-50 border border-gray-200 space-y-3">
               <span className="text-xs font-semibold text-emerald-400 uppercase tracking-wider block">
                 Gelir Parametreleri (Müşteri)
               </span>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs text-slate-400 mb-1">Hedef Anket Sayısı</label>
+                  <label className="block text-xs text-gray-500 mb-1">Hedef Anket Sayısı</label>
                   <input
                     type="number"
                     min="1"
                     value={targetSurveys}
                     onChange={(e) => setTargetSurveys(Math.max(1, Number(e.target.value)))}
-                    className="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 text-sm text-white font-mono"
+                    className="w-full px-3 py-2 rounded-lg bg-white border border-gray-200 text-sm text-gray-900 font-mono"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs text-slate-400 mb-1">Müşteri Anket Birim Fiyatı (TL)</label>
+                  <label className="block text-xs text-gray-500 mb-1">Müşteri Anket Birim Fiyatı (TL)</label>
                   <input
                     type="number"
                     min="1"
                     value={clientUnitPrice}
                     onChange={(e) => setClientUnitPrice(Math.max(1, Number(e.target.value)))}
-                    className="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 text-sm text-white font-mono"
+                    className="w-full px-3 py-2 rounded-lg bg-white border border-gray-200 text-sm text-gray-900 font-mono"
                   />
                 </div>
               </div>
@@ -238,70 +238,70 @@ export default function FeasibilitySimulatorModal({ isOpen, onClose }: Feasibili
                 </span>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs text-slate-400 mb-1">İl / Dış Ekip / Firma Adı</label>
+                    <label className="block text-xs text-gray-500 mb-1">İl / Dış Ekip / Firma Adı</label>
                     <input
                       type="text"
                       value={subcontractorName}
                       onChange={(e) => setSubcontractorName(e.target.value)}
-                      className="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 text-sm text-white"
+                      className="w-full px-3 py-2 rounded-lg bg-white border border-gray-200 text-sm text-gray-900"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-slate-400 mb-1">Anket Başı Birim Fiyat (TL)</label>
+                    <label className="block text-xs text-gray-500 mb-1">Anket Başı Birim Fiyat (TL)</label>
                     <input
                       type="number"
                       min="1"
                       value={subcontractorUnitPrice}
                       onChange={(e) => setSubcontractorUnitPrice(Math.max(1, Number(e.target.value)))}
-                      className="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 text-sm text-white font-mono"
+                      className="w-full px-3 py-2 rounded-lg bg-white border border-gray-200 text-sm text-gray-900 font-mono"
                     />
                   </div>
                 </div>
               </div>
             ) : (
-              <div className="p-3.5 rounded-xl bg-slate-950/60 border border-slate-800 space-y-3">
+              <div className="p-3.5 rounded-xl bg-gray-50 border border-gray-200 space-y-3">
                 <span className="text-xs font-semibold text-sky-400 uppercase tracking-wider block">
                   İstanbul Ekip & Sabit Gider Dağıtımı
                 </span>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs text-slate-400 mb-1">Anketör Standart Fiyat (TL)</label>
+                    <label className="block text-xs text-gray-500 mb-1">Anketör Standart Fiyat (TL)</label>
                     <input
                       type="number"
                       min="1"
                       value={personnelRate}
                       onChange={(e) => setPersonnelRate(Math.max(1, Number(e.target.value)))}
-                      className="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 text-sm text-white font-mono"
+                      className="w-full px-3 py-2 rounded-lg bg-white border border-gray-200 text-sm text-gray-900 font-mono"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-slate-400 mb-1">SPV / Günlük Sabit Gider (TL)</label>
+                    <label className="block text-xs text-gray-500 mb-1">SPV / Günlük Sabit Gider (TL)</label>
                     <input
                       type="number"
                       min="0"
                       value={spvDailyRate}
                       onChange={(e) => setSpvDailyRate(Math.max(0, Number(e.target.value)))}
-                      className="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 text-sm text-white font-mono"
+                      className="w-full px-3 py-2 rounded-lg bg-white border border-gray-200 text-sm text-gray-900 font-mono"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-slate-400 mb-1">Tahmini Saha Gün Sayısı</label>
+                    <label className="block text-xs text-gray-500 mb-1">Tahmini Saha Gün Sayısı</label>
                     <input
                       type="number"
                       min="1"
                       value={projectDays}
                       onChange={(e) => setProjectDays(Math.max(1, Number(e.target.value)))}
-                      className="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 text-sm text-white font-mono"
+                      className="w-full px-3 py-2 rounded-lg bg-white border border-gray-200 text-sm text-gray-900 font-mono"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-slate-400 mb-1">Diğer Saha Gideri (Yakıt, Yemek vb. TL)</label>
+                    <label className="block text-xs text-gray-500 mb-1">Diğer Saha Gideri (Yakıt, Yemek vb. TL)</label>
                     <input
                       type="number"
                       min="0"
                       value={otherEstimatedExpenses}
                       onChange={(e) => setOtherEstimatedExpenses(Math.max(0, Number(e.target.value)))}
-                      className="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 text-sm text-white font-mono"
+                      className="w-full px-3 py-2 rounded-lg bg-white border border-gray-200 text-sm text-gray-900 font-mono"
                     />
                   </div>
                 </div>
@@ -310,10 +310,10 @@ export default function FeasibilitySimulatorModal({ isOpen, onClose }: Feasibili
           </div>
 
           {/* Right Column: Live Output & Simulation Gauge (5 Cols) */}
-          <div className="lg:col-span-5 flex flex-col justify-between p-5 rounded-2xl bg-gradient-to-b from-slate-950 to-slate-900 border border-slate-800">
+          <div className="lg:col-span-5 flex flex-col justify-between p-5 rounded-2xl bg-gradient-to-b from-slate-950 to-slate-900 border border-gray-200">
             <div>
               <div className="flex items-center justify-between mb-4">
-                <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
                   Canlı Finansal Özet
                 </span>
                 <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-xs font-medium ${badge.color}`}>
@@ -324,36 +324,36 @@ export default function FeasibilitySimulatorModal({ isOpen, onClose }: Feasibili
 
               {/* Big KPI Metrics */}
               <div className="space-y-3">
-                <div className="p-3.5 rounded-xl bg-slate-900/90 border border-slate-800">
-                  <p className="text-[11px] text-slate-400">Hedeflenen Toplam Ciro</p>
-                  <p className="text-2xl font-black text-white font-mono">
+                <div className="p-3.5 rounded-xl bg-gray-50 border border-gray-200">
+                  <p className="text-[11px] text-gray-500">Hedeflenen Toplam Ciro</p>
+                  <p className="text-2xl font-black text-gray-900 font-mono">
                     ₺{totalRevenue.toLocaleString('tr-TR')}
                   </p>
                 </div>
 
-                <div className="p-3.5 rounded-xl bg-slate-900/90 border border-slate-800 space-y-1.5">
-                  <div className="flex justify-between text-xs text-slate-400">
+                <div className="p-3.5 rounded-xl bg-gray-50 border border-gray-200 space-y-1.5">
+                  <div className="flex justify-between text-xs text-gray-500">
                     <span>Toplam Maliyet:</span>
-                    <span className="text-slate-200 font-mono font-medium">₺{totalCost.toLocaleString('tr-TR')}</span>
+                    <span className="text-gray-800 font-mono font-medium">₺{totalCost.toLocaleString('tr-TR')}</span>
                   </div>
                   {businessModel === 'model_b_micro' && (
                     <>
-                      <div className="flex justify-between text-[11px] text-slate-500">
+                      <div className="flex justify-between text-[11px] text-gray-400">
                         <span>• Anketör Hakedişleri:</span>
                         <span className="font-mono">₺{personnelCost.toLocaleString('tr-TR')}</span>
                       </div>
-                      <div className="flex justify-between text-[11px] text-slate-500">
+                      <div className="flex justify-between text-[11px] text-gray-400">
                         <span>• SPV & Sabit Gider ({projectDays} Gün):</span>
                         <span className="font-mono">₺{overheadCost.toLocaleString('tr-TR')}</span>
                       </div>
-                      <div className="flex justify-between text-[11px] text-slate-500">
+                      <div className="flex justify-between text-[11px] text-gray-400">
                         <span>• Tahmini Fiş Masrafları:</span>
                         <span className="font-mono">₺{otherEstimatedExpenses.toLocaleString('tr-TR')}</span>
                       </div>
                     </>
                   )}
                   {businessModel === 'model_a_macro' && (
-                    <div className="flex justify-between text-[11px] text-slate-500">
+                    <div className="flex justify-between text-[11px] text-gray-400">
                       <span>• İller Toplam Hakedişi:</span>
                       <span className="font-mono">₺{personnelCost.toLocaleString('tr-TR')}</span>
                     </div>
@@ -363,13 +363,13 @@ export default function FeasibilitySimulatorModal({ isOpen, onClose }: Feasibili
                 <div className={`p-4 rounded-xl border ${netProfit >= 0 ? 'bg-emerald-950/30 border-emerald-800/50' : 'bg-rose-950/30 border-rose-800/50'}`}>
                   <div className="flex items-baseline justify-between">
                     <div>
-                      <p className="text-xs font-semibold text-slate-400">Tahmini Net Kâr</p>
+                      <p className="text-xs font-semibold text-gray-500">Tahmini Net Kâr</p>
                       <p className={`text-2xl font-black font-mono ${netProfit >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
                         ₺{netProfit.toLocaleString('tr-TR')}
                       </p>
                     </div>
                     <div className="text-right">
-                      <p className="text-xs font-semibold text-slate-400">Kâr Marjı</p>
+                      <p className="text-xs font-semibold text-gray-500">Kâr Marjı</p>
                       <p className={`text-2xl font-black font-mono ${netProfit >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
                         %{marginPercent.toFixed(1)}
                       </p>
@@ -377,7 +377,7 @@ export default function FeasibilitySimulatorModal({ isOpen, onClose }: Feasibili
                   </div>
 
                   {/* Progress bar visual */}
-                  <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden mt-3">
+                  <div className="w-full bg-gray-100 h-2 rounded-full overflow-hidden mt-3">
                     <div 
                       className={`h-full transition-all duration-500 ${marginPercent >= 30 ? 'bg-emerald-500' : marginPercent >= 15 ? 'bg-sky-500' : 'bg-rose-500'}`}
                       style={{ width: `${Math.min(Math.max(marginPercent, 0), 100)}%` }}
@@ -388,18 +388,18 @@ export default function FeasibilitySimulatorModal({ isOpen, onClose }: Feasibili
             </div>
 
             {/* Action Buttons */}
-            <div className="mt-6 pt-4 border-t border-slate-800 flex gap-3">
+            <div className="mt-6 pt-4 border-t border-gray-200 flex gap-3">
               <button
                 type="button"
                 onClick={onClose}
-                className="flex-1 py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-300 transition-colors cursor-pointer"
+                className="flex-1 py-2.5 px-4 rounded-xl bg-gray-100 hover:bg-gray-200 text-xs font-semibold text-gray-700 transition-colors cursor-pointer"
               >
                 Vazgeç
               </button>
               <button
                 type="button"
                 onClick={handleCreateActiveProject}
-                className="flex-2 py-2.5 px-4 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-xs font-bold text-white shadow-lg shadow-sky-500/20 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                className="flex-2 py-2.5 px-4 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-xs font-bold text-gray-900 shadow-lg shadow-sky-500/20 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
               >
                 <span>Projeyi Aktif Et</span>
                 <ArrowRight className="w-4 h-4" />
@@ -411,3 +411,5 @@ export default function FeasibilitySimulatorModal({ isOpen, onClose }: Feasibili
     </div>
   );
 }
+
+

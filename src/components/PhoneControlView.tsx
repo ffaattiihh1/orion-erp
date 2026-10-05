@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useState } from 'react';
 import { useApp } from '@/context/AppContext';
@@ -248,8 +248,8 @@ export default function PhoneControlView() {
               <PhoneCall className="w-5 h-5" />
             </div>
             <div>
-              <h1 className="text-xl font-black text-white tracking-tight">TK & Telefon Kontrol Takibi</h1>
-              <p className="text-xs text-slate-400">
+              <h1 className="text-xl font-black text-gray-900 tracking-tight">TK & Telefon Kontrol Takibi</h1>
+              <p className="text-xs text-gray-500">
                 Yapılan anketlerin telefon kontrolü, günlük arama ve okey sayıları, TK kontrolcü günlük ücretleri
               </p>
             </div>
@@ -259,7 +259,7 @@ export default function PhoneControlView() {
         <div className="flex items-center gap-2.5">
           <button
             onClick={handleExportExcel}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold transition-all border border-slate-700 cursor-pointer"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs font-bold transition-all border border-gray-200 cursor-pointer"
           >
             <FileSpreadsheet className="w-4 h-4 text-emerald-400" />
             <span>Excel'e Aktar</span>
@@ -267,7 +267,7 @@ export default function PhoneControlView() {
 
           <button
             onClick={handleOpenCreateModal}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-500 hover:bg-indigo-400 text-white text-xs font-bold shadow-lg shadow-indigo-500/20 transition-all cursor-pointer"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-500 hover:bg-indigo-400 text-gray-900 text-xs font-bold shadow-lg shadow-indigo-500/20 transition-all cursor-pointer"
           >
             <Plus className="w-4 h-4" />
             <span>+ Yeni TK Arama Kaydı Gir</span>
@@ -277,40 +277,40 @@ export default function PhoneControlView() {
 
       {/* KPI Ribbon */}
       <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-        <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800">
-          <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider block">Toplam Aranan</span>
-          <span className="text-xl font-black font-mono text-white mt-1 block">
-            {totalCallsDone} <span className="text-xs font-normal text-slate-500">Kişi / Anket</span>
+        <div className="p-4 rounded-2xl bg-white border border-gray-200">
+          <span className="text-[10px] uppercase font-bold text-gray-500 tracking-wider block">Toplam Aranan</span>
+          <span className="text-xl font-black font-mono text-gray-900 mt-1 block">
+            {totalCallsDone} <span className="text-xs font-normal text-gray-400">Kişi / Anket</span>
           </span>
-          <span className="text-[10px] text-slate-500 block mt-0.5">{filteredRecords.length} TK Çalışma Kaydı</span>
+          <span className="text-[10px] text-gray-400 block mt-0.5">{filteredRecords.length} TK Çalışma Kaydı</span>
         </div>
 
-        <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800">
-          <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider block">Okey / Onay Alınan</span>
+        <div className="p-4 rounded-2xl bg-white border border-gray-200">
+          <span className="text-[10px] uppercase font-bold text-gray-500 tracking-wider block">Okey / Onay Alınan</span>
           <span className="text-xl font-black font-mono text-emerald-400 mt-1 block">
-            {totalApprovedDone} <span className="text-xs font-normal text-slate-500">Onay</span>
+            {totalApprovedDone} <span className="text-xs font-normal text-gray-400">Onay</span>
           </span>
           <span className="text-[10px] text-emerald-400/80 block mt-0.5">Geçerli teyitli anket</span>
         </div>
 
-        <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800">
-          <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider block">Red / İptal Anket</span>
+        <div className="p-4 rounded-2xl bg-white border border-gray-200">
+          <span className="text-[10px] uppercase font-bold text-gray-500 tracking-wider block">Red / İptal Anket</span>
           <span className="text-xl font-black font-mono text-rose-400 mt-1 block">
-            {totalRejectedDone} <span className="text-xs font-normal text-slate-500">İptal</span>
+            {totalRejectedDone} <span className="text-xs font-normal text-gray-400">İptal</span>
           </span>
           <span className="text-[10px] text-rose-400/80 block mt-0.5">Hakedişten düşülecek</span>
         </div>
 
-        <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800">
-          <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider block">Genel Onay Başarısı</span>
+        <div className="p-4 rounded-2xl bg-white border border-gray-200">
+          <span className="text-[10px] uppercase font-bold text-gray-500 tracking-wider block">Genel Onay Başarısı</span>
           <span className="text-xl font-black font-mono text-sky-400 mt-1 block">
             %{overallApprovalRate}
           </span>
           <span className="text-[10px] text-sky-400/80 block mt-0.5">Teyit Başarı Oranı</span>
         </div>
 
-        <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 col-span-2 sm:col-span-1">
-          <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider block">Toplam TK Maliyeti</span>
+        <div className="p-4 rounded-2xl bg-white border border-gray-200 col-span-2 sm:col-span-1">
+          <span className="text-[10px] uppercase font-bold text-gray-500 tracking-wider block">Toplam TK Maliyeti</span>
           <span className="text-xl font-black font-mono text-amber-400 mt-1 block">
             ₺{totalTkCost.toLocaleString('tr-TR')}
           </span>
@@ -319,13 +319,13 @@ export default function PhoneControlView() {
       </div>
 
       {/* Filter & Search Bar */}
-      <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+      <div className="p-4 rounded-2xl bg-white border border-gray-200 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
         <div className="flex flex-wrap items-center gap-2.5">
           {/* Project Filter */}
           <select
             value={selectedProjectId}
             onChange={(e) => setSelectedProjectId(e.target.value)}
-            className="px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-slate-200 font-medium focus:outline-none focus:ring-1 focus:ring-indigo-500"
+            className="px-3 py-2 rounded-xl bg-white border border-gray-200 text-xs text-gray-800 font-medium focus:outline-none focus:ring-1 focus:ring-indigo-500"
           >
             <option value="all">Tüm Projeler ({projects.length})</option>
             {projects.map(p => (
@@ -337,7 +337,7 @@ export default function PhoneControlView() {
           <select
             value={selectedController}
             onChange={(e) => setSelectedController(e.target.value)}
-            className="px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-slate-200 font-medium focus:outline-none focus:ring-1 focus:ring-indigo-500"
+            className="px-3 py-2 rounded-xl bg-white border border-gray-200 text-xs text-gray-800 font-medium focus:outline-none focus:ring-1 focus:ring-indigo-500"
           >
             <option value="all">Tüm TK Kontrolcüleri ({uniqueControllers.length})</option>
             {uniqueControllers.map(c => (
@@ -348,22 +348,22 @@ export default function PhoneControlView() {
 
         {/* Search Input */}
         <div className="relative min-w-[240px]">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+          <Search className="w-4 h-4 text-gray-500 absolute left-3 top-2.5" />
           <input
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Kontrolcü, proje veya not ara..."
-            className="w-full pl-9 pr-3.5 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+            className="w-full pl-9 pr-3.5 py-2 rounded-xl bg-white border border-gray-200 text-xs text-gray-900 placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
           />
         </div>
       </div>
 
       {/* Table of TK Records */}
-      <div className="rounded-2xl bg-slate-900 border border-slate-800 overflow-hidden shadow-xl">
+      <div className="rounded-2xl bg-white border border-gray-200 overflow-hidden shadow-xl">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs text-slate-300">
-            <thead className="bg-slate-950 text-slate-400 uppercase tracking-wider text-[10px] border-b border-slate-800">
+          <table className="w-full text-left text-xs text-gray-700">
+            <thead className="bg-white text-gray-500 uppercase tracking-wider text-[10px] border-b border-gray-200">
               <tr>
                 <th className="py-3 px-4">Tarih</th>
                 <th className="py-3 px-4">Proje</th>
@@ -372,7 +372,7 @@ export default function PhoneControlView() {
                 <th className="py-3 px-4 text-center">Aranan</th>
                 <th className="py-3 px-4 text-center text-emerald-400 font-bold">Okey (Onay)</th>
                 <th className="py-3 px-4 text-center text-rose-400">Red / İptal</th>
-                <th className="py-3 px-4 text-center text-slate-500">Ulaşılamadı</th>
+                <th className="py-3 px-4 text-center text-gray-400">Ulaşılamadı</th>
                 <th className="py-3 px-4 text-center">Onay Başarısı</th>
                 <th className="py-3 px-4">Açıklama / Not</th>
                 <th className="py-3 px-4 text-center">İşlemler</th>
@@ -381,15 +381,15 @@ export default function PhoneControlView() {
             <tbody className="divide-y divide-slate-800/80 font-medium">
               {filteredRecords.length === 0 ? (
                 <tr>
-                  <td colSpan={11} className="py-12 text-center text-slate-500">
+                  <td colSpan={11} className="py-12 text-center text-gray-400">
                     <PhoneCall className="w-8 h-8 text-slate-600 mx-auto mb-2" />
                     Henüz kayıtlı telefon kontrol (TK) verisi bulunamadı.
                   </td>
                 </tr>
               ) : (
                 filteredRecords.map((rec) => (
-                  <tr key={rec.id} className="hover:bg-slate-800/40 transition-colors">
-                    <td className="py-3.5 px-4 font-mono text-slate-400 whitespace-nowrap">
+                  <tr key={rec.id} className="hover:bg-gray-100 transition-colors">
+                    <td className="py-3.5 px-4 font-mono text-gray-500 whitespace-nowrap">
                       {rec.controlDate}
                     </td>
 
@@ -398,13 +398,13 @@ export default function PhoneControlView() {
                         <span className="font-mono font-bold text-sky-400 px-1.5 py-0.5 rounded bg-sky-500/10 border border-sky-500/20 text-[11px]">
                           {rec.projectCode}
                         </span>
-                        <span className="text-slate-300 truncate max-w-[140px] block" title={rec.projectTitle}>
+                        <span className="text-gray-700 truncate max-w-[140px] block" title={rec.projectTitle}>
                           {rec.projectTitle}
                         </span>
                       </div>
                     </td>
 
-                    <td className="py-3.5 px-4 font-bold text-white whitespace-nowrap flex items-center gap-1.5">
+                    <td className="py-3.5 px-4 font-bold text-gray-900 whitespace-nowrap flex items-center gap-1.5">
                       <div className="w-6 h-6 rounded-lg bg-indigo-500/15 border border-indigo-500/30 flex items-center justify-center text-indigo-400 text-[11px]">
                         TK
                       </div>
@@ -415,7 +415,7 @@ export default function PhoneControlView() {
                       ₺{Number(rec.dailyWage || 0).toLocaleString('tr-TR')}
                     </td>
 
-                    <td className="py-3.5 px-4 text-center font-mono font-bold text-white">
+                    <td className="py-3.5 px-4 text-center font-mono font-bold text-gray-900">
                       {rec.totalCalled}
                     </td>
 
@@ -427,7 +427,7 @@ export default function PhoneControlView() {
                       {rec.totalRejected}
                     </td>
 
-                    <td className="py-3.5 px-4 text-center font-mono text-slate-500">
+                    <td className="py-3.5 px-4 text-center font-mono text-gray-400">
                       {rec.totalUnreachable || 0}
                     </td>
 
@@ -435,7 +435,7 @@ export default function PhoneControlView() {
                       {getApprovalRateBadge(rec.approvalRate)}
                     </td>
 
-                    <td className="py-3.5 px-4 text-slate-300 text-xs max-w-[200px] truncate" title={rec.notes}>
+                    <td className="py-3.5 px-4 text-gray-700 text-xs max-w-[200px] truncate" title={rec.notes}>
                       {rec.notes || '-'}
                     </td>
 
@@ -443,7 +443,7 @@ export default function PhoneControlView() {
                       <div className="flex items-center justify-center gap-1.5">
                         <button
                           onClick={() => handleOpenEditModal(rec)}
-                          className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors cursor-pointer"
+                          className="p-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 hover:text-gray-900 transition-colors cursor-pointer"
                           title="Düzenle"
                         >
                           <Edit3 className="w-3.5 h-3.5 text-sky-400" />
@@ -454,7 +454,7 @@ export default function PhoneControlView() {
                               deletePhoneControlRecord(rec.id);
                             }
                           }}
-                          className="p-1.5 rounded-lg bg-slate-800 hover:bg-rose-950/40 text-slate-400 hover:text-rose-400 transition-colors cursor-pointer"
+                          className="p-1.5 rounded-lg bg-gray-100 hover:bg-rose-950/40 text-gray-500 hover:text-rose-400 transition-colors cursor-pointer"
                           title="Sil"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
@@ -471,27 +471,27 @@ export default function PhoneControlView() {
 
       {/* ---------------- MODAL: CREATE / EDIT TK RECORD ---------------- */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/85 backdrop-blur-md overflow-y-auto">
-          <div className="w-full max-w-lg bg-slate-900 border border-slate-800 rounded-3xl p-5 sm:p-7 text-slate-100 shadow-2xl space-y-4 my-6">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/40 backdrop-blur-md overflow-y-auto">
+          <div className="w-full max-w-lg bg-white border border-gray-200 rounded-3xl p-5 sm:p-7 text-gray-900 shadow-2xl space-y-4 my-6">
             
             {/* Header */}
-            <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+            <div className="flex items-center justify-between pb-3 border-b border-gray-200">
               <div className="flex items-center gap-2">
                 <div className="p-2 rounded-xl bg-indigo-500/15 text-indigo-400 border border-indigo-500/30">
                   <PhoneCall className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-white tracking-tight">
+                  <h3 className="text-base font-bold text-gray-900 tracking-tight">
                     {editingRecordId ? 'TK Arama Kaydını Düzenle' : 'Yeni TK Arama Kaydı Ekle'}
                   </h3>
-                  <p className="text-xs text-slate-400">
+                  <p className="text-xs text-gray-500">
                     Telefon kontrolcüsü günlük arama, okey sayısı ve günlük ücreti
                   </p>
                 </div>
               </div>
               <button 
                 onClick={() => setIsModalOpen(false)}
-                className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800"
+                className="p-1.5 rounded-xl text-gray-500 hover:text-gray-900 hover:bg-gray-100"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -502,14 +502,14 @@ export default function PhoneControlView() {
               {/* Row 1: Proje ve Tarih */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">
+                  <label className="block text-xs font-semibold text-gray-700 mb-1">
                     İlgili Proje <span className="text-rose-400">*</span>
                   </label>
                   <select
                     value={formProjectId}
                     onChange={(e) => setFormProjectId(e.target.value)}
                     required
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-gray-200 text-xs text-gray-900 focus:outline-none focus:ring-1 focus:ring-indigo-500"
                   >
                     <option value="">-- Proje Seçin --</option>
                     {projects.map(p => (
@@ -519,7 +519,7 @@ export default function PhoneControlView() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">
+                  <label className="block text-xs font-semibold text-gray-700 mb-1">
                     Kontrol Tarihi <span className="text-rose-400">*</span>
                   </label>
                   <input
@@ -527,7 +527,7 @@ export default function PhoneControlView() {
                     required
                     value={formControlDate}
                     onChange={(e) => setFormControlDate(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-gray-200 text-xs text-gray-900 focus:outline-none focus:ring-1 focus:ring-indigo-500"
                   />
                 </div>
               </div>
@@ -535,7 +535,7 @@ export default function PhoneControlView() {
               {/* Row 2: TK Kontrolcü Adı */}
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <label className="block text-xs font-semibold text-slate-300">
+                  <label className="block text-xs font-semibold text-gray-700">
                     TK Kontrolcüsü Adı Soyadı <span className="text-rose-400">*</span>
                   </label>
                   {personnel.filter(p => p.defaultRole === 'telefon_kontrolcu').length > 0 && (
@@ -556,10 +556,10 @@ export default function PhoneControlView() {
                           onClick={() => handleSelectPersonnelController(p)}
                           className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-all cursor-pointer flex items-center gap-1 ${
                             formControllerName === p.fullName
-                              ? 'bg-indigo-500 text-white font-bold shadow-sm'
+                              ? 'bg-indigo-500 text-gray-900 font-bold shadow-sm'
                               : p.defaultRole === 'telefon_kontrolcu'
                                 ? 'bg-indigo-950/60 text-indigo-300 hover:bg-indigo-900 border border-indigo-800/60'
-                                : 'bg-slate-950 text-slate-400 hover:bg-slate-800 border border-slate-800'
+                                : 'bg-white text-gray-500 hover:bg-gray-100 border border-gray-200'
                           }`}
                         >
                           <span>{p.fullName}</span>
@@ -578,7 +578,7 @@ export default function PhoneControlView() {
                   onChange={(e) => setFormControllerName(e.target.value)}
                   placeholder="Örn: Merve Kaya (TK)"
                   list="tk-personnel-list"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-gray-200 text-xs text-gray-900 placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
                 />
                 <datalist id="tk-personnel-list">
                   {personnel.map(p => (
@@ -588,12 +588,12 @@ export default function PhoneControlView() {
               </div>
 
               {/* Row 3: TK Günlük Ücreti (Ayarlanabilir) */}
-              <div className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 space-y-2.5">
+              <div className="p-3.5 rounded-2xl bg-white border border-gray-200 space-y-2.5">
                 <div className="flex items-center justify-between">
                   <label className="text-xs font-semibold text-amber-400">
                     TK'cı Günlük Sabit Ücreti (TL) <span className="text-rose-400">*</span>
                   </label>
-                  <span className="text-[10px] text-slate-400">Kimine 1000, kimine 1500 seçilebilir</span>
+                  <span className="text-[10px] text-gray-500">Kimine 1000, kimine 1500 seçilebilir</span>
                 </div>
 
                 {/* Quick Presets */}
@@ -606,7 +606,7 @@ export default function PhoneControlView() {
                       className={`px-3 py-1 rounded-xl text-xs font-bold transition-all cursor-pointer font-mono ${
                         formDailyWage === preset
                           ? 'bg-amber-500 text-slate-950 shadow-md'
-                          : 'bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-800'
+                          : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
                       }`}
                     >
                       ₺{preset.toLocaleString('tr-TR')}
@@ -623,15 +623,15 @@ export default function PhoneControlView() {
                     step="50"
                     value={formDailyWage}
                     onChange={(e) => setFormDailyWage(Number(e.target.value))}
-                    className="w-full pl-8 pr-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-sm font-mono font-bold text-amber-400 focus:outline-none focus:ring-1 focus:ring-amber-500"
+                    className="w-full pl-8 pr-3 py-2 rounded-xl bg-white border border-gray-200 text-sm font-mono font-bold text-amber-400 focus:outline-none focus:ring-1 focus:ring-amber-500"
                   />
                 </div>
               </div>
 
               {/* Row 4: Arama İstatistikleri (Aranan, Okey, Red, Ulaşılamayan) */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-                <div className="p-3 rounded-xl bg-slate-950 border border-slate-800">
-                  <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">
+                <div className="p-3 rounded-xl bg-white border border-gray-200">
+                  <label className="block text-[10px] uppercase font-bold text-gray-500 mb-1">
                     Aranan Adet <span className="text-rose-400">*</span>
                   </label>
                   <input
@@ -640,7 +640,7 @@ export default function PhoneControlView() {
                     min="0"
                     value={formTotalCalled}
                     onChange={(e) => setFormTotalCalled(e.target.value)}
-                    className="w-full px-2.5 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-sm font-mono font-black text-white focus:outline-none focus:ring-1 focus:ring-indigo-500 text-center"
+                    className="w-full px-2.5 py-1.5 rounded-lg bg-white border border-gray-200 text-sm font-mono font-black text-gray-900 focus:outline-none focus:ring-1 focus:ring-indigo-500 text-center"
                   />
                 </div>
 
@@ -654,7 +654,7 @@ export default function PhoneControlView() {
                     min="0"
                     value={formTotalApproved}
                     onChange={(e) => setFormTotalApproved(e.target.value)}
-                    className="w-full px-2.5 py-1.5 rounded-lg bg-slate-900 border border-emerald-600/50 text-sm font-mono font-black text-emerald-400 focus:outline-none focus:ring-1 focus:ring-emerald-500 text-center"
+                    className="w-full px-2.5 py-1.5 rounded-lg bg-white border border-emerald-600/50 text-sm font-mono font-black text-emerald-400 focus:outline-none focus:ring-1 focus:ring-emerald-500 text-center"
                   />
                 </div>
 
@@ -667,12 +667,12 @@ export default function PhoneControlView() {
                     min="0"
                     value={formTotalRejected}
                     onChange={(e) => setFormTotalRejected(e.target.value)}
-                    className="w-full px-2.5 py-1.5 rounded-lg bg-slate-900 border border-rose-600/50 text-sm font-mono font-black text-rose-400 focus:outline-none focus:ring-1 focus:ring-rose-500 text-center"
+                    className="w-full px-2.5 py-1.5 rounded-lg bg-white border border-rose-600/50 text-sm font-mono font-black text-rose-400 focus:outline-none focus:ring-1 focus:ring-rose-500 text-center"
                   />
                 </div>
 
-                <div className="p-3 rounded-xl bg-slate-950 border border-slate-800">
-                  <label className="block text-[10px] uppercase font-bold text-slate-500 mb-1">
+                <div className="p-3 rounded-xl bg-white border border-gray-200">
+                  <label className="block text-[10px] uppercase font-bold text-gray-400 mb-1">
                     Cevapsız
                   </label>
                   <input
@@ -680,19 +680,19 @@ export default function PhoneControlView() {
                     min="0"
                     value={formTotalUnreachable}
                     onChange={(e) => setFormTotalUnreachable(e.target.value)}
-                    className="w-full px-2.5 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-sm font-mono font-black text-slate-400 focus:outline-none focus:ring-1 focus:ring-indigo-500 text-center"
+                    className="w-full px-2.5 py-1.5 rounded-lg bg-white border border-gray-200 text-sm font-mono font-black text-gray-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 text-center"
                   />
                 </div>
               </div>
 
               {/* Live Quality Preview Ribbon */}
               {Number(formTotalCalled) > 0 && (
-                <div className="p-3 rounded-xl bg-gradient-to-r from-slate-950 to-slate-900 border border-slate-800 flex items-center justify-between text-xs">
-                  <span className="text-slate-400">
+                <div className="p-3 rounded-xl bg-gradient-to-r from-slate-950 to-slate-900 border border-gray-200 flex items-center justify-between text-xs">
+                  <span className="text-gray-500">
                     Hesaplanan Başarı Oranı:
                   </span>
                   <div className="flex items-center gap-2">
-                    <span className="font-mono text-xs text-slate-300">
+                    <span className="font-mono text-xs text-gray-700">
                       {formTotalApproved} / {formTotalCalled}
                     </span>
                     {getApprovalRateBadge(Math.round((Number(formTotalApproved || 0) / Number(formTotalCalled || 1)) * 100))}
@@ -702,7 +702,7 @@ export default function PhoneControlView() {
 
               {/* Row 5: Notlar */}
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">
+                <label className="block text-xs font-semibold text-gray-700 mb-1">
                   TK Kontrol Notları & Uyarılar (Opsiyonel)
                 </label>
                 <textarea
@@ -710,16 +710,16 @@ export default function PhoneControlView() {
                   value={formNotes}
                   onChange={(e) => setFormNotes(e.target.value)}
                   placeholder="Örn: 3 nolu anketörün anketlerinde tutarsızlık var, sorular eksik sorulmuş..."
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-gray-200 text-xs text-gray-900 placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
                 />
               </div>
 
               {/* Submit Buttons */}
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-2 pt-2 border-t border-slate-800">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-2 pt-2 border-t border-gray-200">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition-all cursor-pointer"
+                  className="px-4 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold transition-all cursor-pointer"
                 >
                   Vazgeç
                 </button>
@@ -738,7 +738,7 @@ export default function PhoneControlView() {
 
                 <button
                   type="submit"
-                  className="px-6 py-2.5 rounded-xl bg-indigo-500 hover:bg-indigo-400 text-white text-xs font-bold shadow-lg shadow-indigo-500/20 transition-all cursor-pointer"
+                  className="px-6 py-2.5 rounded-xl bg-indigo-500 hover:bg-indigo-400 text-gray-900 text-xs font-bold shadow-lg shadow-indigo-500/20 transition-all cursor-pointer"
                 >
                   {editingRecordId ? 'TK Kaydını Güncelle' : 'TK Arama Kaydını Kaydet'}
                 </button>
@@ -752,3 +752,5 @@ export default function PhoneControlView() {
     </div>
   );
 }
+
+

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useState } from 'react';
 import { useApp, ExcelImportRow } from '@/context/AppContext';
@@ -176,21 +176,21 @@ Ankara	4147286	AYLA AKAT	6	0	6	₺320,00	₺1.920,00	`;
   const targetProject = projects.find(p => p.id === selectedProjectId);
 
   return (
-    <div className="fixed inset-0 z-60 flex items-center justify-center p-3 sm:p-5 bg-slate-950/85 backdrop-blur-md overflow-y-auto">
-      <div className="w-full max-w-4xl bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl p-6 text-slate-100 flex flex-col max-h-[92vh] overflow-y-auto">
+    <div className="fixed inset-0 z-60 flex items-center justify-center p-3 sm:p-5 bg-black/40 backdrop-blur-md overflow-y-auto">
+      <div className="w-full max-w-4xl bg-white border border-gray-200 rounded-3xl shadow-2xl p-6 text-gray-900 flex flex-col max-h-[92vh] overflow-y-auto">
         
         {/* Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-slate-800">
+        <div className="flex items-center justify-between pb-4 border-b border-gray-200">
           <div className="flex items-center gap-3">
             <div className="p-3 rounded-2xl bg-emerald-500/15 text-emerald-400 border border-emerald-500/25">
               <ClipboardPaste className="w-6 h-6" />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-white tracking-tight">Excel'den Toplu Hakediş Kopyala & Yapıştır</h2>
-              <p className="text-xs text-slate-400">Excel tablosunu kopyalayıp buraya yapıştırın, sistem otomatik anketör ve hakedişleri hesaplasın</p>
+              <h2 className="text-lg font-bold text-gray-900 tracking-tight">Excel'den Toplu Hakediş Kopyala & Yapıştır</h2>
+              <p className="text-xs text-gray-500">Excel tablosunu kopyalayıp buraya yapıştırın, sistem otomatik anketör ve hakedişleri hesaplasın</p>
             </div>
           </div>
-          <button onClick={onClose} className="p-2 text-slate-400 hover:text-white rounded-xl hover:bg-slate-800">
+          <button onClick={onClose} className="p-2 text-gray-500 hover:text-gray-900 rounded-xl hover:bg-gray-100">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -198,13 +198,13 @@ Ankara	4147286	AYLA AKAT	6	0	6	₺320,00	₺1.920,00	`;
         {/* Project Selector & Sample Fill Ribbon */}
         <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 my-4">
           <div className="sm:col-span-8">
-            <label className="block text-xs font-semibold text-slate-300 mb-1">
+            <label className="block text-xs font-semibold text-gray-700 mb-1">
               Hakedişlerin Yükleneceği Proje
             </label>
             <select
               value={selectedProjectId}
               onChange={(e) => setSelectedProjectId(e.target.value)}
-              className="w-full px-3 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white font-medium"
+              className="w-full px-3 py-2.5 rounded-xl bg-white border border-gray-200 text-xs text-gray-900 font-medium"
             >
               {projects.map(p => (
                 <option key={p.id} value={p.id}>
@@ -218,7 +218,7 @@ Ankara	4147286	AYLA AKAT	6	0	6	₺320,00	₺1.920,00	`;
             <button
               type="button"
               onClick={handleFillSample}
-              className="w-full py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-bold text-sky-400 flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+              className="w-full py-2.5 px-3 rounded-xl bg-gray-100 hover:bg-gray-200 border border-gray-200 text-xs font-bold text-sky-400 flex items-center justify-center gap-1.5 transition-all cursor-pointer"
             >
               <Sparkles className="w-4 h-4" />
               <span>Örnek Excel Formatını Doldur</span>
@@ -229,10 +229,10 @@ Ankara	4147286	AYLA AKAT	6	0	6	₺320,00	₺1.920,00	`;
         {/* Textarea Paste Area */}
         <div className="space-y-2 mb-4">
           <div className="flex justify-between items-center text-xs">
-            <span className="font-semibold text-slate-300">
+            <span className="font-semibold text-gray-700">
               Excel'den Kopyalanan Hücreleri Buraya Yapıştırın (Ctrl + V):
             </span>
-            <span className="text-[11px] text-slate-400 font-mono">
+            <span className="text-[11px] text-gray-500 font-mono">
               Format: IL • TC • ANKETÖR • TOPLAM • İPTAL • VERİLEN
             </span>
           </div>
@@ -242,7 +242,7 @@ Ankara	4147286	AYLA AKAT	6	0	6	₺320,00	₺1.920,00	`;
             value={rawText}
             onChange={handleTextChange}
             placeholder="Excel tablonuzu seçip kopyalayın (Ctrl+C) ve bu alana yapıştırın (Ctrl+V)..."
-            className="w-full p-3 rounded-2xl bg-slate-950 border border-slate-800 focus:border-emerald-500 font-mono text-xs text-emerald-300 placeholder-slate-600 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+            className="w-full p-3 rounded-2xl bg-white border border-gray-200 focus:border-emerald-500 font-mono text-xs text-emerald-300 placeholder-slate-600 focus:outline-none focus:ring-1 focus:ring-emerald-500"
           />
 
           {parseError && (
@@ -257,18 +257,18 @@ Ankara	4147286	AYLA AKAT	6	0	6	₺320,00	₺1.920,00	`;
         {parsedRows.length > 0 && (
           <div className="flex-1 space-y-2 mb-4 overflow-hidden flex flex-col">
             <div className="flex justify-between items-center text-xs">
-              <span className="font-bold text-white flex items-center gap-1.5">
+              <span className="font-bold text-gray-900 flex items-center gap-1.5">
                 <CheckCircle2 className="w-4 h-4 text-emerald-400" />
                 <span>Ayrıştırılan Hakediş Önizlemesi ({parsedRows.length} Anketör Satırı)</span>
               </span>
-              <span className="text-[11px] text-slate-400">
+              <span className="text-[11px] text-gray-500">
                 Hedef Proje: <strong className="text-sky-400">{targetProject?.code}</strong>
               </span>
             </div>
 
-            <div className="overflow-x-auto rounded-2xl border border-slate-800 bg-slate-950 flex-1 max-h-56">
-              <table className="w-full text-left text-xs text-slate-300">
-                <thead className="bg-slate-900 text-slate-400 uppercase tracking-wider text-[10px] sticky top-0 border-b border-slate-800">
+            <div className="overflow-x-auto rounded-2xl border border-gray-200 bg-white flex-1 max-h-56">
+              <table className="w-full text-left text-xs text-gray-700">
+                <thead className="bg-white text-gray-500 uppercase tracking-wider text-[10px] sticky top-0 border-b border-gray-200">
                   <tr>
                     <th className="py-2 px-3">İL</th>
                     <th className="py-2 px-3">TC</th>
@@ -291,22 +291,22 @@ Ankara	4147286	AYLA AKAT	6	0	6	₺320,00	₺1.920,00	`;
                     const net = Math.max(0, gross - adv);
 
                     return (
-                      <tr key={idx} className="hover:bg-slate-900/40">
-                        <td className="py-2 px-3 text-slate-400">{row.city || 'Ankara'}</td>
-                        <td className="py-2 px-3 font-mono text-[11px] text-slate-400">{row.identityNumber || '-'}</td>
-                        <td className="py-2 px-3 font-bold text-white">{row.personnelName}</td>
+                      <tr key={idx} className="hover:bg-gray-50">
+                        <td className="py-2 px-3 text-gray-500">{row.city || 'Ankara'}</td>
+                        <td className="py-2 px-3 font-mono text-[11px] text-gray-500">{row.identityNumber || '-'}</td>
+                        <td className="py-2 px-3 font-bold text-gray-900">{row.personnelName}</td>
                         <td className="py-2 px-3 text-center font-mono">{row.totalSurveys}</td>
                         <td className="py-2 px-3 text-center font-mono text-rose-400">{row.invalidSurveys}</td>
                         <td className="py-2 px-3 text-center font-mono font-bold text-sky-300 bg-sky-500/5">{valid}</td>
                         <td className="py-2 px-3 text-right font-mono">₺{row.unitPrice}</td>
-                        <td className="py-2 px-3 text-right font-mono text-slate-300">₺{gross.toLocaleString('tr-TR')}</td>
+                        <td className="py-2 px-3 text-right font-mono text-gray-700">₺{gross.toLocaleString('tr-TR')}</td>
                         <td className="py-2 px-3 text-right font-mono text-amber-400">
                           {adv > 0 ? `-₺${adv.toLocaleString('tr-TR')}` : '₺0'}
                         </td>
                         <td className="py-2 px-3 text-right font-mono font-black text-emerald-400 bg-emerald-500/5">
                           ₺{net.toLocaleString('tr-TR')}
                         </td>
-                        <td className="py-2 px-3 text-slate-500 text-[11px]">{row.notes || '-'}</td>
+                        <td className="py-2 px-3 text-gray-400 text-[11px]">{row.notes || '-'}</td>
                       </tr>
                     );
                   })}
@@ -317,11 +317,11 @@ Ankara	4147286	AYLA AKAT	6	0	6	₺320,00	₺1.920,00	`;
         )}
 
         {/* Footer Actions */}
-        <div className="pt-4 border-t border-slate-800 flex justify-between items-center gap-3">
+        <div className="pt-4 border-t border-gray-200 flex justify-between items-center gap-3">
           <button
             type="button"
             onClick={onClose}
-            className="py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-300 transition-colors cursor-pointer"
+            className="py-2.5 px-4 rounded-xl bg-gray-100 hover:bg-gray-200 text-xs font-semibold text-gray-700 transition-colors cursor-pointer"
           >
             Vazgeç
           </button>
@@ -332,8 +332,8 @@ Ankara	4147286	AYLA AKAT	6	0	6	₺320,00	₺1.920,00	`;
             onClick={handleCommitImport}
             className={`py-2.5 px-6 rounded-xl font-bold text-xs flex items-center gap-2 shadow-lg transition-all cursor-pointer ${
               parsedRows.length > 0
-                ? 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white shadow-emerald-600/25'
-                : 'bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700'
+                ? 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-gray-900 shadow-emerald-600/25'
+                : 'bg-gray-100 text-gray-400 cursor-not-allowed border border-gray-200'
             }`}
           >
             <span>Hakedişleri Projeye Aktar & Hesapla ({parsedRows.length} Satır)</span>
@@ -345,3 +345,5 @@ Ankara	4147286	AYLA AKAT	6	0	6	₺320,00	₺1.920,00	`;
     </div>
   );
 }
+
+

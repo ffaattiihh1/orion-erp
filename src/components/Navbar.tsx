@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useState } from 'react';
 import { useApp } from '@/context/AppContext';
@@ -87,7 +87,7 @@ export default function Navbar({ activeTab, setActiveTab }: NavbarProps) {
             {/* Logo */}
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-xl bg-blue-600 flex items-center justify-center flex-shrink-0">
-                <span className="text-white font-black text-sm">O</span>
+                <span className="text-gray-900 font-black text-sm">O</span>
               </div>
               <div className="hidden sm:block">
                 <div className="flex items-center gap-2">
@@ -149,7 +149,7 @@ export default function Navbar({ activeTab, setActiveTab }: NavbarProps) {
                 <button
                   onClick={() => handleRoleToggle('admin')}
                   className={`flex items-center gap-1 px-2.5 py-1.5 transition-all cursor-pointer ${
-                    isAdmin ? 'bg-blue-600 text-white font-semibold' : 'text-gray-500 hover:bg-gray-100'
+                    isAdmin ? 'bg-blue-600 text-gray-900 font-semibold' : 'text-gray-500 hover:bg-gray-100'
                   }`}
                 >
                   <ShieldCheck className="w-3 h-3" />
@@ -158,7 +158,7 @@ export default function Navbar({ activeTab, setActiveTab }: NavbarProps) {
                 <button
                   onClick={() => handleRoleToggle('spv')}
                   className={`flex items-center gap-1 px-2.5 py-1.5 transition-all cursor-pointer ${
-                    !isAdmin ? 'bg-amber-500 text-white font-semibold' : 'text-gray-500 hover:bg-gray-100'
+                    !isAdmin ? 'bg-amber-500 text-gray-900 font-semibold' : 'text-gray-500 hover:bg-gray-100'
                   }`}
                 >
                   <Smartphone className="w-3 h-3" />
@@ -231,7 +231,7 @@ export default function Navbar({ activeTab, setActiveTab }: NavbarProps) {
                     onClick={() => setActiveTab(item.id)}
                     className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all cursor-pointer flex-shrink-0 ${
                       isActive
-                        ? 'bg-blue-600 text-white font-semibold shadow-sm'
+                        ? 'bg-blue-600 text-gray-900 font-semibold shadow-sm'
                         : 'text-gray-500 hover:text-gray-700 hover:bg-white'
                     }`}
                   >
@@ -315,7 +315,7 @@ export default function Navbar({ activeTab, setActiveTab }: NavbarProps) {
                         : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100'
                     }`}
                   >
-                    <div className={`p-2 rounded-lg ${isActive ? 'bg-blue-600 text-white' : 'bg-white text-gray-500'}`}>
+                    <div className={`p-2 rounded-lg ${isActive ? 'bg-blue-600 text-gray-900' : 'bg-white text-gray-500'}`}>
                       <Icon className="w-4 h-4" />
                     </div>
                     <span className="text-xs font-semibold">{item.label}</span>
@@ -328,7 +328,7 @@ export default function Navbar({ activeTab, setActiveTab }: NavbarProps) {
               <button
                 onClick={() => { setIsMobileMenuOpen(false); handleRoleToggle('admin'); }}
                 className={`flex items-center justify-center gap-1 py-2.5 rounded-xl text-xs font-semibold border cursor-pointer ${
-                  isAdmin ? 'bg-blue-600 text-white border-blue-600' : 'bg-gray-50 border-gray-200 text-gray-500'
+                  isAdmin ? 'bg-blue-600 text-gray-900 border-blue-600' : 'bg-gray-50 border-gray-200 text-gray-500'
                 }`}
               >
                 <ShieldCheck className="w-3.5 h-3.5" />
@@ -337,7 +337,7 @@ export default function Navbar({ activeTab, setActiveTab }: NavbarProps) {
               <button
                 onClick={() => { setIsMobileMenuOpen(false); handleRoleToggle('spv'); }}
                 className={`flex items-center justify-center gap-1 py-2.5 rounded-xl text-xs font-semibold border cursor-pointer ${
-                  !isAdmin ? 'bg-amber-500 text-white border-amber-500' : 'bg-gray-50 border-gray-200 text-gray-500'
+                  !isAdmin ? 'bg-amber-500 text-gray-900 border-amber-500' : 'bg-gray-50 border-gray-200 text-gray-500'
                 }`}
               >
                 <Smartphone className="w-3.5 h-3.5" />
@@ -360,3 +360,5 @@ export default function Navbar({ activeTab, setActiveTab }: NavbarProps) {
     </>
   );
 }
+
+
