@@ -126,6 +126,7 @@ interface AppContextType {
   importFullBackup: (backupJson: string) => { success: boolean; message: string };
   
   addPersonnel: (p: Omit<Personnel, 'id' | 'isBlacklisted' | 'totalProjectsCompleted'>) => Personnel;
+  addMultiplePersonnel: (pList: Omit<Personnel, 'id' | 'isBlacklisted' | 'totalProjectsCompleted'>[]) => number;
   toggleBlacklist: (id: string, reason?: string) => void;
   
   assignPersonnelToProject: (
@@ -157,6 +158,9 @@ interface AppContextType {
     status: ClientInvoice['status'], 
     invoiceNumber?: string
   ) => void;
+  addClientInvoice: (inv: Omit<ClientInvoice, 'id'>) => ClientInvoice;
+  updateClientInvoice: (id: string, updatedFields: Partial<ClientInvoice>) => void;
+  deleteClientInvoice: (id: string) => void;
   
   getPersonnelNetAdvance: (projectId: string, personnelIdOrName: string, identityNumber?: string) => number;
   getProjectsForPersonnel: (personnelId: string) => Project[];
@@ -852,8 +856,49 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       isBlacklisted: false,
       totalProjectsCompleted: 0
     };
-    setPersonnel(prev => [newPerson, ...prev]);
+    setPersonnel(prev => {
+      const updated = [newPerson, ...prev];
+      saveLocal('orion_personnel', updated);
+      pushToServer({ personnel: updated });
+      return updated;
+    });
     return newPerson;
+  };
+
+  const addMultiplePersonnel = (pList: Omit<Personnel, 'id' | 'isBlacklisted' | 'totalProjectsCompleted'>[]): number => {
+    let count = 0;
+    setPersonnel(prev => {
+      const existingNames = new Set(prev.map(p => p.fullName.trim().toLowerCase()));
+      const existingTcs = new Set(prev.filter(p => p.identityNumber).map(p => p.identityNumber!.trim()));
+      const toAdd: Personnel[] = [];
+
+      pList.forEach((item, idx) => {
+        const cleanName = item.fullName.trim();
+        const cleanTc = item.identityNumber?.trim();
+        if ((cleanTc && existingTcs.has(cleanTc)) || existingNames.has(cleanName.toLowerCase())) {
+          return; // skip duplicate
+        }
+
+        const newPerson: Personnel = {
+          ...item,
+          id: 'pers-' + Date.now() + '-' + idx,
+          isBlacklisted: false,
+          totalProjectsCompleted: 0
+        };
+        toAdd.push(newPerson);
+        existingNames.add(cleanName.toLowerCase());
+        if (cleanTc) existingTcs.add(cleanTc);
+        count++;
+      });
+
+      if (toAdd.length === 0) return prev;
+
+      const updated = [...toAdd, ...prev];
+      saveLocal('orion_personnel', updated);
+      pushToServer({ personnel: updated });
+      return updated;
+    });
+    return count;
   };
 
   const toggleBlacklist = (id: string, reason?: string) => {
@@ -1172,16 +1217,54 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     status: ClientInvoice['status'], 
     invoiceNumber?: string
   ) => {
-    setClientInvoices(prev => prev.map(inv => {
-      if (inv.id !== invoiceId) return inv;
-      return {
-        ...inv,
-        status,
-        invoiceNumber: invoiceNumber || inv.invoiceNumber,
-        invoicedAt: status === 'invoiced' ? (inv.invoicedAt || new Date().toISOString().split('T')[0]) : inv.invoicedAt,
-        collectedAt: status === 'collected' ? (inv.collectedAt || new Date().toISOString().split('T')[0]) : inv.collectedAt
-      };
-    }));
+    setClientInvoices(prev => {
+      const updated = prev.map(inv => {
+        if (inv.id !== invoiceId) return inv;
+        return {
+          ...inv,
+          status,
+          invoiceNumber: invoiceNumber || inv.invoiceNumber,
+          invoicedAt: status === 'invoiced' ? (inv.invoicedAt || new Date().toISOString().split('T')[0]) : inv.invoicedAt,
+          collectedAt: status === 'collected' ? (inv.collectedAt || new Date().toISOString().split('T')[0]) : inv.collectedAt
+        };
+      });
+      saveLocal('orion_client_invoices', updated);
+      pushToServer({ clientInvoices: updated });
+      return updated;
+    });
+  };
+
+  const addClientInvoice = (invData: Omit<ClientInvoice, 'id'>): ClientInvoice => {
+    const newInvoice: ClientInvoice = {
+      ...invData,
+      id: 'inv-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6)
+    };
+    setClientInvoices(prev => {
+      const updated = [newInvoice, ...prev];
+      saveLocal('orion_client_invoices', updated);
+      pushToServer({ clientInvoices: updated });
+      return updated;
+    });
+    return newInvoice;
+  };
+
+  const updateClientInvoice = (id: string, updatedFields: Partial<ClientInvoice>) => {
+    setClientInvoices(prev => {
+      const updated = prev.map(inv => inv.id === id ? { ...inv, ...updatedFields } : inv);
+      saveLocal('orion_client_invoices', updated);
+      pushToServer({ clientInvoices: updated });
+      return updated;
+    });
+  };
+
+  const deleteClientInvoice = (id: string) => {
+    markAsDeleted(id);
+    setClientInvoices(prev => {
+      const updated = prev.filter(inv => inv.id !== id);
+      saveLocal('orion_client_invoices', updated);
+      pushToServer({ clientInvoices: updated });
+      return updated;
+    });
   };
 
   return (
@@ -1220,6 +1303,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       exportFullBackup,
       importFullBackup,
       addPersonnel,
+      addMultiplePersonnel,
       toggleBlacklist,
       assignPersonnelToProject,
       removePersonnelFromProject,
@@ -1229,6 +1313,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       importSettlementsFromExcel,
       toggleSettlementPaid,
       updateInvoiceStatus,
+      addClientInvoice,
+      updateClientInvoice,
+      deleteClientInvoice,
       getPersonnelNetAdvance,
       getProjectsForPersonnel,
       syncWithServer,

@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState } from 'react';
 import { useApp, ExcelImportRow } from '@/context/AppContext';
@@ -10,8 +10,10 @@ import {
   AlertCircle, 
   ArrowRight, 
   Sparkles,
-  RefreshCw 
+  RefreshCw,
+  Download
 } from 'lucide-react';
+import { downloadSettlementTemplate } from '@/lib/excel-export';
 
 interface ExcelPasteSettlementModalProps {
   projectId?: string;
@@ -214,14 +216,25 @@ Ankara	4147286	AYLA AKAT	6	0	6	₺320,00	₺1.920,00	`;
             </select>
           </div>
 
-          <div className="sm:col-span-4 flex items-end">
+          <div className="sm:col-span-4 flex items-end gap-2">
+            <button
+              type="button"
+              onClick={downloadSettlementTemplate}
+              className="flex-1 py-2.5 px-3 rounded-xl bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 text-xs font-bold text-emerald-700 flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-sm"
+              title="Örnek Hakediş Excel Şablonunu İndir"
+            >
+              <Download className="w-4 h-4" />
+              <span>ŞABLONU İNDİR</span>
+            </button>
+
             <button
               type="button"
               onClick={handleFillSample}
-              className="w-full py-2.5 px-3 rounded-xl bg-gray-100 hover:bg-gray-200 border border-gray-200 text-xs font-bold text-sky-400 flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+              className="py-2.5 px-3 rounded-xl bg-gray-100 hover:bg-gray-200 border border-gray-200 text-xs font-bold text-sky-600 flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+              title="Örnek verilerle doldur"
             >
               <Sparkles className="w-4 h-4" />
-              <span>Örnek Excel Formatını Doldur</span>
+              <span>Örnek</span>
             </button>
           </div>
         </div>

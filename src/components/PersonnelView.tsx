@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState } from 'react';
 import { useApp } from '@/context/AppContext';
@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { exportToExcel } from '@/lib/excel-export';
 import { PersonnelRole, Personnel } from '@/types';
+import ExcelPastePersonnelModal from '@/components/ExcelPastePersonnelModal';
 
 export default function PersonnelView() {
   const { 
@@ -25,7 +26,6 @@ export default function PersonnelView() {
     addPersonnel, 
     toggleBlacklist, 
     projects, 
-    assignPersonnelToProject,
     getProjectsForPersonnel 
   } = useApp();
 
@@ -43,15 +43,13 @@ export default function PersonnelView() {
   const [newDefaultPrice, setNewDefaultPrice] = useState('180');
   const [newNotes, setNewNotes] = useState('');
 
+  // Modal: Excel Paste Personnel Import
+  const [isExcelModalOpen, setIsExcelModalOpen] = useState(false);
+  const [importNotification, setImportNotification] = useState<string | null>(null);
+
   // Modal: Blacklist confirmation / reason
   const [blacklistTarget, setBlacklistTarget] = useState<Personnel | null>(null);
   const [blacklistReasonInput, setBlacklistReasonInput] = useState('');
-
-  // Modal: Assign to project with price override
-  const [assignTarget, setAssignTarget] = useState<Personnel | null>(null);
-  const [targetProjectId, setTargetProjectId] = useState(projects[0]?.id || '');
-  const [overridePriceInput, setOverridePriceInput] = useState('200');
-  const [foodAllowanceInput, setFoodAllowanceInput] = useState('150');
 
   // Excel Export
   const handleExport = () => {
@@ -113,21 +111,6 @@ export default function PersonnelView() {
     toggleBlacklist(blacklistTarget.id, blacklistReasonInput);
     setBlacklistTarget(null);
     setBlacklistReasonInput('');
-  };
-
-  const handleConfirmAssignment = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!assignTarget || !targetProjectId) return;
-
-    assignPersonnelToProject(
-      targetProjectId,
-      assignTarget.id,
-      Number(overridePriceInput),
-      Number(foodAllowanceInput || 0)
-    );
-
-    setAssignTarget(null);
-    alert(`${assignTarget.fullName} başarıyla projeye ₺${overridePriceInput} özel fiyat ile atandı!`);
   };
 
   const roleLabels: Record<PersonnelRole, string> = {
@@ -218,6 +201,14 @@ export default function PersonnelView() {
           >
             <FileSpreadsheet className="w-4 h-4 text-emerald-400" />
             <span>Excel'e Aktar</span>
+          </button>
+
+          <button
+            onClick={() => setIsExcelModalOpen(true)}
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-md cursor-pointer"
+          >
+            <FileSpreadsheet className="w-4 h-4" />
+            <span>Excel'den Toplu Ekle</span>
           </button>
 
           <button
@@ -502,78 +493,21 @@ export default function PersonnelView() {
         </div>
       )}
 
-      {/* MODAL 3: ASSIGN TO PROJECT & OVERRIDE PRICE */}
-      {assignTarget && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
-          <div className="w-full max-w-md bg-white border border-gray-200 rounded-2xl p-6 text-gray-900 shadow-2xl">
-            <div className="flex justify-between items-center pb-3 border-b border-gray-200">
-              <h3 className="text-base font-bold text-gray-900 flex items-center gap-2">
-                <Layers className="w-5 h-5 text-sky-400" />
-                <span>Projeye Atama & Fiyat Override</span>
-              </h3>
-              <button onClick={() => setAssignTarget(null)} className="p-1 text-gray-500 hover:text-gray-900">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
+      {/* MODAL 3: EXCEL PASTE PERSONNEL IMPORT */}
+      <ExcelPastePersonnelModal
+        isOpen={isExcelModalOpen}
+        onClose={() => setIsExcelModalOpen(false)}
+        onSuccess={(count) => {
+          setImportNotification(`${count} personel başarıyla Excel'den aktarıldı ve bulut veritabanına eşitlendi!`);
+          setTimeout(() => setImportNotification(null), 5000);
+        }}
+      />
 
-            <form onSubmit={handleConfirmAssignment} className="space-y-4 mt-4">
-              <div>
-                <span className="text-xs text-gray-500">Seçili Personel:</span>
-                <p className="text-sm font-bold text-gray-900">{assignTarget.fullName} ({assignTarget.defaultRole})</p>
-                <p className="text-[11px] text-gray-400">Standart Birim Fiyatı: ₺{assignTarget.defaultUnitPrice}</p>
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-1">Atanacak Proje</label>
-                <select
-                  value={targetProjectId}
-                  onChange={(e) => setTargetProjectId(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-white border border-gray-200 text-xs text-gray-900"
-                >
-                  {projects.filter(p => p.businessModel === 'model_b_micro').map(p => (
-                    <option key={p.id} value={p.id}>{p.code} - {p.title}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-sky-400 mb-1">
-                  Özel Fiyat Ezme (Override Fiyat - TL)
-                </label>
-                <input
-                  type="number"
-                  required
-                  min="1"
-                  value={overridePriceInput}
-                  onChange={(e) => setOverridePriceInput(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl bg-white border border-sky-500/50 text-base font-mono font-bold text-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-500"
-                />
-                <p className="text-[11px] text-gray-500 mt-1">
-                  Bu personelin hakedişi bu projede standart 180 TL yerine girdiğiniz <strong>₺{overridePriceInput}</strong> üzerinden hesaplanacaktır.
-                </p>
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-1">
-                  Günlük Yemek Bedeli (TL - Opsiyonel)
-                </label>
-                <input
-                  type="number"
-                  min="0"
-                  value={foodAllowanceInput}
-                  onChange={(e) => setFoodAllowanceInput(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-white border border-gray-200 text-xs text-gray-900 font-mono"
-                />
-              </div>
-
-              <button
-                type="submit"
-                className="w-full py-3 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-gray-900 font-bold text-xs shadow-lg shadow-sky-500/20 transition-all cursor-pointer"
-              >
-                Projeye Ata & Fiyatı Tanımla
-              </button>
-            </form>
-          </div>
+      {/* Notification Toast */}
+      {importNotification && (
+        <div className="fixed bottom-6 right-6 z-50 p-4 rounded-xl bg-emerald-600 text-white shadow-2xl flex items-center gap-3 animate-fadeIn">
+          <Check className="w-5 h-5" />
+          <span className="text-xs font-bold">{importNotification}</span>
         </div>
       )}
 

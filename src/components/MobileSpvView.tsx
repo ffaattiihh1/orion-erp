@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState } from 'react';
 import { useApp } from '@/context/AppContext';
@@ -40,12 +40,8 @@ export default function MobileSpvView() {
   const spvProjects = projects.filter(p => p.assignedSpvId === currentUser?.id);
   const activeProject = spvProjects[0] || projects[0]; // fallback to first if test
 
-  // Active personnel assigned to this project
-  const assignedPersonnelIds = projectPersonnel
-    .filter(pp => pp.projectId === activeProject?.id)
-    .map(pp => pp.personnelId);
-
-  const availablePersonnel = personnel.filter(p => assignedPersonnelIds.includes(p.id) && !p.isBlacklisted);
+  // All active personnel pool (Global personnel)
+  const availablePersonnel = personnel.filter(p => !p.isBlacklisted);
 
   // Modal States
   const [selectedProjectForDetail, setSelectedProjectForDetail] = useState<Project | null>(null);

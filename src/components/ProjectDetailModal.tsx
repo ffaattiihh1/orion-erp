@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState } from 'react';
 import { useApp } from '@/context/AppContext';
@@ -56,7 +56,6 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
     addAdvance, 
     closeSurveysAndCalculateSettlement, 
     toggleSettlementPaid, 
-    assignPersonnelToProject, 
     getPersonnelNetAdvance,
     updateProject,
     addProjectNote,
@@ -73,7 +72,6 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
   const [isAdvanceModalOpen, setIsAdvanceModalOpen] = useState(false);
   const [isExpenseModalOpen, setIsExpenseModalOpen] = useState(false);
   const [isSurveyModalOpen, setIsSurveyModalOpen] = useState(false);
-  const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
   const [isNoteModalOpen, setIsNoteModalOpen] = useState(false);
   const [isDailyReportModalOpen, setIsDailyReportModalOpen] = useState(false);
   const [isPhoneControlModalOpen, setIsPhoneControlModalOpen] = useState(false);
@@ -97,12 +95,7 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
   const [surveyTotal, setSurveyTotal] = useState('');
   const [surveyInvalid, setSurveyInvalid] = useState('0');
 
-  // 4. Assign Personnel Form
-  const [assignPersonnelId, setAssignPersonnelId] = useState('');
-  const [assignOverridePrice, setAssignOverridePrice] = useState('200');
-  const [assignFoodAllowance, setAssignFoodAllowance] = useState('150');
-
-  // 5. Note Form
+  // 4. Note Form
   const [newNoteText, setNewNoteText] = useState('');
 
   // 6. Daily Field Report Form
@@ -158,9 +151,8 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
   const totalProjectTkApproved = projectPhoneControls.reduce((sum, p) => sum + Number(p.totalApproved || 0), 0);
   const totalProjectTkCost = projectPhoneControls.reduce((sum, p) => sum + Number(p.dailyWage || 0), 0);
 
-  // Unassigned eligible personnel for modal
-  const assignedIds = projectAssigned.map(pp => pp.personnelId);
-  const unassignedPersonnel = personnel.filter(p => !assignedIds.includes(p.id) && !p.isBlacklisted);
+  // Active personnel pool (Global personnel)
+  const activePersonnel = personnel.filter(p => !p.isBlacklisted);
 
   // Excel Export for this single project
   const handleExportProjectSheet = () => {
@@ -258,22 +250,6 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
     setIsSurveyModalOpen(false);
     setSurveyTotal('');
     setSurveyInvalid('0');
-  };
-
-  // Submit Assign Personnel
-  const handleAssignSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!assignPersonnelId) return;
-
-    assignPersonnelToProject(
-      project.id,
-      assignPersonnelId,
-      Number(assignOverridePrice),
-      Number(assignFoodAllowance || 0)
-    );
-
-    setIsAssignModalOpen(false);
-    setAssignPersonnelId('');
   };
 
   // Submit Note
@@ -510,7 +486,7 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
           {/* 5. Anket Kapama & Hakediş */}
           <button
             onClick={() => {
-              if (projectAssigned.length > 0) setSurveyPersonnelId(projectAssigned[0].personnelId);
+              if (activePersonnel.length > 0) setSurveyPersonnelId(activePersonnel[0].id);
               setIsSurveyModalOpen(true);
             }}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/30 text-xs font-bold transition-all cursor-pointer"
@@ -519,21 +495,7 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
             <span>+ Hakediş Kapa</span>
           </button>
 
-          {/* 6. Personel Ata */}
-          {!isModelA && (
-            <button
-              onClick={() => {
-                if (unassignedPersonnel.length > 0) setAssignPersonnelId(unassignedPersonnel[0].id);
-                setIsAssignModalOpen(true);
-              }}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-800 border border-gray-200 text-xs font-bold transition-all cursor-pointer"
-            >
-              <Users className="w-3.5 h-3.5" />
-              <span>+ Personel Ata</span>
-            </button>
-          )}
-
-          {/* 7. Not Ekle */}
+          {/* 6. Not Ekle */}
           <button
             onClick={() => setIsNoteModalOpen(true)}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-800 border border-gray-200 text-xs font-bold transition-all cursor-pointer"
@@ -554,7 +516,7 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
             }`}
           >
             <Users className="w-3.5 h-3.5" />
-            <span>Saha Personeli & Hakedişler ({isModelA ? 'Taşeron' : projectAssigned.length})</span>
+            <span>Saha Personeli & Hakedişler ({isModelA ? 'Taşeron' : activePersonnel.length})</span>
           </button>
 
           <button
@@ -664,27 +626,31 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200/80">
-                    {projectAssigned.length === 0 ? (
+                    {activePersonnel.length === 0 ? (
                       <tr>
                         <td colSpan={11} className="py-6 text-center text-gray-400">
-                          Bu projeye henüz personel atanmadı. Yukarıdaki <strong>"+ Personel Ata"</strong> butonunu kullanarak personel ekleyebilirsiniz.
+                          Sistemde kayıtlı aktif personel bulunmuyor. Personel Yönetimi bölümünden Excel ile veya formdan personel ekleyebilirsiniz.
                         </td>
                       </tr>
                     ) : (
-                      projectAssigned.map(pp => {
-                        const settlement = projectSettlements.find(s => s.personnelId === pp.personnelId);
-                        const netAdv = getPersonnelNetAdvance(project.id, pp.personnelId);
+                      activePersonnel.map(person => {
+                        const settlement = projectSettlements.find(s => s.personnelId === person.id);
+                        const netAdv = getPersonnelNetAdvance(project.id, person.id);
+                        const unitPrice = person.defaultUnitPrice || project.defaultPersonnelRate || 180;
 
                         return (
-                          <tr key={pp.id} className="hover:bg-gray-100 transition-colors">
+                          <tr key={person.id} className="hover:bg-gray-100 transition-colors">
                             <td className="py-2.5 px-3 font-bold text-gray-900">
-                              {pp.personnelName}
+                              <div>{person.fullName}</div>
+                              <div className="text-[10px] text-gray-400 font-mono font-normal">
+                                {person.identityNumber ? `TC: ${person.identityNumber}` : ''} {person.phone ? `• ${person.phone}` : ''}
+                              </div>
                             </td>
                             <td className="py-2.5 px-3 uppercase text-[10px] font-semibold text-gray-500">
-                              {pp.assignedRole}
+                              {person.defaultRole}
                             </td>
                             <td className="py-2.5 px-3 text-right font-mono font-bold text-sky-400">
-                              ₺{pp.customUnitPrice}
+                              ₺{unitPrice}
                             </td>
                             <td className="py-2.5 px-3 text-center font-mono">
                               {settlement?.totalSurveys ?? '-'}
@@ -707,7 +673,7 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
                             <td className="py-2.5 px-3 text-center">
                               {settlement ? (
                                 <span className="inline-block px-2 py-0.5 rounded bg-sky-500/10 text-sky-300 border border-sky-500/20 text-[10px] font-semibold">
-                                  {settlement.createdByName || 'Fatih Sakar'}
+                                  {settlement.createdByName || 'Yönetici'}
                                 </span>
                               ) : '-'}
                             </td>
@@ -726,12 +692,12 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
                               ) : (
                                 <button
                                   onClick={() => {
-                                    setSurveyPersonnelId(pp.personnelId);
+                                    setSurveyPersonnelId(person.id);
                                     setIsSurveyModalOpen(true);
                                   }}
-                                  className="text-[10px] px-2 py-0.5 rounded bg-sky-500/20 text-sky-300 hover:bg-sky-500/30"
+                                  className="text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 border border-emerald-500/30 font-semibold cursor-pointer"
                                 >
-                                  Kapa
+                                  + Kapa
                                 </button>
                               )}
                             </td>
@@ -1238,8 +1204,8 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
                     className="w-full px-3 py-2 rounded-xl bg-white border border-gray-200 text-xs text-gray-900"
                   >
                     <option value="">-- Personel Seçin --</option>
-                    {projectAssigned.map(pp => (
-                      <option key={pp.personnelId} value={pp.personnelId}>{pp.personnelName}</option>
+                    {activePersonnel.map(p => (
+                      <option key={p.id} value={p.id}>{p.fullName} ({p.phone || p.identityNumber || p.defaultRole})</option>
                     ))}
                   </select>
                 </div>
@@ -1380,8 +1346,8 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
                     className="w-full px-3 py-2 rounded-xl bg-white border border-gray-200 text-xs text-gray-900"
                   >
                     <option value="">-- Personel Seçin --</option>
-                    {projectAssigned.map(pp => (
-                      <option key={pp.personnelId} value={pp.personnelId}>{pp.personnelName}</option>
+                    {activePersonnel.map(p => (
+                      <option key={p.id} value={p.id}>{p.fullName} ({p.phone || p.defaultRole})</option>
                     ))}
                   </select>
                 </div>
@@ -1417,75 +1383,6 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
                   className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-gray-900 font-bold text-xs shadow transition-all cursor-pointer"
                 >
                   Hakedişi Hesapla & Kapat
-                </button>
-              </form>
-            </div>
-          </div>
-        )}
-
-        {/* ---------------- SUB-MODAL 4: ASSIGN PERSONNEL ---------------- */}
-        {isAssignModalOpen && (
-          <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
-            <div className="w-full max-w-sm bg-white border border-gray-200 rounded-2xl p-5 text-gray-900 shadow-2xl">
-              <div className="flex justify-between items-center pb-2 border-b border-gray-200">
-                <h3 className="text-sm font-bold text-gray-900 flex items-center gap-1.5">
-                  <Users className="w-4 h-4 text-indigo-400" />
-                  <span>Projeye Personel Ata</span>
-                </h3>
-                <button onClick={() => setIsAssignModalOpen(false)} className="text-gray-500 hover:text-gray-900">
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-
-              <form onSubmit={handleAssignSubmit} className="space-y-3 mt-3">
-                <div>
-                  <label className="block text-xs font-semibold text-gray-700 mb-1">Personel Havuzundan Seçin</label>
-                  <select
-                    value={assignPersonnelId}
-                    onChange={(e) => {
-                      setAssignPersonnelId(e.target.value);
-                      const target = personnel.find(p => p.id === e.target.value);
-                      if (target) setAssignOverridePrice(String(target.defaultUnitPrice));
-                    }}
-                    required
-                    className="w-full px-3 py-2 rounded-xl bg-white border border-gray-200 text-xs text-gray-900"
-                  >
-                    <option value="">-- Personel Seçin --</option>
-                    {unassignedPersonnel.map(p => (
-                      <option key={p.id} value={p.id}>{p.fullName} ({p.defaultRole})</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-sky-400 mb-1">Özel Fiyat Ezme (Override - TL)</label>
-                  <input
-                    type="number"
-                    required
-                    min="1"
-                    value={assignOverridePrice}
-                    onChange={(e) => setAssignOverridePrice(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-white border border-sky-500/50 text-base font-mono font-bold text-sky-400"
-                  />
-                  <p className="text-[10px] text-gray-500 mt-0.5">Bu personelin hakedişi bu fiyattan hesaplanır.</p>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-gray-700 mb-1">Günlük Yemek Bedeli (TL)</label>
-                  <input
-                    type="number"
-                    min="0"
-                    value={assignFoodAllowance}
-                    onChange={(e) => setAssignFoodAllowance(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-white border border-gray-200 text-xs text-gray-900 font-mono"
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  className="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-gray-900 font-bold text-xs shadow transition-all cursor-pointer"
-                >
-                  Projeye Personeli Ekle
                 </button>
               </form>
             </div>

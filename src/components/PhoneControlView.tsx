@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState } from 'react';
 import { useApp } from '@/context/AppContext';
@@ -59,14 +59,12 @@ export default function PhoneControlView() {
   // Open Create Modal
   const handleOpenCreateModal = () => {
     setEditingRecordId(null);
-    setFormProjectId(projects[0]?.id || '');
+    setFormProjectId('general_tk');
     setFormControlDate(new Date().toISOString().split('T')[0]);
     setFormControllerName('');
     setFormDailyWage(1000);
     setFormTotalCalled('80');
     setFormTotalApproved('72');
-    setFormTotalRejected('4');
-    setFormTotalUnreachable('4');
     setFormNotes('');
     setIsModalOpen(true);
   };
@@ -74,14 +72,12 @@ export default function PhoneControlView() {
   // Open Edit Modal
   const handleOpenEditModal = (rec: PhoneControlRecord) => {
     setEditingRecordId(rec.id);
-    setFormProjectId(rec.projectId);
+    setFormProjectId(rec.projectId || 'general_tk');
     setFormControlDate(rec.controlDate);
     setFormControllerName(rec.controllerName);
     setFormDailyWage(rec.dailyWage || 1000);
     setFormTotalCalled(String(rec.totalCalled));
     setFormTotalApproved(String(rec.totalApproved));
-    setFormTotalRejected(String(rec.totalRejected));
-    setFormTotalUnreachable(String(rec.totalUnreachable || 0));
     setFormNotes(rec.notes || '');
     setIsModalOpen(true);
   };
@@ -95,74 +91,49 @@ export default function PhoneControlView() {
   };
 
   // Submit Form
-  const handleSubmit = async (e: React.FormEvent, keepOpenForNextProject: boolean = false) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     if (e && e.preventDefault) e.preventDefault();
-    if (!formProjectId) {
-      alert('Lütfen bir proje seçin.');
-      return;
-    }
     if (!formControllerName.trim()) {
       alert('Lütfen TK kontrolcüsü adını girin.');
       return;
     }
 
-    const selectedProj = projects.find(p => p.id === formProjectId);
     const called = Number(formTotalCalled || 0);
     const approved = Number(formTotalApproved || 0);
-    const rejected = Number(formTotalRejected || 0);
-    const unreachable = Number(formTotalUnreachable || 0);
     const rate = called > 0 ? Math.round((approved / called) * 100) : 0;
 
     if (editingRecordId) {
       updatePhoneControlRecord(editingRecordId, {
-        projectId: formProjectId,
-        projectCode: selectedProj?.code || 'PROJ',
-        projectTitle: selectedProj?.title || '',
+        projectId: 'general_tk',
+        projectCode: 'GÜNLÜK TK',
+        projectTitle: 'Günlük TK',
         controllerName: formControllerName.trim(),
         controlDate: formControlDate,
         dailyWage: Number(formDailyWage),
         totalCalled: called,
         totalApproved: approved,
-        totalRejected: rejected,
-        totalUnreachable: unreachable,
+        totalRejected: 0,
+        totalUnreachable: 0,
         approvalRate: rate,
         notes: formNotes
       });
       setIsModalOpen(false);
     } else {
       await addPhoneControlRecord({
-        projectId: formProjectId,
-        projectCode: selectedProj?.code || 'PROJ',
-        projectTitle: selectedProj?.title || '',
+        projectId: 'general_tk',
+        projectCode: 'GÜNLÜK TK',
+        projectTitle: 'Günlük TK',
         controllerName: formControllerName.trim(),
         controlDate: formControlDate,
         dailyWage: Number(formDailyWage),
         totalCalled: called,
         totalApproved: approved,
-        totalRejected: rejected,
-        totalUnreachable: unreachable,
+        totalRejected: 0,
+        totalUnreachable: 0,
         approvalRate: rate,
         notes: formNotes
       });
-
-      if (keepOpenForNextProject) {
-        // Find next project in list if available
-        const currentIdx = projects.findIndex(p => p.id === formProjectId);
-        const nextProj = projects[(currentIdx + 1) % projects.length];
-        if (nextProj && nextProj.id !== formProjectId) {
-          setFormProjectId(nextProj.id);
-        } else {
-          setFormProjectId('');
-        }
-        setFormTotalCalled('60');
-        setFormTotalApproved('54');
-        setFormTotalRejected('3');
-        setFormTotalUnreachable('3');
-        setFormNotes('');
-        alert(`✅ ${formControllerName} için ${selectedProj?.code} projesi kaydı eklendi! Aynı kontrolcü için sonraki projenin sayılarını girebilirsiniz.`);
-      } else {
-        setIsModalOpen(false);
-      }
+      setIsModalOpen(false);
     }
   };
 
@@ -287,52 +258,32 @@ export default function PhoneControlView() {
 
         <div className="p-4 rounded-2xl bg-white border border-gray-200">
           <span className="text-[10px] uppercase font-bold text-gray-500 tracking-wider block">Okey / Onay Alınan</span>
-          <span className="text-xl font-black font-mono text-emerald-400 mt-1 block">
+          <span className="text-xl font-black font-mono text-emerald-600 mt-1 block">
             {totalApprovedDone} <span className="text-xs font-normal text-gray-400">Onay</span>
           </span>
-          <span className="text-[10px] text-emerald-400/80 block mt-0.5">Geçerli teyitli anket</span>
-        </div>
-
-        <div className="p-4 rounded-2xl bg-white border border-gray-200">
-          <span className="text-[10px] uppercase font-bold text-gray-500 tracking-wider block">Red / İptal Anket</span>
-          <span className="text-xl font-black font-mono text-rose-400 mt-1 block">
-            {totalRejectedDone} <span className="text-xs font-normal text-gray-400">İptal</span>
-          </span>
-          <span className="text-[10px] text-rose-400/80 block mt-0.5">Hakedişten düşülecek</span>
+          <span className="text-[10px] text-emerald-600 block mt-0.5">Geçerli teyitli anket</span>
         </div>
 
         <div className="p-4 rounded-2xl bg-white border border-gray-200">
           <span className="text-[10px] uppercase font-bold text-gray-500 tracking-wider block">Genel Onay Başarısı</span>
-          <span className="text-xl font-black font-mono text-sky-400 mt-1 block">
+          <span className="text-xl font-black font-mono text-sky-600 mt-1 block">
             %{overallApprovalRate}
           </span>
-          <span className="text-[10px] text-sky-400/80 block mt-0.5">Teyit Başarı Oranı</span>
+          <span className="text-[10px] text-sky-600 block mt-0.5">Teyit Başarı Oranı</span>
         </div>
 
-        <div className="p-4 rounded-2xl bg-white border border-gray-200 col-span-2 sm:col-span-1">
+        <div className="p-4 rounded-2xl bg-white border border-gray-200">
           <span className="text-[10px] uppercase font-bold text-gray-500 tracking-wider block">Toplam TK Maliyeti</span>
-          <span className="text-xl font-black font-mono text-amber-400 mt-1 block">
+          <span className="text-xl font-black font-mono text-amber-600 mt-1 block">
             ₺{totalTkCost.toLocaleString('tr-TR')}
           </span>
-          <span className="text-[10px] text-amber-400/80 block mt-0.5">TK günlük yevmiye toplamı</span>
+          <span className="text-[10px] text-amber-600 block mt-0.5">TK günlük yevmiye toplamı</span>
         </div>
       </div>
 
       {/* Filter & Search Bar */}
       <div className="p-4 rounded-2xl bg-white border border-gray-200 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
         <div className="flex flex-wrap items-center gap-2.5">
-          {/* Project Filter */}
-          <select
-            value={selectedProjectId}
-            onChange={(e) => setSelectedProjectId(e.target.value)}
-            className="px-3 py-2 rounded-xl bg-white border border-gray-200 text-xs text-gray-800 font-medium focus:outline-none focus:ring-1 focus:ring-indigo-500"
-          >
-            <option value="all">Tüm Projeler ({projects.length})</option>
-            {projects.map(p => (
-              <option key={p.id} value={p.id}>{p.code} - {p.title || p.clientName}</option>
-            ))}
-          </select>
-
           {/* Controller Filter */}
           <select
             value={selectedController}
@@ -353,65 +304,51 @@ export default function PhoneControlView() {
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Kontrolcü, proje veya not ara..."
-            className="w-full pl-9 pr-3.5 py-2 rounded-xl bg-white border border-gray-200 text-xs text-gray-900 placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+            placeholder="Kontrolcü veya not ara..."
+            className="w-full pl-9 pr-3.5 py-2 rounded-xl bg-white border border-gray-200 text-xs text-gray-900 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-indigo-500"
           />
         </div>
       </div>
 
       {/* Table of TK Records */}
-      <div className="rounded-2xl bg-white border border-gray-200 overflow-hidden shadow-xl">
+      <div className="rounded-2xl bg-white border border-gray-200 overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs text-gray-700">
-            <thead className="bg-white text-gray-500 uppercase tracking-wider text-[10px] border-b border-gray-200">
+            <thead className="bg-gray-50 text-gray-500 uppercase tracking-wider text-[10px] border-b border-gray-200">
               <tr>
-                <th className="py-3 px-4">Tarih</th>
-                <th className="py-3 px-4">Proje</th>
+                <th className="py-3 px-4">Kontrol Tarihi</th>
                 <th className="py-3 px-4">TK Kontrolcüsü</th>
-                <th className="py-3 px-4 text-right text-amber-400">TK Günlük Ücreti</th>
-                <th className="py-3 px-4 text-center">Aranan</th>
-                <th className="py-3 px-4 text-center text-emerald-400 font-bold">Okey (Onay)</th>
-                <th className="py-3 px-4 text-center text-rose-400">Red / İptal</th>
-                <th className="py-3 px-4 text-center text-gray-400">Ulaşılamadı</th>
+                <th className="py-3 px-4 text-right text-amber-600">TK Günlük Ücreti</th>
+                <th className="py-3 px-4 text-center">Aranan Adet</th>
+                <th className="py-3 px-4 text-center text-emerald-600 font-bold">Okey (Onay)</th>
                 <th className="py-3 px-4 text-center">Onay Başarısı</th>
-                <th className="py-3 px-4">Açıklama / Not</th>
+                <th className="py-3 px-4">Kontrol Notu</th>
                 <th className="py-3 px-4 text-center">İşlemler</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200/80 font-medium">
+            <tbody className="divide-y divide-gray-200 font-medium">
               {filteredRecords.length === 0 ? (
                 <tr>
-                  <td colSpan={11} className="py-12 text-center text-gray-400">
-                    <PhoneCall className="w-8 h-8 text-gray-500 mx-auto mb-2" />
-                    Henüz kayıtlı telefon kontrol (TK) verisi bulunamadı.
+                  <td colSpan={8} className="py-12 text-center text-gray-400">
+                    <PhoneCall className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                    Henüz kayıtlı günlük telefon kontrol (TK) verisi bulunamadı.
                   </td>
                 </tr>
               ) : (
                 filteredRecords.map((rec) => (
-                  <tr key={rec.id} className="hover:bg-gray-100 transition-colors">
-                    <td className="py-3.5 px-4 font-mono text-gray-500 whitespace-nowrap">
+                  <tr key={rec.id} className="hover:bg-gray-50 transition-colors">
+                    <td className="py-3.5 px-4 font-mono text-gray-700 whitespace-nowrap">
                       {rec.controlDate}
                     </td>
 
-                    <td className="py-3.5 px-4">
-                      <div className="flex items-center gap-1.5">
-                        <span className="font-mono font-bold text-sky-400 px-1.5 py-0.5 rounded bg-sky-500/10 border border-sky-500/20 text-[11px]">
-                          {rec.projectCode}
-                        </span>
-                        <span className="text-gray-700 truncate max-w-[140px] block" title={rec.projectTitle}>
-                          {rec.projectTitle}
-                        </span>
-                      </div>
-                    </td>
-
                     <td className="py-3.5 px-4 font-bold text-gray-900 whitespace-nowrap flex items-center gap-1.5">
-                      <div className="w-6 h-6 rounded-lg bg-indigo-500/15 border border-indigo-500/30 flex items-center justify-center text-indigo-400 text-[11px]">
+                      <div className="w-6 h-6 rounded-lg bg-indigo-100 border border-indigo-200 flex items-center justify-center text-indigo-700 text-[11px] font-bold">
                         TK
                       </div>
                       <span>{rec.controllerName}</span>
                     </td>
 
-                    <td className="py-3.5 px-4 text-right font-mono font-bold text-amber-400 whitespace-nowrap">
+                    <td className="py-3.5 px-4 text-right font-mono font-bold text-amber-600 whitespace-nowrap">
                       ₺{Number(rec.dailyWage || 0).toLocaleString('tr-TR')}
                     </td>
 
@@ -419,23 +356,15 @@ export default function PhoneControlView() {
                       {rec.totalCalled}
                     </td>
 
-                    <td className="py-3.5 px-4 text-center font-mono font-black text-emerald-400 bg-emerald-500/5">
+                    <td className="py-3.5 px-4 text-center font-mono font-black text-emerald-600 bg-emerald-50">
                       {rec.totalApproved}
-                    </td>
-
-                    <td className="py-3.5 px-4 text-center font-mono font-bold text-rose-400">
-                      {rec.totalRejected}
-                    </td>
-
-                    <td className="py-3.5 px-4 text-center font-mono text-gray-400">
-                      {rec.totalUnreachable || 0}
                     </td>
 
                     <td className="py-3.5 px-4 text-center whitespace-nowrap">
                       {getApprovalRateBadge(rec.approvalRate)}
                     </td>
 
-                    <td className="py-3.5 px-4 text-gray-700 text-xs max-w-[200px] truncate" title={rec.notes}>
+                    <td className="py-3.5 px-4 text-gray-600 text-xs max-w-[200px] truncate" title={rec.notes}>
                       {rec.notes || '-'}
                     </td>
 
@@ -446,7 +375,7 @@ export default function PhoneControlView() {
                           className="p-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 hover:text-gray-900 transition-colors cursor-pointer"
                           title="Düzenle"
                         >
-                          <Edit3 className="w-3.5 h-3.5 text-sky-400" />
+                          <Edit3 className="w-3.5 h-3.5 text-sky-600" />
                         </button>
                         <button
                           onClick={() => {
@@ -454,7 +383,7 @@ export default function PhoneControlView() {
                               deletePhoneControlRecord(rec.id);
                             }
                           }}
-                          className="p-1.5 rounded-lg bg-gray-100 hover:bg-rose-950/40 text-gray-500 hover:text-rose-400 transition-colors cursor-pointer"
+                          className="p-1.5 rounded-lg bg-gray-100 hover:bg-rose-100 text-gray-500 hover:text-rose-600 transition-colors cursor-pointer"
                           title="Sil"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
@@ -499,37 +428,18 @@ export default function PhoneControlView() {
 
             <form onSubmit={handleSubmit} className="space-y-4">
               
-              {/* Row 1: Proje ve Tarih */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-semibold text-gray-700 mb-1">
-                    İlgili Proje <span className="text-rose-400">*</span>
-                  </label>
-                  <select
-                    value={formProjectId}
-                    onChange={(e) => setFormProjectId(e.target.value)}
-                    required
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-gray-200 text-xs text-gray-900 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-                  >
-                    <option value="">-- Proje Seçin --</option>
-                    {projects.map(p => (
-                      <option key={p.id} value={p.id}>{p.code} - {p.title || p.clientName}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-gray-700 mb-1">
-                    Kontrol Tarihi <span className="text-rose-400">*</span>
-                  </label>
-                  <input
-                    type="date"
-                    required
-                    value={formControlDate}
-                    onChange={(e) => setFormControlDate(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-gray-200 text-xs text-gray-900 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-                  />
-                </div>
+              {/* Row 1: Kontrol Tarihi (Günlük TK) */}
+              <div>
+                <label className="block text-xs font-semibold text-gray-700 mb-1">
+                  Kontrol Tarihi <span className="text-rose-400">*</span>
+                </label>
+                <input
+                  type="date"
+                  required
+                  value={formControlDate}
+                  onChange={(e) => setFormControlDate(e.target.value)}
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-gray-200 text-xs text-gray-900 focus:outline-none focus:ring-1 focus:ring-indigo-500 font-medium"
+                />
               </div>
 
               {/* Row 2: TK Kontrolcü Adı */}
@@ -590,7 +500,7 @@ export default function PhoneControlView() {
               {/* Row 3: TK Günlük Ücreti (Ayarlanabilir) */}
               <div className="p-3.5 rounded-2xl bg-white border border-gray-200 space-y-2.5">
                 <div className="flex items-center justify-between">
-                  <label className="text-xs font-semibold text-amber-400">
+                  <label className="text-xs font-semibold text-amber-500">
                     TK'cı Günlük Sabit Ücreti (TL) <span className="text-rose-400">*</span>
                   </label>
                   <span className="text-[10px] text-gray-500">Kimine 1000, kimine 1500 seçilebilir</span>
@@ -605,7 +515,7 @@ export default function PhoneControlView() {
                       onClick={() => setFormDailyWage(preset)}
                       className={`px-3 py-1 rounded-xl text-xs font-bold transition-all cursor-pointer font-mono ${
                         formDailyWage === preset
-                          ? 'bg-amber-500 text-gray-500 shadow-md'
+                          ? 'bg-amber-500 text-gray-900 shadow-md'
                           : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
                       }`}
                     >
@@ -615,7 +525,7 @@ export default function PhoneControlView() {
                 </div>
 
                 <div className="relative">
-                  <span className="absolute left-3 top-2.5 text-amber-400 font-bold text-xs">₺</span>
+                  <span className="absolute left-3 top-2.5 text-amber-500 font-bold text-xs">₺</span>
                   <input
                     type="number"
                     required
@@ -623,30 +533,31 @@ export default function PhoneControlView() {
                     step="50"
                     value={formDailyWage}
                     onChange={(e) => setFormDailyWage(Number(e.target.value))}
-                    className="w-full pl-8 pr-3 py-2 rounded-xl bg-white border border-gray-200 text-sm font-mono font-bold text-amber-400 focus:outline-none focus:ring-1 focus:ring-amber-500"
+                    className="w-full pl-8 pr-3 py-2 rounded-xl bg-white border border-gray-200 text-sm font-mono font-bold text-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
                   />
                 </div>
               </div>
 
-              {/* Row 4: Arama İstatistikleri (Aranan, Okey, Red, Ulaşılamayan) */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-                <div className="p-3 rounded-xl bg-white border border-gray-200">
-                  <label className="block text-[10px] uppercase font-bold text-gray-500 mb-1">
-                    Aranan Adet <span className="text-rose-400">*</span>
+              {/* Row 4: Arama İstatistikleri (Sadece Aranan ve Okey Onay) */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="p-3.5 rounded-xl bg-gray-50 border border-gray-200">
+                  <label className="block text-[11px] uppercase font-bold text-gray-600 mb-1">
+                    ARANAN ADET <span className="text-rose-400">*</span>
                   </label>
                   <input
                     type="number"
                     required
-                    min="0"
+                    min="1"
                     value={formTotalCalled}
                     onChange={(e) => setFormTotalCalled(e.target.value)}
-                    className="w-full px-2.5 py-1.5 rounded-lg bg-white border border-gray-200 text-sm font-mono font-black text-gray-900 focus:outline-none focus:ring-1 focus:ring-indigo-500 text-center"
+                    placeholder="80"
+                    className="w-full px-3 py-2 rounded-lg bg-white border border-gray-300 text-base font-mono font-black text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-center"
                   />
                 </div>
 
-                <div className="p-3 rounded-xl bg-emerald-950/20 border border-emerald-800/40">
-                  <label className="block text-[10px] uppercase font-bold text-emerald-400 mb-1">
-                    Okey (Onay) <span className="text-rose-400">*</span>
+                <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200">
+                  <label className="block text-[11px] uppercase font-bold text-emerald-700 mb-1">
+                    OKEY (ONAY) <span className="text-rose-400">*</span>
                   </label>
                   <input
                     type="number"
@@ -654,45 +565,20 @@ export default function PhoneControlView() {
                     min="0"
                     value={formTotalApproved}
                     onChange={(e) => setFormTotalApproved(e.target.value)}
-                    className="w-full px-2.5 py-1.5 rounded-lg bg-white border border-emerald-600/50 text-sm font-mono font-black text-emerald-400 focus:outline-none focus:ring-1 focus:ring-emerald-500 text-center"
-                  />
-                </div>
-
-                <div className="p-3 rounded-xl bg-rose-950/20 border border-rose-800/40">
-                  <label className="block text-[10px] uppercase font-bold text-rose-400 mb-1">
-                    Red / İptal
-                  </label>
-                  <input
-                    type="number"
-                    min="0"
-                    value={formTotalRejected}
-                    onChange={(e) => setFormTotalRejected(e.target.value)}
-                    className="w-full px-2.5 py-1.5 rounded-lg bg-white border border-rose-600/50 text-sm font-mono font-black text-rose-400 focus:outline-none focus:ring-1 focus:ring-rose-500 text-center"
-                  />
-                </div>
-
-                <div className="p-3 rounded-xl bg-white border border-gray-200">
-                  <label className="block text-[10px] uppercase font-bold text-gray-400 mb-1">
-                    Cevapsız
-                  </label>
-                  <input
-                    type="number"
-                    min="0"
-                    value={formTotalUnreachable}
-                    onChange={(e) => setFormTotalUnreachable(e.target.value)}
-                    className="w-full px-2.5 py-1.5 rounded-lg bg-white border border-gray-200 text-sm font-mono font-black text-gray-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 text-center"
+                    placeholder="72"
+                    className="w-full px-3 py-2 rounded-lg bg-white border border-emerald-400 text-base font-mono font-black text-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-center"
                   />
                 </div>
               </div>
 
               {/* Live Quality Preview Ribbon */}
               {Number(formTotalCalled) > 0 && (
-                <div className="p-3 rounded-xl bg-white border border-gray-200 border border-gray-200 flex items-center justify-between text-xs">
-                  <span className="text-gray-500">
+                <div className="p-3 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-between text-xs">
+                  <span className="text-gray-600 font-medium">
                     Hesaplanan Başarı Oranı:
                   </span>
                   <div className="flex items-center gap-2">
-                    <span className="font-mono text-xs text-gray-700">
+                    <span className="font-mono text-xs font-bold text-gray-800">
                       {formTotalApproved} / {formTotalCalled}
                     </span>
                     {getApprovalRateBadge(Math.round((Number(formTotalApproved || 0) / Number(formTotalCalled || 1)) * 100))}
@@ -709,13 +595,13 @@ export default function PhoneControlView() {
                   rows={2}
                   value={formNotes}
                   onChange={(e) => setFormNotes(e.target.value)}
-                  placeholder="Örn: 3 nolu anketörün anketlerinde tutarsızlık var, sorular eksik sorulmuş..."
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-gray-200 text-xs text-gray-900 placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  placeholder="Örn: Sorular tam ve eksiksiz sorulmuş..."
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-gray-200 text-xs text-gray-900 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-indigo-500"
                 />
               </div>
 
               {/* Submit Buttons */}
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-2 pt-2 border-t border-gray-200">
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-gray-200">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
@@ -724,21 +610,9 @@ export default function PhoneControlView() {
                   Vazgeç
                 </button>
 
-                {!editingRecordId && (
-                  <button
-                    type="button"
-                    onClick={(e) => handleSubmit(e, true)}
-                    title="Bu projeyi kaydeder ve aynı kontrolcü ile hemen bir sonraki projeyi girmeniz için açık tutar"
-                    className="px-4 py-2.5 rounded-xl bg-indigo-950/80 hover:bg-indigo-900 text-indigo-300 text-xs font-bold border border-indigo-700/60 transition-all cursor-pointer flex items-center justify-center gap-1.5"
-                  >
-                    <Plus className="w-3.5 h-3.5" />
-                    <span>Kaydet & Başka Proje Ekle</span>
-                  </button>
-                )}
-
                 <button
                   type="submit"
-                  className="px-6 py-2.5 rounded-xl bg-indigo-500 hover:bg-indigo-400 text-gray-900 text-xs font-bold shadow-lg shadow-indigo-500/20 transition-all cursor-pointer"
+                  className="px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-md hover:shadow-lg transition-all cursor-pointer"
                 >
                   {editingRecordId ? 'TK Kaydını Güncelle' : 'TK Arama Kaydını Kaydet'}
                 </button>
