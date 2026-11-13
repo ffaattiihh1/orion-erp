@@ -1,79 +1,114 @@
 import { NextResponse } from 'next/server';
-import { neon } from '@neondatabase/serverless';
+import { getDb, getSessionUser, isSameOriginJson } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
-function getDb() {
-  const url = process.env.DATABASE_URL;
-  if (!url) throw new Error('DATABASE_URL is not set');
-  return neon(url);
-}
-
+// Kullanıcılar artık ayrı `app_users` tablosunda; burada asla okunmaz/yazılmaz.
 const COLLECTIONS = [
   'projects', 'personnel', 'projectPersonnel', 'expenses',
   'advances', 'settlements', 'clientInvoices', 'dailyReports',
-  'phoneControlRecords', 'users', 'deleted_ids'
+  'phoneControlRecords', 'deleted_ids'
 ];
+
+// Yalnızca yöneticilerin görebileceği/değiştirebileceği koleksiyonlar
+const ADMIN_ONLY = new Set(['clientInvoices']);
+
+function allowedCollections(role: string): string[] {
+  return role === 'admin' ? COLLECTIONS : COLLECTIONS.filter(k => !ADMIN_ONLY.has(k));
+}
 
 export async function GET() {
   try {
+    const user = await getSessionUser();
+    if (!user) {
+      return NextResponse.json({ success: false, error: 'Oturum gerekli' }, { status: 401 });
+    }
+
     const sql = getDb();
-    
-    // Fetch all collection keys in one query
+    const keys = allowedCollections(user.role);
     const rows = await sql`
-      SELECT key, value FROM app_data 
-      WHERE key = ANY(${COLLECTIONS})
+      SELECT key, value FROM app_data
+      WHERE key = ANY(${keys})
     `;
 
     const db: Record<string, unknown> = {
       lastUpdated: new Date().toISOString(),
       version: 1,
     };
-
-    // Defaults
-    COLLECTIONS.forEach(k => { db[k] = []; });
-
+    keys.forEach(k => { db[k] = []; });
     rows.forEach((row: Record<string, unknown>) => {
       db[row.key as string] = row.value;
     });
 
     return NextResponse.json({ success: true, data: db });
   } catch (error: unknown) {
-    const msg = error instanceof Error ? error.message : 'Failed to read database';
-    console.error('GET /api/data error:', msg);
-    return NextResponse.json({ success: false, error: msg }, { status: 500 });
+    console.error('GET /api/data error:', error instanceof Error ? error.message : error);
+    return NextResponse.json({ success: false, error: 'Veri okunamadı' }, { status: 500 });
   }
 }
 
 export async function POST(req: Request) {
+  if (!isSameOriginJson(req)) {
+    return NextResponse.json({ success: false, error: 'Geçersiz istek' }, { status: 403 });
+  }
   try {
+    const user = await getSessionUser();
+    if (!user) {
+      return NextResponse.json({ success: false, error: 'Oturum gerekli' }, { status: 401 });
+    }
+
     const body = await req.json();
-    const sql = getDb();
-
-    // Upsert each collection that was provided in the payload
-    const updates = COLLECTIONS.filter(k => body[k] !== undefined);
-    
-    if (updates.length === 0) {
-      return NextResponse.json({ success: true, data: body });
+    if (!body || typeof body !== 'object' || Array.isArray(body)) {
+      return NextResponse.json({ success: false, error: 'Geçersiz veri' }, { status: 400 });
     }
 
-    // Upsert all provided collections
+    // Rolün yazamayacağı koleksiyonlar sessizce yok sayılır
+    const updates = allowedCollections(user.role).filter(k => body[k] !== undefined);
+
     for (const key of updates) {
-      await sql`
-        INSERT INTO app_data (key, value, updated_at)
-        VALUES (${key}, ${JSON.stringify(body[key])}::jsonb, NOW())
-        ON CONFLICT (key) DO UPDATE 
-        SET value = EXCLUDED.value, updated_at = NOW()
-      `;
+      if (!Array.isArray(body[key])) {
+        return NextResponse.json({ success: false, error: `${key} bir liste olmalı` }, { status: 400 });
+      }
     }
 
-    return NextResponse.json({ 
-      success: true, 
-      data: { ...body, lastUpdated: new Date().toISOString() } 
+    // Veri kaybı koruması: 2+ kayıt içeren bir koleksiyon tek seferde boş listeyle
+    // değiştirilemez (arayüz kayıtları tek tek siler; toplu boşaltma hata belirtisidir).
+    const emptyKeys = updates.filter(k => (body[k] as unknown[]).length === 0);
+    const protectedKeys = new Set<string>();
+    if (emptyKeys.length > 0) {
+      const sql = getDb();
+      const rows = (await sql`
+        SELECT key, jsonb_array_length(value) AS n FROM app_data
+        WHERE key = ANY(${emptyKeys}) AND jsonb_typeof(value) = 'array'
+      `) as { key: string; n: number }[];
+      rows.forEach(r => { if (Number(r.n) >= 2) protectedKeys.add(r.key); });
+    }
+
+    for (const key of updates) {
+      if (protectedKeys.has(key)) {
+        console.warn(`POST /api/data: ${key} boş listeyle silinmek istendi, engellendi (kullanıcı: ${user.id})`);
+        continue;
+      }
+      await upsertCollection(key, body[key]);
+    }
+
+    return NextResponse.json({
+      success: true,
+      lastUpdated: new Date().toISOString(),
+      ...(protectedKeys.size > 0 ? { skipped: Array.from(protectedKeys) } : {}),
     });
   } catch (error: unknown) {
-    const msg = error instanceof Error ? error.message : 'Failed to write database';
-    console.error('POST /api/data error:', msg);
-    return NextResponse.json({ success: false, error: msg }, { status: 500 });
+    console.error('POST /api/data error:', error instanceof Error ? error.message : error);
+    return NextResponse.json({ success: false, error: 'Veri kaydedilemedi' }, { status: 500 });
   }
+}
+
+async function upsertCollection(key: string, value: unknown) {
+  const sql = getDb();
+  await sql`
+    INSERT INTO app_data (key, value, updated_at)
+    VALUES (${key}, ${JSON.stringify(value)}::jsonb, NOW())
+    ON CONFLICT (key) DO UPDATE
+    SET value = EXCLUDED.value, updated_at = NOW()
+  `;
 }

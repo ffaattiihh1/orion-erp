@@ -15,9 +15,8 @@ import {
   DailyFieldReport,
   PhoneControlRecord
 } from '@/types';
-import { 
-  INITIAL_USERS, 
-  INITIAL_PERSONNEL, 
+import {
+  INITIAL_PERSONNEL,
   INITIAL_PROJECTS, 
   INITIAL_PROJECT_PERSONNEL, 
   INITIAL_EXPENSES, 
@@ -82,12 +81,11 @@ export const calculateNameSimilarity = (name1?: string, name2?: string): boolean
 
 interface AppContextType {
   currentUser: UserProfile | null;
-  setCurrentUser: (user: UserProfile | null) => void;
-  users: UserProfile[];
-  loginWithCredentials: (userOrEmail: string, password: string) => { success: boolean; error?: string };
-  logout: () => void;
+  isAuthReady: boolean;
+  loginWithCredentials: (userOrEmail: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  logout: () => Promise<void>;
   sendPasswordReset: (emailOrUser: string) => { success: boolean; message: string };
-  changePassword: (newPassword: string, currentPassword?: string) => { success: boolean; message: string };
+  changePassword: (newPassword: string, currentPassword?: string, targetUserId?: string) => Promise<{ success: boolean; message: string }>;
   
   isOnline: boolean;
   offlineQueueCount: number;
@@ -173,8 +171,9 @@ interface AppContextType {
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
-  const [users] = useState<UserProfile[]>(INITIAL_USERS);
-  const [currentUser, setCurrentUserState] = useState<UserProfile | null>(null); // Start with null for login wall
+  // Oturum sunucuda (httpOnly çerez) tutulur; burada yalnızca profil bilgisi var
+  const [currentUser, setCurrentUserState] = useState<UserProfile | null>(null);
+  const [isAuthReady, setIsAuthReady] = useState<boolean>(false);
   
   // Online / Offline tracking
   const [isOnline, setIsOnline] = useState<boolean>(true);
@@ -242,6 +241,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       });
       if (res.ok) {
         setLastSyncedAt(new Date().toLocaleTimeString('tr-TR'));
+      } else if (res.status === 401) {
+        handleSessionExpired();
       }
     } catch { /* offline - localStorage still has the data */ }
   };
@@ -254,6 +255,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
     try {
       const res = await fetch('/api/data', { cache: 'no-store' });
+      if (res.status === 401) { handleSessionExpired(); return; }
       if (!res.ok) return;
       const json = await res.json();
       if (!json.success || !json.data) return;
@@ -344,12 +346,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       }
 
       setLastSyncedAt(new Date().toLocaleTimeString('tr-TR'));
+      // Yalnızca sunucudan veri BAŞARIYLA alındıktan sonra otomatik kayıt açılır.
+      // Böylece eksik/boş yerel önbellek sunucudaki verinin üzerine yazılamaz.
+      isLoadedRef.current = true;
     } catch {
       /* offline or network error - continue using local */
     } finally {
       isSyncingServerRef.current = false;
       setIsSyncing(false);
-      isLoadedRef.current = true;
     }
   };
 
@@ -357,19 +361,40 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     await loadFromServer();
   };
 
-  // On mount: restore from localStorage immediately, then load latest from Neon
+  const clearAdminOnlyCache = () => {
+    setClientInvoices([]);
+    if (typeof window !== 'undefined') {
+      try { localStorage.removeItem('orion_client_invoices'); } catch {}
+    }
+  };
+
+  // Sunucu oturumu düştüğünde (401) kullanıcıyı giriş ekranına döndür
+  const handleSessionExpired = () => {
+    isLoadedRef.current = false;
+    setCurrentUserState(null);
+  };
+
+  // On mount: sunucudaki oturumu kontrol et (eski localStorage oturumu artık geçersiz)
   useEffect(() => {
     if (typeof window === 'undefined') return;
+    try { localStorage.removeItem('orion_persistent_user'); } catch {}
 
-    // Auto-login
-    try {
-      const savedUserJson = localStorage.getItem('orion_persistent_user');
-      if (savedUserJson) {
-        const parsed = JSON.parse(savedUserJson);
-        const matched = users.find(u => u.id === parsed.id || u.username === parsed.username || u.email === parsed.email);
-        if (matched) setCurrentUserState(matched);
-      }
-    } catch {}
+    let cancelled = false;
+    fetch('/api/auth/me', { cache: 'no-store' })
+      .then(res => (res.ok ? res.json() : null))
+      .then(json => {
+        if (!cancelled && json?.success && json.user) {
+          setCurrentUserState(json.user as UserProfile);
+        }
+      })
+      .catch(() => { /* offline: giriş ekranı gösterilir */ })
+      .finally(() => { if (!cancelled) setIsAuthReady(true); });
+    return () => { cancelled = true; };
+  }, []);
+
+  // Oturum açıkken Neon'dan veriyi çek ve periyodik olarak güncelle
+  useEffect(() => {
+    if (typeof window === 'undefined' || !currentUser) return;
 
     loadFromServer();
 
@@ -378,7 +403,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const onFocus = () => loadFromServer();
     window.addEventListener('focus', onFocus);
     return () => { clearInterval(interval); window.removeEventListener('focus', onFocus); };
-  }, [users]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentUser?.id]);
 
   // Save to localStorage on every state change (fast cache)
   useEffect(() => { saveLocal('orion_projects', projects); }, [projects]);
@@ -393,100 +419,83 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   // Debounced auto-sync to Neon whenever state changes
   useEffect(() => {
-    if (!isLoadedRef.current) return;
+    if (!isLoadedRef.current || !currentUser) return;
     const timer = setTimeout(() => {
-      pushToServer({
+      const payload: Record<string, unknown> = {
         projects,
         personnel,
         projectPersonnel,
         expenses,
         advances,
         settlements,
-        clientInvoices,
         dailyReports,
         phoneControlRecords,
-      });
+      };
+      // Faturalar yalnızca yöneticiye ait; diğer roller hiç göndermez
+      if (currentUser.role === 'admin') payload.clientInvoices = clientInvoices;
+      pushToServer(payload);
     }, 1200);
     return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [projects, personnel, projectPersonnel, expenses, advances, settlements, clientInvoices, dailyReports, phoneControlRecords]);
 
-  const setCurrentUser = (user: UserProfile | null) => {
-    setCurrentUserState(user);
-    if (typeof window !== 'undefined') {
-      if (user) {
-        localStorage.setItem('orion_persistent_user', JSON.stringify(user));
-      } else {
-        localStorage.removeItem('orion_persistent_user');
+  const loginWithCredentials = async (userOrEmail: string, pass: string): Promise<{ success: boolean; error?: string }> => {
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: userOrEmail.trim(), password: pass }),
+      });
+      const json = await res.json().catch(() => null);
+      if (!res.ok || !json?.success || !json.user) {
+        return { success: false, error: json?.error || 'Giriş yapılamadı.' };
       }
+      const user = json.user as UserProfile;
+      if (user.role !== 'admin') clearAdminOnlyCache();
+      setCurrentUserState(user);
+      return { success: true };
+    } catch {
+      return { success: false, error: 'Sunucuya ulaşılamadı. İnternet bağlantınızı kontrol edin.' };
     }
   };
 
-  const loginWithCredentials = (userOrEmail: string, pass: string): { success: boolean; error?: string } => {
-    const cleanInput = userOrEmail.trim().toLowerCase();
-    const matched = users.find(u => 
-      u.username.toLowerCase() === cleanInput || 
-      u.email.toLowerCase() === cleanInput
-    );
-
-    if (!matched) {
-      return { 
-        success: false, 
-        error: 'Kullanıcı kodu veya e-posta adresi bulunamadı. Lütfen merkez yönetimiyle iletişime geçin.' 
-      };
-    }
-
-    if (matched.password && matched.password !== pass && pass !== '123' && pass !== '123456') {
-      return { 
-        success: false, 
-        error: 'Girilen şifre hatalı. Şifrenizi unuttuysanız aşağıdaki bağlantıdan talep edebilirsiniz.' 
-      };
-    }
-
-    setCurrentUser(matched);
-    return { success: true };
+  const logout = async () => {
+    isLoadedRef.current = false;
+    try { await fetch('/api/auth/logout', { method: 'POST' }); } catch {}
+    clearAdminOnlyCache();
+    setCurrentUserState(null);
   };
 
-  const logout = () => {
-    setCurrentUser(null);
-  };
-
-  const sendPasswordReset = (emailOrUser: string): { success: boolean; message: string } => {
-    const clean = emailOrUser.trim().toLowerCase();
-    const matched = users.find(u => u.username.toLowerCase() === clean || u.email.toLowerCase() === clean);
-    
-    if (matched) {
-      return {
-        success: true,
-        message: `Şifre sıfırlama bağlantısı ${matched.email} kurumsal adresine gönderildi. Lütfen gelen kutunuzu kontrol edin.`
-      };
-    }
+  const sendPasswordReset = (): { success: boolean; message: string } => {
     return {
-      success: false,
-      message: 'Belirtilen kullanıcı kodu veya e-posta adresi sistemde kayıtlı değil.'
+      success: true,
+      message: 'Şifrenizi yöneticiniz (Müdür) sıfırlayabilir. Lütfen yöneticinize başvurun; yeni şifrenizi size iletecektir.'
     };
   };
 
-  const changePassword = (newPassword: string, currentPassword?: string): { success: boolean; message: string } => {
+  const changePassword = async (
+    newPassword: string,
+    currentPassword?: string,
+    targetUserId?: string
+  ): Promise<{ success: boolean; message: string }> => {
     if (!currentUser) {
       return { success: false, message: 'Oturum açmış kullanıcı bulunamadı.' };
     }
-
-    if (currentPassword && currentUser.password && currentUser.password !== currentPassword && currentPassword !== '123') {
-      return { success: false, message: 'Mevcut şifreniz hatalı.' };
+    try {
+      const res = await fetch('/api/auth/password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ newPassword, currentPassword, userId: targetUserId }),
+      });
+      const json = await res.json().catch(() => null);
+      if (res.status === 401) handleSessionExpired();
+      return {
+        success: Boolean(res.ok && json?.success),
+        message: json?.message || (res.ok ? 'Şifre güncellendi.' : 'Şifre değiştirilemedi.'),
+      };
+    } catch {
+      return { success: false, message: 'Sunucuya ulaşılamadı.' };
     }
-
-    const updatedUser: UserProfile = {
-      ...currentUser,
-      password: newPassword
-    };
-
-    setCurrentUserState(updatedUser);
-
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('orion_persistent_user', JSON.stringify(updatedUser));
-    }
-
-    return { success: true, message: 'Şifreniz başarıyla değiştirildi.' };
   };
 
   // Monitor network status
@@ -1270,8 +1279,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   return (
     <AppContext.Provider value={{
       currentUser,
-      setCurrentUser,
-      users,
+      isAuthReady,
       loginWithCredentials,
       logout,
       sendPasswordReset,

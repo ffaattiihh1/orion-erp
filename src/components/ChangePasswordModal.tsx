@@ -1,6 +1,9 @@
 ﻿'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import type { UserProfile } from '@/types';
+
+const MIN_LENGTH = 8;
 import { useApp } from '@/context/AppContext';
 import { KeyRound, Lock, CheckCircle2, AlertCircle, X, ShieldCheck } from 'lucide-react';
 
@@ -17,16 +20,32 @@ export default function ChangePasswordModal({ isOpen, onClose }: ChangePasswordM
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  // Yönetici başka bir kullanıcının şifresini sıfırlayabilir ('' = kendi şifrem)
+  const [targetUserId, setTargetUserId] = useState<string>('');
+  const [userList, setUserList] = useState<UserProfile[]>([]);
+
+  const isAdmin = currentUser?.role === 'admin';
+  const isResettingOther = isAdmin && targetUserId !== '' && targetUserId !== currentUser?.id;
+
+  useEffect(() => {
+    if (!isOpen || !isAdmin) return;
+    fetch('/api/auth/users', { cache: 'no-store' })
+      .then(res => (res.ok ? res.json() : null))
+      .then(json => { if (json?.success) setUserList(json.users as UserProfile[]); })
+      .catch(() => {});
+  }, [isOpen, isAdmin]);
 
   if (!isOpen || !currentUser) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return;
     setError(null);
     setSuccess(null);
 
-    if (newPassword.length < 3) {
-      setError('Yeni şifreniz en az 3 karakter olmalıdır.');
+    if (newPassword.length < MIN_LENGTH) {
+      setError(`Yeni şifre en az ${MIN_LENGTH} karakter olmalıdır.`);
       return;
     }
 
@@ -35,16 +54,23 @@ export default function ChangePasswordModal({ isOpen, onClose }: ChangePasswordM
       return;
     }
 
-    const res = changePassword(newPassword, currentPassword);
+    setIsSubmitting(true);
+    const res = await changePassword(
+      newPassword,
+      isResettingOther ? undefined : currentPassword,
+      isResettingOther ? targetUserId : undefined
+    );
+    setIsSubmitting(false);
     if (!res.success) {
       setError(res.message);
     } else {
-      setSuccess('Şifreniz başarıyla güncellendi ve kaydedildi.');
+      setSuccess(res.message);
       setTimeout(() => {
         onClose();
         setCurrentPassword('');
         setNewPassword('');
         setConfirmPassword('');
+        setTargetUserId('');
         setSuccess(null);
       }, 1500);
     }
@@ -90,6 +116,25 @@ export default function ChangePasswordModal({ isOpen, onClose }: ChangePasswordM
             </div>
           )}
 
+          {isAdmin && userList.length > 0 && (
+            <div>
+              <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
+                Kullanıcı
+              </label>
+              <select
+                value={targetUserId}
+                onChange={(e) => setTargetUserId(e.target.value)}
+                className="w-full px-3 py-2.5 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 focus:outline-none focus:ring-2 focus:ring-sky-500 text-xs"
+              >
+                <option value="">Kendi şifrem</option>
+                {userList.filter(u => u.id !== currentUser.id).map(u => (
+                  <option key={u.id} value={u.id}>{u.fullName} ({u.role === 'admin' ? 'Müdür' : 'SPV'}) — şifresini sıfırla</option>
+                ))}
+              </select>
+            </div>
+          )}
+
+          {!isResettingOther && (
           <div>
             <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
               Mevcut Şifre
@@ -106,6 +151,7 @@ export default function ChangePasswordModal({ isOpen, onClose }: ChangePasswordM
               <Lock className="w-4 h-4 text-gray-400 absolute left-3.5 top-3" />
             </div>
           </div>
+          )}
 
           <div>
             <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
@@ -117,7 +163,7 @@ export default function ChangePasswordModal({ isOpen, onClose }: ChangePasswordM
                 required
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                placeholder="En az 3 karakter yeni şifre"
+                placeholder={`En az ${MIN_LENGTH} karakter`}
                 className="w-full px-4 py-2.5 pl-10 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-500 text-xs font-mono"
               />
               <KeyRound className="w-4 h-4 text-gray-400 absolute left-3.5 top-3" />
@@ -144,10 +190,11 @@ export default function ChangePasswordModal({ isOpen, onClose }: ChangePasswordM
           <div className="pt-2">
             <button
               type="submit"
-              className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-gray-900 font-bold text-xs shadow-lg shadow-sky-500/20 transition-all cursor-pointer flex items-center justify-center gap-2"
+              disabled={isSubmitting}
+              className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 disabled:opacity-60 text-white font-bold text-xs shadow-lg shadow-sky-500/20 transition-all cursor-pointer flex items-center justify-center gap-2"
             >
               <CheckCircle2 className="w-4 h-4" />
-              <span>Şifreyi Güncelle & Kaydet</span>
+              <span>{isSubmitting ? 'Kaydediliyor…' : 'Şifreyi Güncelle & Kaydet'}</span>
             </button>
           </div>
         </form>
