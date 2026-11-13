@@ -16,9 +16,18 @@ import PhoneControlView from '@/components/PhoneControlView';
 import FeasibilitySimulatorModal from '@/components/FeasibilitySimulatorModal';
 
 export default function HomePage() {
-  const { currentUser } = useApp();
+  const { currentUser, isAuthReady } = useApp();
   const [activeTab, setActiveTab] = useState<string>('dashboard');
   const [isFeasibilityOpen, setIsFeasibilityOpen] = useState<boolean>(false);
+
+  // Oturum kontrol edilirken giriş ekranı yanıp sönmesin
+  if (!isAuthReady) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="w-8 h-8 rounded-full border-2 border-blue-600 border-t-transparent animate-spin" />
+      </div>
+    );
+  }
 
   // 1. Login Wall (Zero registration, closed circuit)
   if (!currentUser) {

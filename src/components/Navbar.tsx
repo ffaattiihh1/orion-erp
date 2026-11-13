@@ -8,8 +8,6 @@ import {
   Wifi, 
   WifiOff, 
   RefreshCw, 
-  ShieldCheck, 
-  Smartphone, 
   LogOut, 
   Briefcase, 
   Users, 
@@ -35,8 +33,7 @@ interface NavbarProps {
 export default function Navbar({ activeTab, setActiveTab }: NavbarProps) {
   const { 
     currentUser, 
-    setCurrentUser, 
-    users, 
+    logout, 
     isOnline, 
     offlineQueueCount, 
     syncOfflineQueue,
@@ -49,13 +46,6 @@ export default function Navbar({ activeTab, setActiveTab }: NavbarProps) {
   const [isBackupModalOpen, setIsBackupModalOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
-
-  const handleRoleToggle = (targetRole: 'admin' | 'spv') => {
-    const user = users.find(u => u.role === targetRole);
-    if (user) {
-      setCurrentUser(user);
-    }
-  };
 
   const isAdmin = currentUser?.role === 'admin';
 
@@ -160,28 +150,6 @@ export default function Navbar({ activeTab, setActiveTab }: NavbarProps) {
                 )}
               </div>
 
-              {/* Role switcher - desktop only */}
-              <div className="hidden lg:flex items-center rounded-lg border border-gray-200 overflow-hidden text-xs">
-                <button
-                  onClick={() => handleRoleToggle('admin')}
-                  className={`flex items-center gap-1 px-2.5 py-1.5 transition-all cursor-pointer ${
-                    isAdmin ? 'bg-blue-600 text-gray-900 font-semibold' : 'text-gray-500 hover:bg-gray-100'
-                  }`}
-                >
-                  <ShieldCheck className="w-3 h-3" />
-                  <span>Müdür</span>
-                </button>
-                <button
-                  onClick={() => handleRoleToggle('spv')}
-                  className={`flex items-center gap-1 px-2.5 py-1.5 transition-all cursor-pointer ${
-                    !isAdmin ? 'bg-amber-500 text-gray-900 font-semibold' : 'text-gray-500 hover:bg-gray-100'
-                  }`}
-                >
-                  <Smartphone className="w-3 h-3" />
-                  <span>SPV</span>
-                </button>
-              </div>
-
               {/* User menu button */}
               <div className="relative">
                 <button
@@ -219,7 +187,7 @@ export default function Navbar({ activeTab, setActiveTab }: NavbarProps) {
                       </button>
                       <div className="border-t border-gray-100">
                         <button
-                          onClick={() => setCurrentUser(null)}
+                          onClick={() => { setIsUserMenuOpen(false); logout(); }}
                           className="w-full flex items-center gap-2 px-3 py-2 text-xs text-red-500 hover:bg-red-50 transition-colors cursor-pointer"
                         >
                           <LogOut className="w-3.5 h-3.5" />
@@ -340,27 +308,9 @@ export default function Navbar({ activeTab, setActiveTab }: NavbarProps) {
               })}
             </div>
 
-            <div className="grid grid-cols-3 gap-2 pt-1 border-t border-gray-100">
+            <div className="grid grid-cols-1 gap-2 pt-1 border-t border-gray-100">
               <button
-                onClick={() => { setIsMobileMenuOpen(false); handleRoleToggle('admin'); }}
-                className={`flex items-center justify-center gap-1 py-2.5 rounded-xl text-xs font-semibold border cursor-pointer ${
-                  isAdmin ? 'bg-blue-600 text-gray-900 border-blue-600' : 'bg-gray-50 border-gray-200 text-gray-500'
-                }`}
-              >
-                <ShieldCheck className="w-3.5 h-3.5" />
-                Müdür
-              </button>
-              <button
-                onClick={() => { setIsMobileMenuOpen(false); handleRoleToggle('spv'); }}
-                className={`flex items-center justify-center gap-1 py-2.5 rounded-xl text-xs font-semibold border cursor-pointer ${
-                  !isAdmin ? 'bg-amber-500 text-gray-900 border-amber-500' : 'bg-gray-50 border-gray-200 text-gray-500'
-                }`}
-              >
-                <Smartphone className="w-3.5 h-3.5" />
-                SPV
-              </button>
-              <button
-                onClick={() => { setIsMobileMenuOpen(false); setCurrentUser(null); }}
+                onClick={() => { setIsMobileMenuOpen(false); logout(); }}
                 className="flex items-center justify-center gap-1 py-2.5 rounded-xl text-xs font-semibold border bg-red-50 border-red-200 text-red-500 cursor-pointer"
               >
                 <LogOut className="w-3.5 h-3.5" />

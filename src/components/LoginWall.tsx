@@ -11,16 +11,20 @@ export default function LoginWall() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   const [isForgotModalOpen, setIsForgotModalOpen] = useState(false);
   const [forgotInput, setForgotInput] = useState('');
   const [forgotSuccess, setForgotSuccess] = useState<string | null>(null);
   const [forgotError, setForgotError] = useState<string | null>(null);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return;
     setError('');
-    const res = loginWithCredentials(usernameOrEmail, password);
+    setIsSubmitting(true);
+    const res = await loginWithCredentials(usernameOrEmail, password);
+    setIsSubmitting(false);
     if (!res.success) {
       setError(res.error || 'Kullanıcı adı veya şifre hatalı.');
     }
@@ -108,9 +112,10 @@ export default function LoginWall() {
 
           <button
             type="submit"
-            className="w-full py-3 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-gray-900 font-bold text-sm shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer"
+            disabled={isSubmitting}
+            className="w-full py-3 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white font-bold text-sm shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer"
           >
-            <span>Giriş Yap</span>
+            <span>{isSubmitting ? 'Giriş yapılıyor…' : 'Giriş Yap'}</span>
             <ArrowRight className="w-4 h-4" />
           </button>
         </form>
@@ -136,7 +141,7 @@ export default function LoginWall() {
 
             <form onSubmit={handleForgotPasswordSubmit} className="space-y-4">
               <p className="text-sm text-gray-600">
-                Kullanıcı adınızı veya e-postanızı girin, şifre sıfırlama bağlantısı gönderilecek.
+                Kullanıcı adınızı girin; şifre sıfırlama işlemini yöneticiniz yapar.
               </p>
 
               <div className="relative">
@@ -162,7 +167,7 @@ export default function LoginWall() {
                 type="submit"
                 className="w-full py-2.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-gray-900 font-bold text-sm transition-all cursor-pointer"
               >
-                Bağlantı Gönder
+                Devam
               </button>
             </form>
           </div>
