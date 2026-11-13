@@ -13,7 +13,6 @@ import {
   Receipt, 
   Plus, 
   ChevronRight,
-  TrendingUp
 } from 'lucide-react';
 
 interface DashboardViewProps {
@@ -38,10 +37,7 @@ export default function DashboardView({ onNavigate, onOpenFeasibility }: Dashboa
 
   const activeProjects = projects.filter(p => !p.isArchived && p.status === 'active');
   const completedProjects = projects.filter(p => p.status === 'completed');
-  const totalTargetSurveys = projects.filter(p => !p.isArchived).reduce((sum, p) => sum + (p.targetSurveys || 0), 0);
-  const totalCompletedSurveys = projects.filter(p => !p.isArchived).reduce((sum, p) => sum + (p.completedSurveys || 0), 0);
   const totalBudget = activeProjects.reduce((sum, p) => sum + (p.clientTotalBudget || 0), 0);
-  const surveyProgress = totalTargetSurveys > 0 ? Math.round((totalCompletedSurveys / totalTargetSurveys) * 100) : 0;
 
   const todayFieldReports = dailyReports.filter(r => r.reportDate === todayStr);
   const totalFieldWorkersToday = todayFieldReports.reduce((sum, r) => sum + (r.workers?.length || 0), 0);
@@ -100,7 +96,7 @@ export default function DashboardView({ onNavigate, onOpenFeasibility }: Dashboa
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
         
         <div
           onClick={() => onNavigate('projects')}
@@ -114,26 +110,6 @@ export default function DashboardView({ onNavigate, onOpenFeasibility }: Dashboa
           </div>
           <div className="text-3xl font-black text-gray-900">{activeProjects.length}</div>
           <p className="text-xs text-gray-500 mt-1">{completedProjects.length} proje tamamlandı</p>
-        </div>
-
-        <div
-          onClick={() => onNavigate('projects')}
-          className="bg-white rounded-2xl border border-gray-200 p-4 hover:border-blue-300 hover:shadow-md transition-all cursor-pointer"
-        >
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-semibold text-gray-500">Saha İlerlemesi</span>
-            <div className="p-2 rounded-xl bg-indigo-50 text-indigo-600">
-              <TrendingUp className="w-4 h-4" />
-            </div>
-          </div>
-          <div className="text-3xl font-black text-gray-900">%{surveyProgress}</div>
-          <div className="w-full bg-gray-100 h-1.5 rounded-full overflow-hidden mt-2">
-            <div
-              className="bg-blue-500 h-full rounded-full transition-all"
-              style={{ width: `${Math.min(surveyProgress, 100)}%` }}
-            />
-          </div>
-          <p className="text-xs text-gray-500 mt-1">{totalCompletedSurveys.toLocaleString('tr-TR')} / {totalTargetSurveys.toLocaleString('tr-TR')} anket</p>
         </div>
 
         <div

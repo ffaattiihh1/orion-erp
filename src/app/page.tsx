@@ -86,7 +86,8 @@ export default function HomePage() {
       </main>
 
       {/* Her ekrandan tek dokunuşla avans/ödeme yazma */}
-      {activeTab !== 'advances' && (
+      {/* Sadece saha/para ile ilgili ekranlarda göster (Avans, Tablet, Fatura vb. ekranlarda gizli) */}
+      {['dashboard', 'projects', 'daily-reports', 'phone-control', 'settlements', 'personnel'].includes(activeTab) && (
         <button
           onClick={() => setIsQuickAdvanceOpen(true)}
           className="fixed right-4 bottom-20 lg:bottom-6 z-40 flex items-center gap-2 pl-4 pr-5 py-3 rounded-full bg-amber-500 hover:bg-amber-600 text-white font-bold text-sm shadow-lg cursor-pointer"
