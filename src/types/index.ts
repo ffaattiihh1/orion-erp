@@ -177,6 +177,10 @@ export interface Project {
   createdByName?: string;
   createdAt: string;
   
+  // Dış sistemden gelen projeler (ör. iControl otomatik aktarım)
+  externalCode?: string;
+  source?: 'manual' | 'icontrol';
+
   // Archive / Hide status
   isArchived?: boolean;
   archivedAt?: string;

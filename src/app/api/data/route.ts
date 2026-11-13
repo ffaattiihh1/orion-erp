@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getDb, getSessionUser, isSameOriginJson } from '@/lib/auth';
+import { preserveIntegrationProjects } from '@/lib/integration';
+import type { Project } from '@/types';
 
 export const dynamic = 'force-dynamic';
 
@@ -69,6 +71,26 @@ export async function POST(req: Request) {
       if (!Array.isArray(body[key])) {
         return NextResponse.json({ success: false, error: `${key} bir liste olmalı` }, { status: 400 });
       }
+    }
+
+    // iControl'den otomatik eklenen projeler, onları henüz görmemiş bir tarayıcının
+    // eski listesiyle ezilmesin (kullanıcı sildiyse deleted_ids'te olur, geri gelmez).
+    if (updates.includes('projects')) {
+      const sql = getDb();
+      const rows = (await sql`
+        SELECT key, value FROM app_data WHERE key = ANY(${['projects', 'deleted_ids']})
+      `) as { key: string; value: unknown }[];
+      const stored = rows.find(r => r.key === 'projects')?.value;
+      const storedDeleted = rows.find(r => r.key === 'deleted_ids')?.value;
+      const deletedIds = new Set<string>([
+        ...(Array.isArray(storedDeleted) ? (storedDeleted as string[]) : []),
+        ...(Array.isArray(body.deleted_ids) ? (body.deleted_ids as string[]) : []),
+      ]);
+      body.projects = preserveIntegrationProjects(
+        body.projects as Project[],
+        Array.isArray(stored) ? (stored as Project[]) : [],
+        deletedIds
+      );
     }
 
     // Veri kaybı koruması: 2+ kayıt içeren bir koleksiyon tek seferde boş listeyle
