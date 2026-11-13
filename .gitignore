@@ -42,3 +42,6 @@ next-env.d.ts
 
 .vercel
 .env*
+
+# yerel veri yedekleri (kisisel veri icerir, asla commit etme)
+/yedekler/
