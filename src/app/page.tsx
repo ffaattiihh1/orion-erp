@@ -14,11 +14,14 @@ import InvoicesView from '@/components/InvoicesView';
 import DailyReportsView from '@/components/DailyReportsView';
 import PhoneControlView from '@/components/PhoneControlView';
 import FeasibilitySimulatorModal from '@/components/FeasibilitySimulatorModal';
+import QuickAdvanceModal from '@/components/QuickAdvanceModal';
+import { Banknote } from 'lucide-react';
 
 export default function HomePage() {
   const { currentUser, isAuthReady } = useApp();
   const [activeTab, setActiveTab] = useState<string>('dashboard');
   const [isFeasibilityOpen, setIsFeasibilityOpen] = useState<boolean>(false);
+  const [isQuickAdvanceOpen, setIsQuickAdvanceOpen] = useState<boolean>(false);
 
   // Oturum kontrol edilirken giriş ekranı yanıp sönmesin
   if (!isAuthReady) {
@@ -79,6 +82,18 @@ export default function HomePage() {
           </div>
         )}
       </main>
+
+      {/* Her ekrandan tek dokunuşla avans/ödeme yazma */}
+      {activeTab !== 'advances' && (
+        <button
+          onClick={() => setIsQuickAdvanceOpen(true)}
+          className="fixed right-4 bottom-24 sm:bottom-6 z-40 flex items-center gap-2 pl-4 pr-5 py-3 rounded-full bg-amber-500 hover:bg-amber-600 text-white font-bold text-sm shadow-lg cursor-pointer"
+        >
+          <Banknote className="w-5 h-5" />
+          Avans Yaz
+        </button>
+      )}
+      <QuickAdvanceModal isOpen={isQuickAdvanceOpen} onClose={() => setIsQuickAdvanceOpen(false)} />
 
       {/* Feasibility Simulator Modal */}
       {currentUser.role === 'admin' && (

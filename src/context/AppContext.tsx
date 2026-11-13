@@ -42,6 +42,10 @@ export interface ExcelImportRow {
   notes?: string;
 }
 
+/** Benzersiz kayıt kimliği (aynı milisaniyede iki kayıt çakışmasın) */
+const makeId = (prefix: string): string =>
+  prefix + Date.now() + '-' + Math.random().toString(36).slice(2, 7);
+
 export const normalizeTurkishText = (str?: string): string => {
   if (!str) return '';
   return str
@@ -136,6 +140,10 @@ interface AppContextType {
   removePersonnelFromProject: (projectId: string, personnelId: string) => void;
   
   addExpense: (e: Omit<Expense, 'id' | 'isApproved' | 'isOfflineQueued'>) => Promise<Expense>;
+  updateAdvance: (id: string, fields: Partial<Omit<Advance, 'id'>>) => void;
+  deleteAdvance: (id: string) => void;
+  /** İsme göre havuzdaki kişiyi bulur; yoksa havuza ekler. */
+  findOrCreatePerson: (fullName: string, role?: Personnel['defaultRole']) => Personnel;
   addAdvance: (a: Omit<Advance, 'id' | 'isOfflineQueued'>) => Promise<Advance>;
   
   closeSurveysAndCalculateSettlement: (
@@ -874,6 +882,15 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     return newPerson;
   };
 
+  const findOrCreatePerson = (fullName: string, role: Personnel['defaultRole'] = 'anketor'): Personnel => {
+    const clean = fullName.trim().replace(/s+/g, ' ');
+    const norm = normalizeTurkishText(clean);
+    // Yalnızca birebir isim eşleşmesi: benzer isimli başka birine para yazılmasın
+    const existing = personnel.find(p => normalizeTurkishText(p.fullName) === norm);
+    if (existing) return existing;
+    return addPersonnel({ fullName: clean, phone: '', city: '', defaultRole: role, defaultUnitPrice: 0 });
+  };
+
   const addMultiplePersonnel = (pList: Omit<Personnel, 'id' | 'isBlacklisted' | 'totalProjectsCompleted'>[]): number => {
     let count = 0;
     setPersonnel(prev => {
@@ -1002,7 +1019,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       ...aData,
       issuedBySpvId: aData.issuedBySpvId || currentUser?.id || 'user',
       spvName: aData.spvName || author,
-      id: 'adv-' + Date.now(),
+      id: makeId('adv-'),
       isOfflineQueued: !isOnline
     };
 
@@ -1011,32 +1028,73 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       setOfflineQueueCount(prev => prev + 1);
     }
 
-    setAdvances(prev => [newAdvance, ...prev]);
-
-    setProjects(prev => prev.map(proj => {
-      if (proj.id === aData.projectId) {
-        return {
-          ...proj,
-          totalAdvances: (proj.totalAdvances || 0) + Number(aData.amount)
-        };
-      }
-      return proj;
-    }));
-
-    // Auto deduct from settlement if already present
-    setSettlements(prev => prev.map(s => {
-      if (s.projectId === aData.projectId && s.personnelId === aData.personnelId) {
-        const newDeducted = s.advancesDeducted + Number(aData.amount);
-        return {
-          ...s,
-          advancesDeducted: newDeducted,
-          netPayable: Math.max(0, s.grossAmount - newDeducted)
-        };
-      }
-      return s;
-    }));
+    setAdvances(prev => {
+      const next = [newAdvance, ...prev];
+      recomputeSettlementDeductions(next, [newAdvance]);
+      return next;
+    });
+    adjustProjectAdvanceTotal(aData.projectId, Number(aData.amount));
 
     return newAdvance;
+  };
+
+  /**
+   * Açık (ödenmemiş) hakedişlerde düşülen avansı, ilgili kişinin o projedeki
+   * avanslarının toplamına eşitler. Ödenmiş hakedişlere asla dokunmaz.
+   * Mutlak değer atadığı için tekrar çağrılması güvenlidir.
+   */
+  const recomputeSettlementDeductions = (allAdvances: Advance[], touched: Advance[]) => {
+    const isAffected = (s: Settlement) => touched.some(t =>
+      t.projectId === s.projectId &&
+      (t.personnelId === s.personnelId || calculateNameSimilarity(t.personnelName, s.personnelName))
+    );
+    setSettlements(prev => prev.map(s => {
+      if (s.isPaid || !isAffected(s)) return s;
+      const deducted = allAdvances
+        .filter(a => a.projectId === s.projectId &&
+          (a.personnelId === s.personnelId || calculateNameSimilarity(a.personnelName, s.personnelName)))
+        .reduce((sum, a) => sum + Number(a.amount || 0), 0);
+      if (deducted === s.advancesDeducted) return s;
+      return { ...s, advancesDeducted: deducted, netPayable: Math.max(0, s.grossAmount - deducted) };
+    }));
+  };
+
+  const adjustProjectAdvanceTotal = (projectId: string, delta: number) => {
+    if (!delta) return;
+    setProjects(prev => prev.map(proj =>
+      proj.id === projectId
+        ? { ...proj, totalAdvances: Math.max(0, (proj.totalAdvances || 0) + delta) }
+        : proj
+    ));
+  };
+
+  const updateAdvance = (id: string, fields: Partial<Omit<Advance, 'id'>>) => {
+    const old = advances.find(a => a.id === id);
+    if (!old) return;
+    const updated: Advance = { ...old, ...fields };
+    setAdvances(prev => {
+      const next = prev.map(a => (a.id === id ? updated : a));
+      recomputeSettlementDeductions(next, [old, updated]);
+      return next;
+    });
+    if (old.projectId === updated.projectId) {
+      adjustProjectAdvanceTotal(old.projectId, Number(updated.amount) - Number(old.amount));
+    } else {
+      adjustProjectAdvanceTotal(old.projectId, -Number(old.amount));
+      adjustProjectAdvanceTotal(updated.projectId, Number(updated.amount));
+    }
+  };
+
+  const deleteAdvance = (id: string) => {
+    const old = advances.find(a => a.id === id);
+    if (!old) return;
+    markAsDeleted(id);
+    setAdvances(prev => {
+      const next = prev.filter(a => a.id !== id);
+      recomputeSettlementDeductions(next, [old]);
+      return next;
+    });
+    adjustProjectAdvanceTotal(old.projectId, -Number(old.amount));
   };
 
   // 5. SETTLEMENT ENGINE & EXCEL IMPORT
@@ -1317,6 +1375,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       removePersonnelFromProject,
       addExpense,
       addAdvance,
+      updateAdvance,
+      deleteAdvance,
+      findOrCreatePerson,
       closeSurveysAndCalculateSettlement,
       importSettlementsFromExcel,
       toggleSettlementPaid,

@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { useApp } from '@/context/AppContext';
+import QuickAdvanceModal from '@/components/QuickAdvanceModal';
 import { 
   X, 
   Briefcase, 
@@ -53,7 +54,6 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
     dailyReports,
     phoneControlRecords,
     addExpense, 
-    addAdvance, 
     closeSurveysAndCalculateSettlement, 
     toggleSettlementPaid, 
     getPersonnelNetAdvance,
@@ -78,12 +78,6 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
   const [previewImage, setPreviewImage] = useState<string | null>(null);
 
   // Form states
-  // 1. Advance Form
-  const [advancePersonnelId, setAdvancePersonnelId] = useState('');
-  const [advanceAmount, setAdvanceAmount] = useState('');
-  const [advanceMethod, setAdvanceMethod] = useState<'nakit' | 'havale'>('nakit');
-  const [advanceNote, setAdvanceNote] = useState('');
-
   // 2. Expense Form
   const [expenseCategory, setExpenseCategory] = useState<ExpenseCategory>('yakit');
   const [expenseAmount, setExpenseAmount] = useState('');
@@ -185,31 +179,6 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
     }));
 
     exportToExcel([...settlementRows, ...expenseRows], `${project.code}_Detay_Hakedis_ve_Masraf_Raporu`, 'Proje Detay');
-  };
-
-  // Submit Advance
-  const handleAdvanceSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!advancePersonnelId || !advanceAmount) return;
-
-    const person = personnel.find(p => p.id === advancePersonnelId);
-
-    await addAdvance({
-      projectId: project.id,
-      projectCode: project.code,
-      personnelId: advancePersonnelId,
-      personnelName: person?.fullName || 'Personel',
-      issuedBySpvId: currentUser?.id || 'spv-1',
-      spvName: currentUser?.fullName || 'Ahmet Demir (SPV)',
-      amount: Number(advanceAmount),
-      paymentMethod: advanceMethod,
-      note: advanceNote || 'Proje içi avans',
-      issuedAt: new Date().toISOString()
-    });
-
-    setIsAdvanceModalOpen(false);
-    setAdvanceAmount('');
-    setAdvanceNote('');
   };
 
   // Submit Expense
@@ -464,10 +433,7 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
 
           {/* 3. Avans Ver */}
           <button
-            onClick={() => {
-              if (projectAssigned.length > 0) setAdvancePersonnelId(projectAssigned[0].personnelId);
-              setIsAdvanceModalOpen(true);
-            }}
+            onClick={() => setIsAdvanceModalOpen(true)}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 text-xs font-bold transition-all cursor-pointer"
           >
             <Banknote className="w-3.5 h-3.5" />
@@ -959,7 +925,7 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
                     {projectAssigned.length === 0 ? (
                       <tr>
                         <td colSpan={11} className="py-6 text-center text-gray-400">
-                          Bu projeye henüz personel atanmadı. Yukarıdaki <strong>"+ Personel Ata"</strong> butonunu kullanarak personel ekleyebilirsiniz.
+                          Bu projeye henüz personel atanmadı. Yukarıdaki <strong>&ldquo;+ Personel Ata&rdquo;</strong> butonunu kullanarak personel ekleyebilirsiniz.
                         </td>
                       </tr>
                     ) : (
@@ -1180,82 +1146,12 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
           </div>
         )}
 
-        {/* ---------------- SUB-MODAL 1: ADVANCE ---------------- */}
-        {isAdvanceModalOpen && (
-          <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
-            <div className="w-full max-w-sm bg-white border border-gray-200 rounded-2xl p-5 text-gray-900 shadow-2xl">
-              <div className="flex justify-between items-center pb-2 border-b border-gray-200">
-                <h3 className="text-sm font-bold text-gray-900 flex items-center gap-1.5">
-                  <Banknote className="w-4 h-4 text-amber-400" />
-                  <span>{project.code} - Avans Ekle</span>
-                </h3>
-                <button onClick={() => setIsAdvanceModalOpen(false)} className="text-gray-500 hover:text-gray-900">
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-
-              <form onSubmit={handleAdvanceSubmit} className="space-y-3 mt-3">
-                <div>
-                  <label className="block text-xs font-semibold text-gray-700 mb-1">Personel</label>
-                  <select
-                    value={advancePersonnelId}
-                    onChange={(e) => setAdvancePersonnelId(e.target.value)}
-                    required
-                    className="w-full px-3 py-2 rounded-xl bg-white border border-gray-200 text-xs text-gray-900"
-                  >
-                    <option value="">-- Personel Seçin --</option>
-                    {activePersonnel.map(p => (
-                      <option key={p.id} value={p.id}>{p.fullName} ({p.phone || p.identityNumber || p.defaultRole})</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-gray-700 mb-1">Avans Tutarı (TL)</label>
-                  <input
-                    type="number"
-                    required
-                    min="1"
-                    value={advanceAmount}
-                    onChange={(e) => setAdvanceAmount(e.target.value)}
-                    placeholder="Örn: 500"
-                    className="w-full px-3 py-2 rounded-xl bg-white border border-gray-200 text-base font-mono font-bold text-amber-400"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-gray-700 mb-1">Ödeme Yöntemi</label>
-                  <select
-                    value={advanceMethod}
-                    onChange={(e) => setAdvanceMethod(e.target.value as 'nakit' | 'havale')}
-                    className="w-full px-3 py-2 rounded-xl bg-white border border-gray-200 text-xs text-gray-900"
-                  >
-                    <option value="nakit">Nakit (Elden)</option>
-                    <option value="havale">Banka / Havale</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-gray-700 mb-1">Not</label>
-                  <input
-                    type="text"
-                    value={advanceNote}
-                    onChange={(e) => setAdvanceNote(e.target.value)}
-                    placeholder="Örn: Sahaya çıkış avansı"
-                    className="w-full px-3 py-2 rounded-xl bg-white border border-gray-200 text-xs text-gray-900"
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  className="w-full py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-gray-500 font-black text-xs shadow transition-all cursor-pointer"
-                >
-                  Avansı Kaydet & Bakiyeden Düş
-                </button>
-              </form>
-            </div>
-          </div>
-        )}
+        {/* Avans: ortak hızlı avans penceresi (kişi havuzda olmasa da yazılabilir) */}
+        <QuickAdvanceModal
+          isOpen={isAdvanceModalOpen}
+          presetProjectId={project.id}
+          onClose={() => setIsAdvanceModalOpen(false)}
+        />
 
         {/* ---------------- SUB-MODAL 2: EXPENSE ---------------- */}
         {isExpenseModalOpen && (
