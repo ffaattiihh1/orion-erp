@@ -22,7 +22,8 @@ import {
   X,
   LayoutDashboard,
   Menu,
-  ChevronDown
+  ChevronDown,
+  TabletSmartphone
 } from 'lucide-react';
 
 interface NavbarProps {
@@ -58,6 +59,7 @@ export default function Navbar({ activeTab, setActiveTab }: NavbarProps) {
     { id: 'settlements',   label: 'Hakediş',      icon: Calculator,      roles: ['admin', 'spv'] },
     { id: 'expenses',      label: 'Masraf',       icon: Receipt,         roles: ['admin', 'spv'] },
     { id: 'advances',      label: 'Avans',        icon: Banknote,        roles: ['admin', 'spv'] },
+    { id: 'tablets',       label: 'Tablet Zimmet', icon: TabletSmartphone, roles: ['admin', 'spv'] },
     { id: 'invoices',      label: 'Fatura',       icon: FileText,        roles: ['admin'] },
   ];
 
@@ -65,7 +67,8 @@ export default function Navbar({ activeTab, setActiveTab }: NavbarProps) {
     !currentUser?.role || item.roles.includes(currentUser.role)
   );
 
-  // Mobile bottom bar: 4 main tabs + menu
+  // Telefon + tablet alt bar: 4 ana sekme + Menü (tüm sayfalar)
+  const shortLabels: Record<string, string> = { 'daily-reports': 'Saha', 'phone-control': 'TK', dashboard: 'Ana Sayfa' };
   const mobileMainIds = ['dashboard', 'projects', 'daily-reports', 'phone-control'];
   const mobileMainItems = visibleNavItems.filter(i => mobileMainIds.includes(i.id));
   const mobileMoreItems = visibleNavItems.filter(i => !mobileMainIds.includes(i.id));
@@ -202,36 +205,11 @@ export default function Navbar({ activeTab, setActiveTab }: NavbarProps) {
           </div>
         </div>
 
-        {/* Mobile top scrollable sub-nav (tablet range) */}
-        <div className="lg:hidden border-t border-gray-100 bg-gray-50/80">
-          <div className="max-w-7xl mx-auto px-2">
-            <nav className="flex gap-1 overflow-x-auto py-1.5 scrollbar-none">
-              {visibleNavItems.map((item) => {
-                const Icon = item.icon;
-                const isActive = activeTab === item.id;
-                return (
-                  <button
-                    key={item.id}
-                    onClick={() => setActiveTab(item.id)}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all cursor-pointer flex-shrink-0 ${
-                      isActive
-                        ? 'bg-blue-600 text-white font-semibold shadow-sm'
-                        : 'text-gray-500 hover:text-gray-700 hover:bg-white'
-                    }`}
-                  >
-                    <Icon className="w-3.5 h-3.5" />
-                    <span>{item.label}</span>
-                  </button>
-                );
-              })}
-            </nav>
-          </div>
-        </div>
       </header>
 
-      {/* MOBILE BOTTOM BAR */}
-      <div className="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-200 shadow-lg">
-        <nav className="grid grid-cols-5 h-16">
+      {/* ALT BAR (telefon + tablet) */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-200 shadow-lg">
+        <nav className="grid grid-cols-5 h-16 max-w-2xl mx-auto" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
           {mobileMainItems.map((item) => {
             const Icon = item.icon;
             const isActive = activeTab === item.id;
@@ -246,7 +224,7 @@ export default function Navbar({ activeTab, setActiveTab }: NavbarProps) {
                 <div className={`p-1.5 rounded-xl transition-all ${isActive ? 'bg-blue-50' : ''}`}>
                   <Icon className="w-5 h-5" />
                 </div>
-                <span className="text-xs font-semibold leading-none">{item.label}</span>
+                <span className="text-xs font-semibold leading-none">{shortLabels[item.id] || item.label}</span>
               </button>
             );
           })}
@@ -262,7 +240,7 @@ export default function Navbar({ activeTab, setActiveTab }: NavbarProps) {
               <Menu className="w-5 h-5" />
             </div>
             <span className="text-xs font-semibold leading-none">
-              {isMoreActive ? 'Diğer ●' : 'Diğer'}
+              {isMoreActive ? 'Menü ●' : 'Menü'}
             </span>
           </button>
         </nav>
@@ -270,14 +248,14 @@ export default function Navbar({ activeTab, setActiveTab }: NavbarProps) {
 
       {/* MOBILE BOTTOM SHEET MENU */}
       {isMobileMenuOpen && (
-        <div className="sm:hidden fixed inset-0 z-50 flex flex-col justify-end" onClick={() => setIsMobileMenuOpen(false)}>
+        <div className="lg:hidden fixed inset-0 z-50 flex flex-col justify-end bg-black/30" onClick={() => setIsMobileMenuOpen(false)}>
           <div
             className="bg-white rounded-t-2xl shadow-2xl p-4 space-y-3 max-h-[75vh] overflow-y-auto"
             onClick={e => e.stopPropagation()}
           >
             <div className="flex items-center justify-between pb-2 border-b border-gray-100">
               <div>
-                <p className="text-sm font-bold text-gray-800">Diğer Sayfalar</p>
+                <p className="text-base font-bold text-gray-900">Tüm Sayfalar</p>
                 <p className="text-xs text-gray-500">{currentUser?.fullName}</p>
               </div>
               <button onClick={() => setIsMobileMenuOpen(false)} className="p-1.5 rounded-xl bg-gray-100 text-gray-500 cursor-pointer">
@@ -285,7 +263,7 @@ export default function Navbar({ activeTab, setActiveTab }: NavbarProps) {
               </button>
             </div>
 
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
               {visibleNavItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = activeTab === item.id;
@@ -302,7 +280,7 @@ export default function Navbar({ activeTab, setActiveTab }: NavbarProps) {
                     <div className={`p-2 rounded-lg ${isActive ? 'bg-blue-600 text-white' : 'bg-white text-gray-500'}`}>
                       <Icon className="w-4 h-4" />
                     </div>
-                    <span className="text-xs font-semibold">{item.label}</span>
+                    <span className="text-sm font-semibold">{item.label}</span>
                   </button>
                 );
               })}

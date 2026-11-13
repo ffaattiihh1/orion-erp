@@ -368,7 +368,6 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {filteredProjects.map(project => {
-            const progressPercent = Math.min(((project.completedSurveys || 0) / (project.targetSurveys || 1)) * 100, 100);
 
             return (
               <div 
@@ -477,21 +476,6 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
                     )}
                   </div>
 
-                  {/* Progress Bar */}
-                  <div className="mt-3">
-                    <div className="flex justify-between text-xs text-gray-500 mb-1">
-                      <span>Saha İlerlemesi</span>
-                      <span className="font-mono text-gray-800 font-bold">
-                        {project.completedSurveys || 0} / {project.targetSurveys} Anket (%{progressPercent.toFixed(0)})
-                      </span>
-                    </div>
-                    <div className="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
-                      <div 
-                        className="h-full rounded-full transition-all bg-sky-500"
-                        style={{ width: `${progressPercent}%` }}
-                      />
-                    </div>
-                  </div>
                 </div>
 
                 {/* Card Footer & Action Buttons */}

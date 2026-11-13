@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
 const COLLECTIONS = [
   'projects', 'personnel', 'projectPersonnel', 'expenses',
   'advances', 'settlements', 'clientInvoices', 'dailyReports',
-  'phoneControlRecords', 'deleted_ids'
+  'phoneControlRecords', 'tablets', 'deleted_ids'
 ];
 
 // Yalnızca yöneticilerin görebileceği/değiştirebileceği koleksiyonlar

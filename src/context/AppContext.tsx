@@ -13,7 +13,10 @@ import {
   OfflineSyncItem,
   ProjectNoteItem,
   DailyFieldReport,
-  PhoneControlRecord
+  PhoneControlRecord,
+  Tablet,
+  TabletHistoryItem,
+  TabletStatus
 } from '@/types';
 import {
   INITIAL_PERSONNEL,
@@ -104,6 +107,12 @@ interface AppContextType {
   clientInvoices: ClientInvoice[];
   dailyReports: DailyFieldReport[];
   phoneControlRecords: PhoneControlRecord[];
+  tablets: Tablet[];
+  saveTablet: (t: Omit<Tablet, 'id' | 'history' | 'createdAt' | 'status'> & { id?: string; status?: TabletStatus }) => Tablet;
+  assignTablet: (id: string, personName: string, projectId?: string, note?: string) => void;
+  returnTablet: (id: string, note?: string) => void;
+  setTabletStatus: (id: string, status: TabletStatus, note?: string) => void;
+  deleteTablet: (id: string) => void;
   
   // Project Management Actions
   addProject: (p: Omit<Project, 'id' | 'createdAt'>) => Project;
@@ -208,6 +217,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [clientInvoices, setClientInvoices] = useState<ClientInvoice[]>(() => getInitialState('orion_client_invoices', []));
   const [dailyReports, setDailyReports] = useState<DailyFieldReport[]>(() => getInitialState('orion_daily_reports', []));
   const [phoneControlRecords, setPhoneControlRecords] = useState<PhoneControlRecord[]>(() => getInitialState('orion_phone_control_records', []));
+  const [tablets, setTablets] = useState<Tablet[]>(() => getInitialState('orion_tablets', []));
   
   // Sync & Status States
   const [isSyncing, setIsSyncing] = useState<boolean>(false);
@@ -346,6 +356,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       mergeAndSync(d.clientInvoices, 'orion_client_invoices', setClientInvoices);
       mergeAndSync(d.dailyReports, 'orion_daily_reports', setDailyReports);
       mergeAndSync(d.phoneControlRecords, 'orion_phone_control_records', setPhoneControlRecords);
+      mergeAndSync(d.tablets, 'orion_tablets', setTablets);
 
       // If local had extra items or server was seeded, push merged data to Neon
       if (Object.keys(toPush).length > 0) {
@@ -423,6 +434,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => { saveLocal('orion_settlements', settlements); }, [settlements]);
   useEffect(() => { saveLocal('orion_daily_reports', dailyReports); }, [dailyReports]);
   useEffect(() => { saveLocal('orion_phone_control_records', phoneControlRecords); }, [phoneControlRecords]);
+  useEffect(() => { saveLocal('orion_tablets', tablets); }, [tablets]);
   useEffect(() => { saveLocal('orion_client_invoices', clientInvoices); }, [clientInvoices]);
 
   // Debounced auto-sync to Neon whenever state changes
@@ -438,6 +450,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         settlements,
         dailyReports,
         phoneControlRecords,
+        tablets,
       };
       // Faturalar yalnızca yöneticiye ait; diğer roller hiç göndermez
       if (currentUser.role === 'admin') payload.clientInvoices = clientInvoices;
@@ -445,7 +458,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }, 1200);
     return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [projects, personnel, projectPersonnel, expenses, advances, settlements, clientInvoices, dailyReports, phoneControlRecords]);
+  }, [projects, personnel, projectPersonnel, expenses, advances, settlements, clientInvoices, dailyReports, phoneControlRecords, tablets]);
 
   const loginWithCredentials = async (userOrEmail: string, pass: string): Promise<{ success: boolean; error?: string }> => {
     try {
@@ -709,7 +722,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       settlements,
       clientInvoices,
       dailyReports,
-      phoneControlRecords
+      phoneControlRecords,
+      tablets
     };
 
     const jsonStr = JSON.stringify(backupData, null, 2);
@@ -741,6 +755,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       if (Array.isArray(data.clientInvoices)) setClientInvoices(data.clientInvoices);
       if (Array.isArray(data.dailyReports)) setDailyReports(data.dailyReports);
       if (Array.isArray(data.phoneControlRecords)) setPhoneControlRecords(data.phoneControlRecords);
+      if (Array.isArray(data.tablets)) setTablets(data.tablets);
 
       return { success: true, message: 'Tüm projeler, personeller, hakedişler, günlük raporlar ve TK kayıtları başarıyla geri yüklendi.' };
     } catch (err: any) {
@@ -830,8 +845,87 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   };
 
   const deletePhoneControlRecord = (id: string) => {
+    markAsDeleted(id); // diğer cihazların önbelleğinden geri gelmesin
     setPhoneControlRecords(prev => prev.filter(r => r.id !== id));
   };
+
+  // ---------------- TABLET ZİMMET ----------------
+  const tabletHistory = (h: Omit<TabletHistoryItem, 'id' | 'at' | 'byName'>): TabletHistoryItem => ({
+    ...h,
+    id: makeId('th-'),
+    at: new Date().toISOString(),
+    byName: currentUser?.fullName,
+  });
+
+  const projectCodeOf = (projectId?: string) => projects.find(p => p.id === projectId)?.code;
+
+  const updateTabletWith = (id: string, fn: (t: Tablet) => Tablet) => {
+    setTablets(prev => prev.map(t => (t.id === id ? { ...fn(t), updatedAt: new Date().toISOString() } : t)));
+  };
+
+  const saveTablet: AppContextType['saveTablet'] = (data) => {
+    if (data.id) {
+      const existing = tablets.find(t => t.id === data.id);
+      if (existing) {
+        const merged: Tablet = { ...existing, ...data, id: existing.id, history: existing.history, status: data.status || existing.status };
+        updateTabletWith(existing.id, () => merged);
+        return merged;
+      }
+    }
+    const created: Tablet = {
+      ...data,
+      id: makeId('tab-'),
+      status: data.status || 'depoda',
+      history: [tabletHistory({ action: 'eklendi' })],
+      createdAt: new Date().toISOString(),
+    };
+    setTablets(prev => [created, ...prev]);
+    return created;
+  };
+
+  const assignTablet = (id: string, personName: string, projectId?: string, note?: string) => {
+    const clean = personName.trim().replace(/\s+/g, ' ');
+    if (!clean) return;
+    const person = personnel.find(p => normalizeTurkishText(p.fullName) === normalizeTurkishText(clean));
+    const name = person?.fullName || clean;
+    updateTabletWith(id, t => ({
+      ...t,
+      status: 'zimmetli',
+      assignedPersonName: name,
+      assignedPersonnelId: person?.id,
+      assignedProjectId: projectId || undefined,
+      assignedAt: new Date().toISOString(),
+      history: [tabletHistory({ action: 'zimmet', personName: name, projectCode: projectCodeOf(projectId), note }), ...t.history],
+    }));
+  };
+
+  const returnTablet = (id: string, note?: string) => {
+    updateTabletWith(id, t => ({
+      ...t,
+      status: 'depoda',
+      history: [tabletHistory({ action: 'iade', personName: t.assignedPersonName, projectCode: projectCodeOf(t.assignedProjectId), note }), ...t.history],
+      assignedPersonName: undefined,
+      assignedPersonnelId: undefined,
+      assignedProjectId: undefined,
+      assignedAt: undefined,
+    }));
+  };
+
+  const TABLET_STATUS_LABEL: Record<TabletStatus, string> = { depoda: 'Depoda', zimmetli: 'Zimmetli', serviste: 'Serviste', kayip: 'Kayıp / Çalıntı' };
+
+  const setTabletStatus = (id: string, status: TabletStatus, note?: string) => {
+    updateTabletWith(id, t => ({
+      ...t,
+      status,
+      history: [tabletHistory({ action: 'durum', note: TABLET_STATUS_LABEL[status] + (note ? ' — ' + note : '') }), ...t.history],
+    }));
+  };
+
+  const deleteTablet = (id: string) => {
+    markAsDeleted(id);
+    setTablets(prev => prev.filter(t => t.id !== id));
+  };
+
 
   const activateProjectFromFeasibility = (id: string) => {
     setProjects(prev => prev.map(p => (p.id === id ? { ...p, status: 'active' } : p)));
@@ -883,7 +977,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   };
 
   const findOrCreatePerson = (fullName: string, role: Personnel['defaultRole'] = 'anketor'): Personnel => {
-    const clean = fullName.trim().replace(/s+/g, ' ');
+    const clean = fullName.trim().replace(/\s+/g, ' ');
     const norm = normalizeTurkishText(clean);
     // Yalnızca birebir isim eşleşmesi: benzer isimli başka birine para yazılmasın
     const existing = personnel.find(p => normalizeTurkishText(p.fullName) === norm);
@@ -1354,6 +1448,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       clientInvoices,
       dailyReports,
       phoneControlRecords,
+      tablets,
+      saveTablet,
+      assignTablet,
+      returnTablet,
+      setTabletStatus,
+      deleteTablet,
       addProject,
       updateProject,
       toggleArchiveProject,
