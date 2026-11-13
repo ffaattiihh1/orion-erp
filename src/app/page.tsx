@@ -13,6 +13,7 @@ import AdvancesView from '@/components/AdvancesView';
 import InvoicesView from '@/components/InvoicesView';
 import DailyReportsView from '@/components/DailyReportsView';
 import PhoneControlView from '@/components/PhoneControlView';
+import TabletsView from '@/components/TabletsView';
 import FeasibilitySimulatorModal from '@/components/FeasibilitySimulatorModal';
 import QuickAdvanceModal from '@/components/QuickAdvanceModal';
 import { Banknote } from 'lucide-react';
@@ -42,7 +43,7 @@ export default function HomePage() {
     <div className="min-h-screen bg-gray-50 flex flex-col text-gray-900">
       <Navbar activeTab={activeTab} setActiveTab={setActiveTab} />
 
-      <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 pt-4 pb-22 sm:py-8">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 pt-4 pb-28 lg:py-8">
         {activeTab === 'dashboard' && (
           <DashboardView 
             onNavigate={(tab) => setActiveTab(tab)} 
@@ -60,6 +61,7 @@ export default function HomePage() {
         {activeTab === 'personnel' && <PersonnelView />}
         {activeTab === 'expenses' && <ExpensesView />}
         {activeTab === 'advances' && <AdvancesView />}
+        {activeTab === 'tablets' && <TabletsView />}
 
         {/* Manager/Admin Only Tabs */}
         {currentUser.role === 'admin' && activeTab === 'invoices' && <InvoicesView />}
@@ -87,7 +89,7 @@ export default function HomePage() {
       {activeTab !== 'advances' && (
         <button
           onClick={() => setIsQuickAdvanceOpen(true)}
-          className="fixed right-4 bottom-24 sm:bottom-6 z-40 flex items-center gap-2 pl-4 pr-5 py-3 rounded-full bg-amber-500 hover:bg-amber-600 text-white font-bold text-sm shadow-lg cursor-pointer"
+          className="fixed right-4 bottom-20 lg:bottom-6 z-40 flex items-center gap-2 pl-4 pr-5 py-3 rounded-full bg-amber-500 hover:bg-amber-600 text-white font-bold text-sm shadow-lg cursor-pointer"
         >
           <Banknote className="w-5 h-5" />
           Avans Yaz

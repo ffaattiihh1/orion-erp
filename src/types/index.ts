@@ -253,3 +253,36 @@ export interface OfflineSyncItem {
   errorMessage?: string;
 }
 
+// ---------------- TABLET ZİMMET ----------------
+export type TabletStatus = 'depoda' | 'zimmetli' | 'serviste' | 'kayip';
+
+export interface TabletHistoryItem {
+  id: string;
+  at: string; // ISO
+  action: 'eklendi' | 'zimmet' | 'iade' | 'durum' | 'not';
+  personName?: string;
+  projectCode?: string;
+  note?: string;
+  byName?: string;
+}
+
+export interface Tablet {
+  id: string;
+  code: string;            // Şirket içi kod / etiket, örn. "TB-07" (tabletin arkasına yapıştırılan)
+  brand?: string;          // Samsung, Lenovo...
+  model?: string;
+  imei?: string;
+  serialNumber?: string;
+  googleAccount?: string;  // Cihazda açık Google hesabı (Cihazımı Bul için)
+  simNumber?: string;
+  status: TabletStatus;
+  assignedPersonName?: string;
+  assignedPersonnelId?: string;
+  assignedProjectId?: string;
+  assignedAt?: string;
+  notes?: string;
+  history: TabletHistoryItem[];
+  createdAt: string;
+  updatedAt?: string;
+}
+
