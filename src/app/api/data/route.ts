@@ -71,11 +71,32 @@ export async function POST(req: Request) {
       }
     }
 
+    // Veri kaybı koruması: 2+ kayıt içeren bir koleksiyon tek seferde boş listeyle
+    // değiştirilemez (arayüz kayıtları tek tek siler; toplu boşaltma hata belirtisidir).
+    const emptyKeys = updates.filter(k => (body[k] as unknown[]).length === 0);
+    const protectedKeys = new Set<string>();
+    if (emptyKeys.length > 0) {
+      const sql = getDb();
+      const rows = (await sql`
+        SELECT key, jsonb_array_length(value) AS n FROM app_data
+        WHERE key = ANY(${emptyKeys}) AND jsonb_typeof(value) = 'array'
+      `) as { key: string; n: number }[];
+      rows.forEach(r => { if (Number(r.n) >= 2) protectedKeys.add(r.key); });
+    }
+
     for (const key of updates) {
+      if (protectedKeys.has(key)) {
+        console.warn(`POST /api/data: ${key} boş listeyle silinmek istendi, engellendi (kullanıcı: ${user.id})`);
+        continue;
+      }
       await upsertCollection(key, body[key]);
     }
 
-    return NextResponse.json({ success: true, lastUpdated: new Date().toISOString() });
+    return NextResponse.json({
+      success: true,
+      lastUpdated: new Date().toISOString(),
+      ...(protectedKeys.size > 0 ? { skipped: Array.from(protectedKeys) } : {}),
+    });
   } catch (error: unknown) {
     console.error('POST /api/data error:', error instanceof Error ? error.message : error);
     return NextResponse.json({ success: false, error: 'Veri kaydedilemedi' }, { status: 500 });

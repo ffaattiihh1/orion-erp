@@ -346,12 +346,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       }
 
       setLastSyncedAt(new Date().toLocaleTimeString('tr-TR'));
+      // Yalnızca sunucudan veri BAŞARIYLA alındıktan sonra otomatik kayıt açılır.
+      // Böylece eksik/boş yerel önbellek sunucudaki verinin üzerine yazılamaz.
+      isLoadedRef.current = true;
     } catch {
       /* offline or network error - continue using local */
     } finally {
       isSyncingServerRef.current = false;
       setIsSyncing(false);
-      isLoadedRef.current = true;
     }
   };
 
