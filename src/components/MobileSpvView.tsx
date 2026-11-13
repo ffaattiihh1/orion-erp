@@ -155,7 +155,7 @@ export default function MobileSpvView() {
       
       {/* Toast Notification */}
       {successToast && (
-        <div className="fixed top-4 left-4 right-4 z-50 p-4 rounded-2xl bg-emerald-500 text-gray-900 shadow-2xl flex items-center gap-3 animate-bounce">
+        <div className="fixed top-4 left-4 right-4 z-50 p-4 rounded-2xl bg-emerald-500 text-white shadow-2xl flex items-center gap-3 animate-bounce">
           <CheckCircle2 className="w-5 h-5 flex-shrink-0" />
           <span className="text-xs font-bold">{successToast}</span>
         </div>
@@ -165,10 +165,10 @@ export default function MobileSpvView() {
       {!isOnline && (
         <div className="mb-4 p-3 rounded-2xl bg-amber-500/20 border border-amber-500/40 text-amber-200 text-xs flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <WifiOff className="w-4 h-4 text-amber-400" />
+            <WifiOff className="w-4 h-4 text-amber-600" />
             <span><strong>Çevrimdışı Mod:</strong> İşlemler önbellekte tutuluyor.</span>
           </div>
-          <span className="px-2 py-0.5 rounded-full bg-amber-500/30 text-[10px] font-bold">
+          <span className="px-2 py-0.5 rounded-full bg-amber-500/30 text-xs font-bold">
             {offlineQueueCount} Kuyrukta
           </span>
         </div>
@@ -182,12 +182,12 @@ export default function MobileSpvView() {
         <div className="flex justify-between items-start">
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+              <span className="text-xs font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-600 border border-emerald-500/30">
                 Saha Ekip Lideri Modu
               </span>
               <span className="text-xs font-mono text-gray-500">{activeProject?.code}</span>
             </div>
-            <h2 className="text-lg font-bold text-gray-900 tracking-tight group-hover:text-sky-300 transition-colors">
+            <h2 className="text-lg font-bold text-gray-900 tracking-tight group-hover:text-sky-700 transition-colors">
               {activeProject?.title}
             </h2>
             <p className="text-xs text-gray-500 mt-0.5">Müşteri: {activeProject?.clientName}</p>
@@ -198,7 +198,7 @@ export default function MobileSpvView() {
               e.stopPropagation();
               setSelectedProjectForDetail(activeProject);
             }}
-            className="flex items-center gap-1 text-[11px] font-bold text-sky-400 px-2.5 py-1 rounded-lg bg-sky-500/10 border border-sky-500/20"
+            className="flex items-center gap-1 text-xs font-bold text-sky-600 px-2.5 py-1 rounded-lg bg-sky-500/10 border border-sky-500/20"
           >
             <span>Tüm İşlemler</span>
             <ArrowRight className="w-3.5 h-3.5" />
@@ -226,7 +226,7 @@ export default function MobileSpvView() {
         {/* Button 1: Live Cash Advance */}
         <button
           onClick={() => setIsAdvanceModalOpen(true)}
-          className="w-full p-4 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 active:scale-98 text-gray-900 font-bold shadow-lg shadow-orange-500/25 flex items-center justify-between transition-all cursor-pointer"
+          className="w-full p-4 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 active:scale-98 text-white font-bold shadow-lg shadow-orange-500/25 flex items-center justify-between transition-all cursor-pointer"
         >
           <div className="flex items-center gap-3">
             <div className="p-2.5 rounded-xl bg-white/20">
@@ -243,7 +243,7 @@ export default function MobileSpvView() {
         {/* Button 2: Photo Expense & Receipt */}
         <button
           onClick={() => setIsExpenseModalOpen(true)}
-          className="w-full p-4 rounded-2xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 active:scale-98 text-gray-900 font-bold shadow-lg shadow-sky-500/25 flex items-center justify-between transition-all cursor-pointer"
+          className="w-full p-4 rounded-2xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 active:scale-98 text-white font-bold shadow-lg shadow-sky-500/25 flex items-center justify-between transition-all cursor-pointer"
         >
           <div className="flex items-center gap-3">
             <div className="p-2.5 rounded-xl bg-white/20">
@@ -260,7 +260,7 @@ export default function MobileSpvView() {
         {/* Button 3: Close Surveys (Hakediş Hesapla) */}
         <button
           onClick={() => setIsSurveyModalOpen(true)}
-          className="w-full p-4 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-500 hover:to-teal-600 active:scale-98 text-gray-900 font-bold shadow-lg shadow-emerald-600/25 flex items-center justify-between transition-all cursor-pointer"
+          className="w-full p-4 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-500 hover:to-teal-600 active:scale-98 text-white font-bold shadow-lg shadow-emerald-600/25 flex items-center justify-between transition-all cursor-pointer"
         >
           <div className="flex items-center gap-3">
             <div className="p-2.5 rounded-xl bg-white/20">
@@ -292,13 +292,13 @@ export default function MobileSpvView() {
               >
                 <div>
                   <p className="text-sm font-bold text-gray-900">{person.fullName}</p>
-                  <p className="text-[11px] text-gray-500">
-                    Özel Fiyat: <span className="text-sky-400 font-semibold">{assignment?.customUnitPrice || person.defaultUnitPrice} TL</span> / Anket
+                  <p className="text-xs text-gray-500">
+                    Özel Fiyat: <span className="text-sky-600 font-semibold">{assignment?.customUnitPrice || person.defaultUnitPrice} TL</span> / Anket
                   </p>
                 </div>
                 <div className="text-right">
                   <span className="text-xs text-gray-500 block">Toplam Avans</span>
-                  <span className="text-xs font-bold font-mono text-amber-400">
+                  <span className="text-xs font-bold font-mono text-amber-600">
                     ₺{netAdvance.toLocaleString('tr-TR')}
                   </span>
                 </div>
@@ -317,12 +317,12 @@ export default function MobileSpvView() {
           {recentSpvExpenses.slice(0, 4).map(exp => (
             <div key={exp.id} className="p-3 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-between text-xs">
               <div className="flex items-center gap-2.5">
-                <div className="p-2 rounded-lg bg-sky-500/10 text-sky-400">
+                <div className="p-2 rounded-lg bg-sky-500/10 text-sky-600">
                   <Receipt className="w-4 h-4" />
                 </div>
                 <div>
                   <p className="font-semibold text-gray-900">{exp.description}</p>
-                  <p className="text-[10px] text-gray-500">{exp.expenseDate} • {exp.category.toUpperCase()}</p>
+                  <p className="text-xs text-gray-500">{exp.expenseDate} • {exp.category.toUpperCase()}</p>
                 </div>
               </div>
               <span className="font-mono font-bold text-gray-900">₺{exp.amount.toLocaleString('tr-TR')}</span>
@@ -337,7 +337,7 @@ export default function MobileSpvView() {
           <div className="w-full max-w-sm bg-white border border-gray-200 rounded-t-3xl sm:rounded-2xl p-6 text-gray-900 animate-in slide-in-from-bottom">
             <div className="flex justify-between items-center pb-3 border-b border-gray-200">
               <h3 className="text-base font-bold text-gray-900 flex items-center gap-2">
-                <Banknote className="w-5 h-5 text-amber-400" />
+                <Banknote className="w-5 h-5 text-amber-600" />
                 <span>Canlı Avans Ver</span>
               </h3>
               <button onClick={() => setIsAdvanceModalOpen(false)} className="p-1 text-gray-500 hover:text-gray-900">
@@ -368,7 +368,7 @@ export default function MobileSpvView() {
                   value={advanceAmount}
                   onChange={(e) => setAdvanceAmount(e.target.value)}
                   placeholder="Örn: 500"
-                  className="w-full px-4 py-3 rounded-xl bg-white border border-gray-200 text-lg font-mono font-bold text-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                  className="w-full px-4 py-3 rounded-xl bg-white border border-gray-200 text-lg font-mono font-bold text-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-500"
                 />
               </div>
 
@@ -379,7 +379,7 @@ export default function MobileSpvView() {
                     type="button"
                     onClick={() => setAdvanceMethod('nakit')}
                     className={`py-2 rounded-xl text-xs font-bold border cursor-pointer ${
-                      advanceMethod === 'nakit' ? 'bg-amber-500/20 border-amber-500 text-amber-300' : 'bg-white border-gray-200 text-gray-500'
+                      advanceMethod === 'nakit' ? 'bg-amber-500/20 border-amber-500 text-amber-700' : 'bg-white border-gray-200 text-gray-500'
                     }`}
                   >
                     Nakit (Elden)
@@ -388,7 +388,7 @@ export default function MobileSpvView() {
                     type="button"
                     onClick={() => setAdvanceMethod('havale')}
                     className={`py-2 rounded-xl text-xs font-bold border cursor-pointer ${
-                      advanceMethod === 'havale' ? 'bg-amber-500/20 border-amber-500 text-amber-300' : 'bg-white border-gray-200 text-gray-500'
+                      advanceMethod === 'havale' ? 'bg-amber-500/20 border-amber-500 text-amber-700' : 'bg-white border-gray-200 text-gray-500'
                     }`}
                   >
                     IBAN / Havale
@@ -424,7 +424,7 @@ export default function MobileSpvView() {
           <div className="w-full max-w-sm bg-white border border-gray-200 rounded-t-3xl sm:rounded-2xl p-6 text-gray-900 animate-in slide-in-from-bottom">
             <div className="flex justify-between items-center pb-3 border-b border-gray-200">
               <h3 className="text-base font-bold text-gray-900 flex items-center gap-2">
-                <Receipt className="w-5 h-5 text-sky-400" />
+                <Receipt className="w-5 h-5 text-sky-600" />
                 <span>Saha Fişi / Masraf Ekle</span>
               </h3>
               <button onClick={() => setIsExpenseModalOpen(false)} className="p-1 text-gray-500 hover:text-gray-900">
@@ -457,7 +457,7 @@ export default function MobileSpvView() {
                   value={expenseAmount}
                   onChange={(e) => setExpenseAmount(e.target.value)}
                   placeholder="Örn: 850"
-                  className="w-full px-4 py-3 rounded-xl bg-white border border-gray-200 text-lg font-mono font-bold text-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                  className="w-full px-4 py-3 rounded-xl bg-white border border-gray-200 text-lg font-mono font-bold text-sky-600 focus:outline-none focus:ring-2 focus:ring-sky-500"
                 />
               </div>
 
@@ -479,7 +479,7 @@ export default function MobileSpvView() {
                   <button
                     type="button"
                     onClick={handleSimulateCameraCapture}
-                    className="w-full py-4 rounded-xl border-2 border-dashed border-gray-200 hover:border-sky-500 bg-white flex flex-col items-center justify-center gap-1.5 text-gray-500 hover:text-sky-400 transition-colors cursor-pointer"
+                    className="w-full py-4 rounded-xl border-2 border-dashed border-gray-200 hover:border-sky-500 bg-white flex flex-col items-center justify-center gap-1.5 text-gray-500 hover:text-sky-600 transition-colors cursor-pointer"
                   >
                     <Camera className="w-6 h-6" />
                     <span className="text-xs font-medium">Kamerayı Aç / Fiş Çek</span>
@@ -500,7 +500,7 @@ export default function MobileSpvView() {
 
               <button
                 type="submit"
-                className="w-full py-3.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-gray-900 font-bold text-sm shadow-lg shadow-sky-500/20 transition-all cursor-pointer"
+                className="w-full py-3.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-white font-bold text-sm shadow-lg shadow-sky-500/20 transition-all cursor-pointer"
               >
                 Fişi Merkeze Gönder
               </button>
@@ -515,7 +515,7 @@ export default function MobileSpvView() {
           <div className="w-full max-w-sm bg-white border border-gray-200 rounded-t-3xl sm:rounded-2xl p-6 text-gray-900 animate-in slide-in-from-bottom">
             <div className="flex justify-between items-center pb-3 border-b border-gray-200">
               <h3 className="text-base font-bold text-gray-900 flex items-center gap-2">
-                <ClipboardCheck className="w-5 h-5 text-emerald-400" />
+                <ClipboardCheck className="w-5 h-5 text-emerald-600" />
                 <span>Anket Sayısı Gir & Kapa</span>
               </h3>
               <button onClick={() => setIsSurveyModalOpen(false)} className="p-1 text-gray-500 hover:text-gray-900">
@@ -551,20 +551,20 @@ export default function MobileSpvView() {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-rose-400 mb-1">İptal / Geçersiz</label>
+                  <label className="block text-xs font-semibold text-rose-600 mb-1">İptal / Geçersiz</label>
                   <input
                     type="number"
                     min="0"
                     value={invalidSurveysInput}
                     onChange={(e) => setInvalidSurveysInput(e.target.value)}
                     placeholder="Örn: 5"
-                    className="w-full px-3 py-2.5 rounded-xl bg-white border border-gray-200 text-base font-mono font-bold text-rose-400"
+                    className="w-full px-3 py-2.5 rounded-xl bg-white border border-gray-200 text-base font-mono font-bold text-rose-600"
                   />
                 </div>
               </div>
 
               {/* Formula Preview Callout */}
-              <div className="p-3 rounded-xl bg-gray-50 border border-gray-200 text-[11px] text-gray-500 space-y-1">
+              <div className="p-3 rounded-xl bg-gray-50 border border-gray-200 text-xs text-gray-500 space-y-1">
                 <div className="flex justify-between">
                   <span>Geçerli Anket:</span>
                   <span className="font-bold text-gray-900 font-mono">
@@ -573,7 +573,7 @@ export default function MobileSpvView() {
                 </div>
                 <div className="flex justify-between">
                   <span>Düşülecek Avans:</span>
-                  <span className="font-bold text-amber-400 font-mono">
+                  <span className="font-bold text-amber-600 font-mono">
                     ₺{getPersonnelNetAdvance(activeProject?.id || '', surveyPersonnelId).toLocaleString('tr-TR')}
                   </span>
                 </div>
@@ -581,7 +581,7 @@ export default function MobileSpvView() {
 
               <button
                 type="submit"
-                className="w-full py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-gray-900 font-black text-sm shadow-lg shadow-emerald-600/20 transition-all cursor-pointer"
+                className="w-full py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-sm shadow-lg shadow-emerald-600/20 transition-all cursor-pointer"
               >
                 Hakedişi Hesapla & Kapat
               </button>

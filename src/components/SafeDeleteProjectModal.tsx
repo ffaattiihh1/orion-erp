@@ -44,12 +44,12 @@ export default function SafeDeleteProjectModal({
         
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-2.5">
-            <div className="p-3 rounded-2xl bg-rose-500/15 text-rose-400 border border-rose-500/30">
+            <div className="p-3 rounded-2xl bg-rose-500/15 text-rose-600 border border-rose-500/30">
               <ShieldAlert className="w-6 h-6" />
             </div>
             <div>
               <h3 className="text-base font-bold text-gray-900 tracking-tight">Projeyi Kalıcı Olarak Sil</h3>
-              <p className="text-xs text-rose-400 font-medium">Bu işlem geri alınamaz!</p>
+              <p className="text-xs text-rose-600 font-medium">Bu işlem geri alınamaz!</p>
             </div>
           </div>
           <button onClick={onClose} className="text-gray-500 hover:text-gray-900 p-1">
@@ -61,7 +61,7 @@ export default function SafeDeleteProjectModal({
           <p>
             <strong className="text-gray-900">{project.code} - {project.title}</strong> projesi silinecektir.
           </p>
-          <p className="text-[11px] text-gray-500">
+          <p className="text-xs text-gray-500">
             İpucu: Sadece geçmiş hesaplamaları gizlemek istiyorsanız silmek yerine <strong>"Projeyi Gizle / Arşivle"</strong> seçeneğini kullanabilirsiniz.
           </p>
         </div>
@@ -69,7 +69,7 @@ export default function SafeDeleteProjectModal({
         <form onSubmit={handleDelete} className="space-y-3">
           <div>
             <label className="block text-xs font-semibold text-gray-700 mb-1">
-              Onaylamak için proje kodunu yazın: <span className="text-rose-400 font-mono font-bold">{project.code}</span>
+              Onaylamak için proje kodunu yazın: <span className="text-rose-600 font-mono font-bold">{project.code}</span>
             </label>
             <input
               type="text"
@@ -85,7 +85,7 @@ export default function SafeDeleteProjectModal({
           </div>
 
           {error && (
-            <p className="text-xs text-rose-400 font-medium">{error}</p>
+            <p className="text-xs text-rose-600 font-medium">{error}</p>
           )}
 
           <div className="flex items-center justify-end gap-2 pt-2 border-t border-gray-200">
@@ -98,7 +98,7 @@ export default function SafeDeleteProjectModal({
             </button>
             <button
               type="submit"
-              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-gray-900 text-xs font-bold shadow-lg shadow-rose-600/30 transition-all cursor-pointer"
+              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold shadow-lg shadow-rose-600/30 transition-all cursor-pointer"
             >
               <Trash2 className="w-3.5 h-3.5" />
               <span>Projeyi ve Kayıtlarını Sil</span>

@@ -83,7 +83,7 @@ export default function ChangePasswordModal({ isOpen, onClose }: ChangePasswordM
         {/* Header */}
         <div className="flex items-center justify-between pb-4 border-b border-gray-200">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400">
+            <div className="w-9 h-9 rounded-xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-600">
               <KeyRound className="w-5 h-5" />
             </div>
             <div>
@@ -103,14 +103,14 @@ export default function ChangePasswordModal({ isOpen, onClose }: ChangePasswordM
 
         <form onSubmit={handleSubmit} className="space-y-4 mt-5">
           {error && (
-            <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs flex items-center gap-2">
+            <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-600 text-xs flex items-center gap-2">
               <AlertCircle className="w-4 h-4 flex-shrink-0" />
               <span>{error}</span>
             </div>
           )}
 
           {success && (
-            <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs flex items-center gap-2">
+            <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 text-xs flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
               <span>{success}</span>
             </div>
@@ -146,9 +146,9 @@ export default function ChangePasswordModal({ isOpen, onClose }: ChangePasswordM
                 value={currentPassword}
                 onChange={(e) => setCurrentPassword(e.target.value)}
                 placeholder="Mevcut şifrenizi girin"
-                className="w-full px-4 py-2.5 pl-10 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-500 text-xs"
+                className="w-full px-4 py-2.5 pl-10 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-sky-500 text-xs"
               />
-              <Lock className="w-4 h-4 text-gray-400 absolute left-3.5 top-3" />
+              <Lock className="w-4 h-4 text-gray-500 absolute left-3.5 top-3" />
             </div>
           </div>
           )}
@@ -164,9 +164,9 @@ export default function ChangePasswordModal({ isOpen, onClose }: ChangePasswordM
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 placeholder={`En az ${MIN_LENGTH} karakter`}
-                className="w-full px-4 py-2.5 pl-10 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-500 text-xs font-mono"
+                className="w-full px-4 py-2.5 pl-10 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-sky-500 text-xs font-mono"
               />
-              <KeyRound className="w-4 h-4 text-gray-400 absolute left-3.5 top-3" />
+              <KeyRound className="w-4 h-4 text-gray-500 absolute left-3.5 top-3" />
             </div>
           </div>
 
@@ -181,9 +181,9 @@ export default function ChangePasswordModal({ isOpen, onClose }: ChangePasswordM
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="Yeni şifrenizi tekrar yazın"
-                className="w-full px-4 py-2.5 pl-10 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-500 text-xs font-mono"
+                className="w-full px-4 py-2.5 pl-10 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-sky-500 text-xs font-mono"
               />
-              <ShieldCheck className="w-4 h-4 text-gray-400 absolute left-3.5 top-3" />
+              <ShieldCheck className="w-4 h-4 text-gray-500 absolute left-3.5 top-3" />
             </div>
           </div>
 

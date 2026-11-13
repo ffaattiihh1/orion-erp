@@ -76,7 +76,7 @@ export default function BackupModal({ isOpen, onClose }: BackupModalProps) {
         {/* Header */}
         <div className="flex items-start justify-between pb-3 border-b border-gray-200">
           <div className="flex items-center gap-2.5">
-            <div className="p-2.5 rounded-2xl bg-sky-500/15 text-sky-400 border border-sky-500/30">
+            <div className="p-2.5 rounded-2xl bg-sky-500/15 text-sky-600 border border-sky-500/30">
               <Database className="w-5 h-5" />
             </div>
             <div>
@@ -91,33 +91,33 @@ export default function BackupModal({ isOpen, onClose }: BackupModalProps) {
 
         {/* Current Database Stats */}
         <div className="p-4 rounded-2xl bg-white border border-gray-200 space-y-2">
-          <span className="text-[10px] uppercase font-bold text-gray-500 tracking-wider block">
+          <span className="text-xs uppercase font-bold text-gray-500 tracking-wider block">
             Mevcut Sistem Verisi Özeti
           </span>
           <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 text-center text-xs">
             <div className="p-2 rounded-xl bg-white border border-gray-200">
-              <span className="text-gray-500 text-[10px] block">Projeler</span>
+              <span className="text-gray-500 text-xs block">Projeler</span>
               <strong className="text-gray-900 text-sm font-mono">{projects.length}</strong>
             </div>
             <div className="p-2 rounded-xl bg-white border border-gray-200">
-              <span className="text-gray-500 text-[10px] block">Personel</span>
+              <span className="text-gray-500 text-xs block">Personel</span>
               <strong className="text-gray-900 text-sm font-mono">{personnel.length}</strong>
             </div>
             <div className="p-2 rounded-xl bg-white border border-gray-200">
-              <span className="text-gray-500 text-[10px] block">Hakediş</span>
-              <strong className="text-emerald-400 text-sm font-mono">{settlements.length}</strong>
+              <span className="text-gray-500 text-xs block">Hakediş</span>
+              <strong className="text-emerald-600 text-sm font-mono">{settlements.length}</strong>
             </div>
             <div className="p-2 rounded-xl bg-white border border-gray-200">
-              <span className="text-gray-500 text-[10px] block">Saha Rapor</span>
-              <strong className="text-sky-400 text-sm font-mono">{dailyReports.length}</strong>
+              <span className="text-gray-500 text-xs block">Saha Rapor</span>
+              <strong className="text-sky-600 text-sm font-mono">{dailyReports.length}</strong>
             </div>
             <div className="p-2 rounded-xl bg-white border border-gray-200">
-              <span className="text-gray-500 text-[10px] block">TK Kaydı</span>
-              <strong className="text-indigo-400 text-sm font-mono">{phoneControlRecords.length}</strong>
+              <span className="text-gray-500 text-xs block">TK Kaydı</span>
+              <strong className="text-indigo-600 text-sm font-mono">{phoneControlRecords.length}</strong>
             </div>
             <div className="p-2 rounded-xl bg-white border border-gray-200">
-              <span className="text-gray-500 text-[10px] block">Gider/Avans</span>
-              <strong className="text-amber-400 text-sm font-mono">{expenses.length + advances.length}</strong>
+              <span className="text-gray-500 text-xs block">Gider/Avans</span>
+              <strong className="text-amber-600 text-sm font-mono">{expenses.length + advances.length}</strong>
             </div>
           </div>
         </div>
@@ -127,17 +127,17 @@ export default function BackupModal({ isOpen, onClose }: BackupModalProps) {
           {/* Export Card */}
           <div className="p-4 rounded-2xl bg-gradient-to-b from-sky-950/20 to-gray-100 border border-sky-500/20 flex flex-col justify-between space-y-3">
             <div>
-              <div className="flex items-center gap-1.5 text-sky-400 font-bold text-xs mb-1">
+              <div className="flex items-center gap-1.5 text-sky-600 font-bold text-xs mb-1">
                 <Download className="w-4 h-4" />
                 <span>Yedek İndir (.json)</span>
               </div>
-              <p className="text-[11px] text-gray-500">
+              <p className="text-xs text-gray-500">
                 Tüm verilerinizi tek bir JSON dosyasında güvenle saklayın.
               </p>
             </div>
             <button
               onClick={handleDownload}
-              className="w-full py-2.5 px-3 rounded-xl bg-sky-500 hover:bg-sky-400 text-gray-900 font-bold text-xs shadow-md shadow-sky-500/20 transition-all cursor-pointer flex items-center justify-center gap-1.5"
+              className="w-full py-2.5 px-3 rounded-xl bg-sky-500 hover:bg-sky-400 text-white font-bold text-xs shadow-md shadow-sky-500/20 transition-all cursor-pointer flex items-center justify-center gap-1.5"
             >
               <Download className="w-3.5 h-3.5" />
               <span>Yedek Dosyası İndir</span>
@@ -147,11 +147,11 @@ export default function BackupModal({ isOpen, onClose }: BackupModalProps) {
           {/* Import Card */}
           <div className="p-4 rounded-2xl bg-gradient-to-b from-emerald-950/20 to-gray-100 border border-emerald-500/20 flex flex-col justify-between space-y-3">
             <div>
-              <div className="flex items-center gap-1.5 text-emerald-400 font-bold text-xs mb-1">
+              <div className="flex items-center gap-1.5 text-emerald-600 font-bold text-xs mb-1">
                 <Upload className="w-4 h-4" />
                 <span>Yedekten Geri Yükle</span>
               </div>
-              <p className="text-[11px] text-gray-500">
+              <p className="text-xs text-gray-500">
                 Önceden aldığınız bir JSON yedek dosyasını sisteme aktarın.
               </p>
             </div>
@@ -165,7 +165,7 @@ export default function BackupModal({ isOpen, onClose }: BackupModalProps) {
               />
               <button
                 onClick={() => fileInputRef.current?.click()}
-                className="w-full py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-gray-900 font-bold text-xs shadow-md shadow-emerald-600/20 transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                className="w-full py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md shadow-emerald-600/20 transition-all cursor-pointer flex items-center justify-center gap-1.5"
               >
                 <Upload className="w-3.5 h-3.5" />
                 <span>Yedek Dosyası Seç</span>
@@ -178,13 +178,13 @@ export default function BackupModal({ isOpen, onClose }: BackupModalProps) {
         {statusMessage && (
           <div className={`p-3 rounded-xl flex items-center gap-2 text-xs ${
             statusMessage.type === 'success'
-              ? 'bg-emerald-950/40 border border-emerald-500/30 text-emerald-300'
-              : 'bg-rose-950/40 border border-rose-500/30 text-rose-300'
+              ? 'bg-emerald-950/40 border border-emerald-500/30 text-emerald-700'
+              : 'bg-rose-950/40 border border-rose-500/30 text-rose-700'
           }`}>
             {statusMessage.type === 'success' ? (
-              <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
             ) : (
-              <AlertCircle className="w-4 h-4 text-rose-400 flex-shrink-0" />
+              <AlertCircle className="w-4 h-4 text-rose-600 flex-shrink-0" />
             )}
             <span>{statusMessage.text}</span>
           </div>

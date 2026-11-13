@@ -130,7 +130,7 @@ export default function SettlementsView() {
       {/* Top Header Banner */}
       <div className="p-5 rounded-2xl bg-white border border-gray-200 border border-gray-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="p-3 rounded-2xl bg-sky-500/15 text-sky-400 border border-sky-500/25">
+          <div className="p-3 rounded-2xl bg-sky-500/15 text-sky-600 border border-sky-500/25">
             <FolderCheck className="w-6 h-6" />
           </div>
           <div>
@@ -146,7 +146,7 @@ export default function SettlementsView() {
           {/* Excel Paste Button */}
           <button
             onClick={() => setIsExcelPasteModalOpen(true)}
-            className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-gray-900 font-bold text-xs shadow-lg shadow-emerald-600/20 transition-all cursor-pointer"
+            className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs shadow-lg shadow-emerald-600/20 transition-all cursor-pointer"
           >
             <ClipboardPaste className="w-4 h-4" />
             <span>Excel'den Kopyala-Yapıştır</span>
@@ -158,7 +158,7 @@ export default function SettlementsView() {
               setModalProjectId(selectedProjectId !== 'all' ? selectedProjectId : projects[0]?.id || '');
               setIsNewSettlementModalOpen(true);
             }}
-            className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-sky-500/20 hover:bg-sky-500/30 text-sky-300 border border-sky-500/30 font-bold text-xs transition-all cursor-pointer"
+            className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-sky-500/20 hover:bg-sky-500/30 text-sky-700 border border-sky-500/30 font-bold text-xs transition-all cursor-pointer"
           >
             <PlusCircle className="w-4 h-4" />
             <span>+ Tekil Satır Ekle</span>
@@ -170,7 +170,7 @@ export default function SettlementsView() {
       <div className="p-4 rounded-2xl bg-white border border-gray-200 flex flex-col md:flex-row md:items-center justify-between gap-3">
         <div className="flex-1">
           <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
-            <Building2 className="w-4 h-4 text-sky-400" />
+            <Building2 className="w-4 h-4 text-sky-600" />
             <span>Hakediş Görüntülenecek Projeyi Seçin:</span>
           </label>
           <div className="relative">
@@ -207,16 +207,16 @@ export default function SettlementsView() {
         {selectedProject && (
           <div className="flex items-center gap-3 pt-2 md:pt-0 md:border-l md:border-gray-200 md:pl-4 text-xs">
             <div>
-              <span className="text-[10px] text-gray-400 block uppercase">Müşteri:</span>
+              <span className="text-xs text-gray-500 block uppercase">Müşteri:</span>
               <strong className="text-gray-900">{selectedProject.clientName}</strong>
             </div>
             <div>
-              <span className="text-[10px] text-gray-400 block uppercase">Hedef Anket:</span>
-              <strong className="text-sky-400 font-mono">{selectedProject.targetSurveys} Adet</strong>
+              <span className="text-xs text-gray-500 block uppercase">Hedef Anket:</span>
+              <strong className="text-sky-600 font-mono">{selectedProject.targetSurveys} Adet</strong>
             </div>
             <div>
-              <span className="text-[10px] text-gray-400 block uppercase">Tarih:</span>
-              <span className="text-gray-700 font-mono text-[11px]">{selectedProject.startDate}</span>
+              <span className="text-xs text-gray-500 block uppercase">Tarih:</span>
+              <span className="text-gray-700 font-mono text-xs">{selectedProject.startDate}</span>
             </div>
           </div>
         )}
@@ -225,35 +225,35 @@ export default function SettlementsView() {
       {/* KPI Ribbon for Selected Project */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <div className="p-3.5 rounded-2xl bg-white border border-gray-200">
-          <span className="text-[10px] uppercase font-semibold text-gray-500 block">Toplam Geçerli Anket</span>
-          <span className="text-xl font-black font-mono text-sky-400 mt-0.5 block">
-            {currentValidSurveys} <span className="text-xs font-normal text-gray-400">Adet</span>
+          <span className="text-xs uppercase font-semibold text-gray-500 block">Toplam Geçerli Anket</span>
+          <span className="text-xl font-black font-mono text-sky-600 mt-0.5 block">
+            {currentValidSurveys} <span className="text-xs font-normal text-gray-500">Adet</span>
           </span>
-          <span className="text-[10px] text-gray-400">{filteredSettlements.length} Anketör Hakedişi</span>
+          <span className="text-xs text-gray-500">{filteredSettlements.length} Anketör Hakedişi</span>
         </div>
 
         <div className="p-3.5 rounded-2xl bg-white border border-gray-200">
-          <span className="text-[10px] uppercase font-semibold text-gray-500 block">Brüt Hakediş Tutarı</span>
+          <span className="text-xs uppercase font-semibold text-gray-500 block">Brüt Hakediş Tutarı</span>
           <span className="text-xl font-black font-mono text-gray-900 mt-0.5 block">
             ₺{currentTotalGross.toLocaleString('tr-TR')}
           </span>
-          <span className="text-[10px] text-gray-400">Anket × Birim Fiyat</span>
+          <span className="text-xs text-gray-500">Anket × Birim Fiyat</span>
         </div>
 
         <div className="p-3.5 rounded-2xl bg-white border border-gray-200">
-          <span className="text-[10px] uppercase font-semibold text-gray-500 block">Mahsup Edilen Avans</span>
-          <span className="text-xl font-black font-mono text-amber-400 mt-0.5 block">
+          <span className="text-xs uppercase font-semibold text-gray-500 block">Mahsup Edilen Avans</span>
+          <span className="text-xl font-black font-mono text-amber-600 mt-0.5 block">
             − ₺{currentTotalAdvances.toLocaleString('tr-TR')}
           </span>
-          <span className="text-[10px] text-gray-400">Hakedişten düşüldü</span>
+          <span className="text-xs text-gray-500">Hakedişten düşüldü</span>
         </div>
 
         <div className="p-3.5 rounded-2xl bg-white border border-gray-200">
-          <span className="text-[10px] uppercase font-semibold text-gray-500 block">NET ÖDENECEK TOPLAM</span>
-          <span className="text-xl font-black font-mono text-emerald-400 mt-0.5 block">
+          <span className="text-xs uppercase font-semibold text-gray-500 block">NET ÖDENECEK TOPLAM</span>
+          <span className="text-xl font-black font-mono text-emerald-600 mt-0.5 block">
             ₺{currentTotalNet.toLocaleString('tr-TR')}
           </span>
-          <span className="text-[10px] text-emerald-300">Ödenen: ₺{currentTotalPaid.toLocaleString('tr-TR')}</span>
+          <span className="text-xs text-emerald-700">Ödenen: ₺{currentTotalPaid.toLocaleString('tr-TR')}</span>
         </div>
       </div>
 
@@ -266,7 +266,7 @@ export default function SettlementsView() {
             placeholder="Anketör adı, şehir, TC kimlik veya not ara..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-8 pr-3 py-2 rounded-xl bg-white border border-gray-200 text-xs text-gray-900 placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+            className="w-full pl-8 pr-3 py-2 rounded-xl bg-white border border-gray-200 text-xs text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-sky-500"
           />
         </div>
 
@@ -277,29 +277,86 @@ export default function SettlementsView() {
             className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs font-semibold transition-all border border-gray-200 cursor-pointer"
             title="Şablona uygun Excel çıktısı alın"
           >
-            <FileSpreadsheet className="w-4 h-4 text-emerald-400" />
+            <FileSpreadsheet className="w-4 h-4 text-emerald-600" />
             <span>Excel'e İndir (.xlsx)</span>
           </button>
         </div>
       </div>
 
-      {/* MAIN SETTLEMENT TABLE (MATCHING USER'S SCREENSHOTS) */}
-      <div className="rounded-3xl bg-white border border-gray-200 overflow-hidden shadow-2xl">
+      {/* TELEFON: kart görünümü */}
+      <div className="sm:hidden space-y-2.5">
+        {filteredSettlements.length === 0 ? (
+          <p className="py-10 text-center text-sm text-gray-500 bg-white rounded-2xl border border-gray-200">Bu projede kayıtlı hakediş bulunamadı.</p>
+        ) : (
+          filteredSettlements.map((s) => {
+            const proj = projects.find(p => p.id === s.projectId);
+            return (
+              <div key={s.id} className="bg-white rounded-2xl border border-gray-200 p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="font-bold text-gray-900 text-base leading-tight">{s.personnelName}</p>
+                    <p className="text-sm text-gray-500 mt-0.5">
+                      <span className="font-mono font-semibold text-sky-700">{proj?.code}</span>
+                      {s.city ? ` · ${s.city}` : ''}
+                    </p>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <p className="text-lg font-black font-mono text-emerald-700">₺{s.netPayable.toLocaleString('tr-TR')}</p>
+                    <p className="text-xs text-gray-500">net ödenecek</p>
+                  </div>
+                </div>
+                <div className="mt-3 grid grid-cols-3 gap-2 text-center">
+                  <div className="rounded-xl bg-gray-50 py-2">
+                    <p className="text-base font-bold text-gray-900">{s.validSurveys}</p>
+                    <p className="text-xs text-gray-500">geçerli</p>
+                  </div>
+                  <div className="rounded-xl bg-gray-50 py-2">
+                    <p className="text-base font-bold text-rose-600">{s.invalidSurveys}</p>
+                    <p className="text-xs text-gray-500">iptal</p>
+                  </div>
+                  <div className="rounded-xl bg-gray-50 py-2">
+                    <p className="text-base font-bold text-gray-900">₺{s.unitPriceApplied.toLocaleString('tr-TR')}</p>
+                    <p className="text-xs text-gray-500">birim</p>
+                  </div>
+                </div>
+                <div className="mt-3 flex items-center justify-between gap-2 text-sm">
+                  <span className="text-gray-600">
+                    Brüt ₺{s.grossAmount.toLocaleString('tr-TR')}
+                    {s.advancesDeducted > 0 && <span className="text-amber-700"> · Avans −₺{s.advancesDeducted.toLocaleString('tr-TR')}</span>}
+                  </span>
+                  <button
+                    onClick={() => toggleSettlementPaid(s.id)}
+                    className={`shrink-0 px-3 py-2 rounded-xl text-sm font-bold border cursor-pointer ${
+                      s.isPaid ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-white text-gray-600 border-gray-300'
+                    }`}
+                  >
+                    {s.isPaid ? '✓ Ödendi' : 'Ödenmedi'}
+                  </button>
+                </div>
+                {s.notes && <p className="mt-2 text-sm text-gray-500">Not: {s.notes}</p>}
+              </div>
+            );
+          })
+        )}
+      </div>
+
+      {/* MASAÜSTÜ: tablo */}
+      <div className="hidden sm:block rounded-3xl bg-white border border-gray-200 overflow-hidden shadow-2xl">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs text-gray-700">
-            <thead className="bg-white text-gray-500 uppercase tracking-wider text-[11px] border-b border-gray-200">
+            <thead className="bg-white text-gray-500 uppercase tracking-wider text-xs border-b border-gray-200">
               <tr>
                 <th className="py-3.5 px-4 font-bold">İL</th>
                 <th className="py-3.5 px-4 font-bold">TC</th>
                 <th className="py-3.5 px-4 font-bold">ANKETÖR</th>
                 <th className="py-3.5 px-4 font-bold">PROJE</th>
                 <th className="py-3.5 px-4 font-bold text-center">TOPLAM</th>
-                <th className="py-3.5 px-4 font-bold text-center text-rose-400">İPTAL</th>
-                <th className="py-3.5 px-4 font-bold text-center text-sky-400">GEÇERLİ</th>
+                <th className="py-3.5 px-4 font-bold text-center text-rose-600">İPTAL</th>
+                <th className="py-3.5 px-4 font-bold text-center text-sky-600">GEÇERLİ</th>
                 <th className="py-3.5 px-4 font-bold text-right">BİRİM FİYAT</th>
                 <th className="py-3.5 px-4 font-bold text-right">BRÜT TUTAR</th>
-                <th className="py-3.5 px-4 font-bold text-right text-amber-400">KESİLEN AVANS</th>
-                <th className="py-3.5 px-4 font-bold text-right text-emerald-400">NET ÖDENECEK</th>
+                <th className="py-3.5 px-4 font-bold text-right text-amber-600">KESİLEN AVANS</th>
+                <th className="py-3.5 px-4 font-bold text-right text-emerald-600">NET ÖDENECEK</th>
                 <th className="py-3.5 px-4 font-bold text-center">ÖDEME DURUMU</th>
                 <th className="py-3.5 px-4 font-bold">İŞLEMİ YAPAN</th>
                 <th className="py-3.5 px-4 font-bold">NOT</th>
@@ -308,7 +365,7 @@ export default function SettlementsView() {
             <tbody className="divide-y divide-gray-200/80">
               {filteredSettlements.length === 0 ? (
                 <tr>
-                  <td colSpan={14} className="py-12 text-center text-gray-400">
+                  <td colSpan={14} className="py-12 text-center text-gray-500">
                     <p className="text-sm font-semibold">Bu projede kayıtlı hakediş bulunamadı.</p>
                     <p className="text-xs text-gray-500 mt-1">
                       Yukarıdaki <strong>"Excel'den Kopyala-Yapıştır"</strong> butonuna tıklayarak Excel tablonuzu doğrudan aktarabilirsiniz.
@@ -327,18 +384,18 @@ export default function SettlementsView() {
                       </td>
 
                       {/* TC */}
-                      <td className="py-3 px-4 font-mono text-gray-500 text-[11px]">
+                      <td className="py-3 px-4 font-mono text-gray-500 text-xs">
                         {s.identityNumber || '-'}
                       </td>
 
                       {/* ANKETÖR */}
                       <td className="py-3 px-4">
                         <p className="font-bold text-gray-900 tracking-wide">{s.personnelName}</p>
-                        <span className="text-[10px] uppercase text-gray-400">{s.personnelRole}</span>
+                        <span className="text-xs uppercase text-gray-500">{s.personnelRole}</span>
                       </td>
 
                       {/* PROJE */}
-                      <td className="py-3 px-4 font-mono text-[11px] text-sky-400 font-semibold">
+                      <td className="py-3 px-4 font-mono text-xs text-sky-600 font-semibold">
                         {proj?.code}
                       </td>
 
@@ -348,12 +405,12 @@ export default function SettlementsView() {
                       </td>
 
                       {/* İPTAL */}
-                      <td className="py-3 px-4 text-center font-mono font-bold text-rose-400">
+                      <td className="py-3 px-4 text-center font-mono font-bold text-rose-600">
                         {s.invalidSurveys > 0 ? `-${s.invalidSurveys}` : '0'}
                       </td>
 
                       {/* GEÇERLİ */}
-                      <td className="py-3 px-4 text-center font-mono font-bold text-sky-300 bg-sky-500/5">
+                      <td className="py-3 px-4 text-center font-mono font-bold text-sky-700 bg-sky-500/5">
                         {s.validSurveys}
                       </td>
 
@@ -368,12 +425,12 @@ export default function SettlementsView() {
                       </td>
 
                       {/* KESİLEN AVANS */}
-                      <td className="py-3 px-4 text-right font-mono font-semibold text-amber-400">
+                      <td className="py-3 px-4 text-right font-mono font-semibold text-amber-600">
                         {s.advancesDeducted > 0 ? `− ₺${s.advancesDeducted.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}` : '₺0,00'}
                       </td>
 
                       {/* NET ÖDENECEK */}
-                      <td className="py-3 px-4 text-right font-mono font-black text-emerald-400 text-sm bg-emerald-500/5">
+                      <td className="py-3 px-4 text-right font-mono font-black text-emerald-600 text-sm bg-emerald-500/5">
                         ₺{s.netPayable.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}
                       </td>
 
@@ -383,18 +440,18 @@ export default function SettlementsView() {
                           onClick={() => toggleSettlementPaid(s.id)}
                           className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold transition-all border cursor-pointer ${
                             s.isPaid
-                              ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40 hover:bg-emerald-500/30'
+                              ? 'bg-emerald-500/20 text-emerald-600 border-emerald-500/40 hover:bg-emerald-500/30'
                               : 'bg-gray-100 text-gray-500 border-gray-200 hover:text-gray-800 hover:border-gray-300'
                           }`}
                         >
                           {s.isPaid ? (
                             <>
-                              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
                               <span>ÖDENDİ</span>
                             </>
                           ) : (
                             <>
-                              <Clock className="w-3.5 h-3.5 text-gray-400" />
+                              <Clock className="w-3.5 h-3.5 text-gray-500" />
                               <span>ÖDENMEDİ</span>
                             </>
                           )}
@@ -403,13 +460,13 @@ export default function SettlementsView() {
 
                       {/* İŞLEMİ YAPAN */}
                       <td className="py-3 px-4">
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-sky-500/10 text-sky-300 border border-sky-500/20 text-[11px] font-semibold">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-sky-500/10 text-sky-700 border border-sky-500/20 text-xs font-semibold">
                           {s.createdByName || 'Fatih Sakar'}
                         </span>
                       </td>
 
                       {/* NOT */}
-                      <td className="py-3 px-4 text-gray-500 max-w-[150px] truncate text-[11px]">
+                      <td className="py-3 px-4 text-gray-500 max-w-[150px] truncate text-xs">
                         {s.notes || '-'}
                       </td>
                     </tr>
@@ -427,7 +484,7 @@ export default function SettlementsView() {
           <div className="w-full max-w-md bg-white border border-gray-200 rounded-3xl p-6 text-gray-900 shadow-2xl">
             <div className="flex justify-between items-center pb-3 border-b border-gray-200">
               <h3 className="text-base font-bold text-gray-900 flex items-center gap-2">
-                <Calculator className="w-5 h-5 text-sky-400" />
+                <Calculator className="w-5 h-5 text-sky-600" />
                 <span>Tekil Hakediş / Anket Kapama</span>
               </h3>
               <button onClick={() => setIsNewSettlementModalOpen(false)} className="p-1 text-gray-500 hover:text-gray-900">
@@ -478,14 +535,14 @@ export default function SettlementsView() {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-rose-400 mb-1">İptal / Geçersiz</label>
+                  <label className="block text-xs font-semibold text-rose-600 mb-1">İptal / Geçersiz</label>
                   <input
                     type="number"
                     min="0"
                     value={modalInvalid}
                     onChange={(e) => setModalInvalid(e.target.value)}
                     placeholder="0"
-                    className="w-full px-3 py-2 rounded-xl bg-white border border-gray-200 text-sm font-mono text-rose-400 font-bold"
+                    className="w-full px-3 py-2 rounded-xl bg-white border border-gray-200 text-sm font-mono text-rose-600 font-bold"
                   />
                 </div>
               </div>
@@ -518,13 +575,13 @@ export default function SettlementsView() {
                 <div className="p-3 rounded-xl bg-white border border-gray-200 text-xs text-gray-500 space-y-1">
                   <div className="flex justify-between">
                     <span>Mevcut Alınan Avans:</span>
-                    <span className="text-amber-400 font-mono font-bold">
+                    <span className="text-amber-600 font-mono font-bold">
                       ₺{getPersonnelNetAdvance(modalProjectId, modalPersonnelId).toLocaleString('tr-TR')}
                     </span>
                   </div>
                   <div className="flex justify-between">
                     <span>Geçerli Sayılacak Anket:</span>
-                    <span className="text-sky-400 font-mono font-bold">
+                    <span className="text-sky-600 font-mono font-bold">
                       {Math.max(0, Number(modalTotal || 0) - Number(modalInvalid || 0))} Adet
                     </span>
                   </div>
@@ -533,7 +590,7 @@ export default function SettlementsView() {
 
               <button
                 type="submit"
-                className="w-full py-3 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-gray-900 font-bold text-xs shadow-lg shadow-sky-500/20 transition-all cursor-pointer"
+                className="w-full py-3 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-bold text-xs shadow-lg shadow-sky-500/20 transition-all cursor-pointer"
               >
                 Hakedişi Hesapla & Sisteme İşle
               </button>

@@ -222,36 +222,36 @@ export default function DailyReportsView() {
     switch (status) {
       case 'started':
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
-            <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-500/15 text-emerald-700 border border-emerald-500/30">
+            <CheckCircle2 className="w-3 h-3 text-emerald-600" />
             <span>Saha Başladı / Aktif</span>
           </span>
         );
       case 'delayed':
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-500/15 text-rose-300 border border-rose-500/30">
-            <AlertCircle className="w-3 h-3 text-rose-400" />
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-500/15 text-rose-700 border border-rose-500/30">
+            <AlertCircle className="w-3 h-3 text-rose-600" />
             <span>Başlayamadı / Gecikti</span>
           </span>
         );
       case 'ongoing':
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-sky-500/15 text-sky-300 border border-sky-500/30">
-            <Clock className="w-3 h-3 text-sky-400" />
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-sky-500/15 text-sky-700 border border-sky-500/30">
+            <Clock className="w-3 h-3 text-sky-600" />
             <span>Saha Devam Ediyor</span>
           </span>
         );
       case 'paused':
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30">
-            <Clock className="w-3 h-3 text-amber-400" />
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-500/15 text-amber-700 border border-amber-500/30">
+            <Clock className="w-3 h-3 text-amber-600" />
             <span>Geçici Durduruldu</span>
           </span>
         );
       case 'completed':
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-indigo-500/15 text-indigo-300 border border-indigo-500/30">
-            <CheckCircle2 className="w-3 h-3 text-indigo-400" />
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-500/15 text-indigo-700 border border-indigo-500/30">
+            <CheckCircle2 className="w-3 h-3 text-indigo-600" />
             <span>Saha Tamamlandı</span>
           </span>
         );
@@ -309,7 +309,7 @@ export default function DailyReportsView() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <div className="p-2 rounded-xl bg-sky-500/15 text-sky-400 border border-sky-500/30">
+            <div className="p-2 rounded-xl bg-sky-500/15 text-sky-600 border border-sky-500/30">
               <FileText className="w-5 h-5" />
             </div>
             <div>
@@ -326,13 +326,13 @@ export default function DailyReportsView() {
             onClick={handleExportExcel}
             className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs font-bold transition-all border border-gray-200 cursor-pointer"
           >
-            <FileSpreadsheet className="w-4 h-4 text-emerald-400" />
+            <FileSpreadsheet className="w-4 h-4 text-emerald-600" />
             <span>Excel'e Aktar</span>
           </button>
 
           <button
             onClick={handleOpenCreateModal}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-gray-900 text-xs font-bold shadow-lg shadow-sky-500/20 transition-all cursor-pointer"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-white text-xs font-bold shadow-lg shadow-sky-500/20 transition-all cursor-pointer"
           >
             <Plus className="w-4 h-4" />
             <span>+ Günlük Rapor Yaz</span>
@@ -343,35 +343,35 @@ export default function DailyReportsView() {
       {/* KPI Ribbon */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <div className="p-4 rounded-2xl bg-white border border-gray-200">
-          <span className="text-[10px] uppercase font-bold text-gray-500 tracking-wider block">Toplam Rapor Girişi</span>
+          <span className="text-xs uppercase font-bold text-gray-500 tracking-wider block">Toplam Rapor Girişi</span>
           <span className="text-xl font-black font-mono text-gray-900 mt-1 block">
-            {totalReportsCount} <span className="text-xs font-normal text-gray-400">Günlük Kayıt</span>
+            {totalReportsCount} <span className="text-xs font-normal text-gray-500">Günlük Kayıt</span>
           </span>
-          <span className="text-[10px] text-gray-400 block mt-0.5">Proje bazlı saha günlüğü</span>
+          <span className="text-xs text-gray-500 block mt-0.5">Proje bazlı saha günlüğü</span>
         </div>
 
         <div className="p-4 rounded-2xl bg-white border border-gray-200">
-          <span className="text-[10px] uppercase font-bold text-gray-500 tracking-wider block">Toplam Sahaya Çıkan</span>
-          <span className="text-xl font-black font-mono text-sky-400 mt-1 block">
-            {totalWorkersCount} <span className="text-xs font-normal text-gray-400">Kişi / Gün</span>
+          <span className="text-xs uppercase font-bold text-gray-500 tracking-wider block">Toplam Sahaya Çıkan</span>
+          <span className="text-xl font-black font-mono text-sky-600 mt-1 block">
+            {totalWorkersCount} <span className="text-xs font-normal text-gray-500">Kişi / Gün</span>
           </span>
-          <span className="text-[10px] text-gray-400 block mt-0.5">Anketör & Gözlemci</span>
+          <span className="text-xs text-gray-500 block mt-0.5">Anketör & Gözlemci</span>
         </div>
 
         <div className="p-4 rounded-2xl bg-white border border-gray-200">
-          <span className="text-[10px] uppercase font-bold text-gray-500 tracking-wider block">Yapılan Toplam Anket</span>
-          <span className="text-xl font-black font-mono text-emerald-400 mt-1 block">
-            {totalSurveysDone} <span className="text-xs font-normal text-gray-400">Anket</span>
+          <span className="text-xs uppercase font-bold text-gray-500 tracking-wider block">Yapılan Toplam Anket</span>
+          <span className="text-xl font-black font-mono text-emerald-600 mt-1 block">
+            {totalSurveysDone} <span className="text-xs font-normal text-gray-500">Anket</span>
           </span>
-          <span className="text-[10px] text-gray-400 block mt-0.5">Raporlanan anket sayısı</span>
+          <span className="text-xs text-gray-500 block mt-0.5">Raporlanan anket sayısı</span>
         </div>
 
         <div className="p-4 rounded-2xl bg-white border border-gray-200">
-          <span className="text-[10px] uppercase font-bold text-gray-500 tracking-wider block">Toplam Anketör Yevmiyesi</span>
-          <span className="text-xl font-black font-mono text-amber-400 mt-1 block">
+          <span className="text-xs uppercase font-bold text-gray-500 tracking-wider block">Toplam Anketör Yevmiyesi</span>
+          <span className="text-xl font-black font-mono text-amber-600 mt-1 block">
             ₺{totalWageCost.toLocaleString('tr-TR')}
           </span>
-          <span className="text-[10px] text-gray-400 block mt-0.5">Toplam saha hakedişi</span>
+          <span className="text-xs text-gray-500 block mt-0.5">Toplam saha hakedişi</span>
         </div>
       </div>
 
@@ -413,7 +413,7 @@ export default function DailyReportsView() {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Anketör, nokta, proje veya not ara..."
-            className="w-full pl-9 pr-3.5 py-2 rounded-xl bg-white border border-gray-200 text-xs text-gray-900 placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+            className="w-full pl-9 pr-3.5 py-2 rounded-xl bg-white border border-gray-200 text-xs text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-sky-500"
           />
         </div>
       </div>
@@ -424,12 +424,12 @@ export default function DailyReportsView() {
           <div className="p-12 text-center rounded-3xl bg-white border border-gray-200 space-y-3">
             <FileText className="w-10 h-10 text-gray-500 mx-auto" />
             <h3 className="text-base font-bold text-gray-700">Henüz saha günlük raporu bulunmuyor</h3>
-            <p className="text-xs text-gray-400 max-w-md mx-auto">
+            <p className="text-xs text-gray-500 max-w-md mx-auto">
               Yukarıdaki <strong>"+ Günlük Rapor Yaz"</strong> butonunu kullanarak bugün anket yapılan noktaları, çalışan anketörleri ve yevmiyeleri kaydedebilirsiniz.
             </p>
             <button
               onClick={handleOpenCreateModal}
-              className="px-4 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-gray-900 text-xs font-bold transition-all cursor-pointer inline-flex items-center gap-1.5"
+              className="px-4 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-white text-xs font-bold transition-all cursor-pointer inline-flex items-center gap-1.5"
             >
               <Plus className="w-4 h-4" />
               <span>İlk Raporu Oluştur</span>
@@ -448,7 +448,7 @@ export default function DailyReportsView() {
                 <div className="p-4 sm:p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                   <div className="space-y-1.5 min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="text-xs font-mono font-bold px-2.5 py-0.5 rounded-md bg-sky-500/10 text-sky-400 border border-sky-500/20">
+                      <span className="text-xs font-mono font-bold px-2.5 py-0.5 rounded-md bg-sky-500/10 text-sky-600 border border-sky-500/20">
                         {rep.projectCode}
                       </span>
                       <span className="text-xs font-bold text-gray-800">
@@ -463,19 +463,19 @@ export default function DailyReportsView() {
 
                     {/* Locations */}
                     <div className="flex items-start gap-1.5 text-xs text-gray-700">
-                      <MapPin className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
+                      <MapPin className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
                       <span className="font-semibold text-gray-900">Çalışılan Noktalar:</span>
                       <span className="text-gray-700 font-medium">{rep.locations || 'Nokta bilgisi girilmedi'}</span>
                     </div>
 
                     {/* Delay or Start Reason if any */}
                     {rep.statusReason && (
-                      <div className="p-2.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-xs text-rose-300 flex items-start gap-2">
-                        <AlertCircle className="w-4 h-4 text-rose-400 flex-shrink-0 mt-0.5" />
+                      <div className="p-2.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-xs text-rose-700 flex items-start gap-2">
+                        <AlertCircle className="w-4 h-4 text-rose-600 flex-shrink-0 mt-0.5" />
                         <div>
                           <strong>Saha Durum Açıklaması:</strong> {rep.statusReason}
                           {rep.actualStartDate && (
-                            <span className="block text-[11px] text-rose-200 mt-0.5">
+                            <span className="block text-xs text-rose-200 mt-0.5">
                               Saha Gerçek Başlama Tarihi: <strong>{rep.actualStartDate}</strong>
                             </span>
                           )}
@@ -488,16 +488,16 @@ export default function DailyReportsView() {
                   <div className="flex items-center justify-between lg:justify-end gap-3 pt-2 lg:pt-0 border-t lg:border-t-0 border-gray-200">
                     <div className="grid grid-cols-3 gap-2 text-center text-xs pr-2">
                       <div className="px-2.5 py-1.5 rounded-xl bg-white border border-gray-200">
-                        <span className="text-[10px] text-gray-400 block">Çalışan</span>
+                        <span className="text-xs text-gray-500 block">Çalışan</span>
                         <strong className="text-gray-900 text-xs font-mono">{rep.workers?.length || 0} Kişi</strong>
                       </div>
                       <div className="px-2.5 py-1.5 rounded-xl bg-white border border-gray-200">
-                        <span className="text-[10px] text-gray-400 block">Anket</span>
-                        <strong className="text-sky-400 text-xs font-mono">{rep.totalDailySurveys || 0}</strong>
+                        <span className="text-xs text-gray-500 block">Anket</span>
+                        <strong className="text-sky-600 text-xs font-mono">{rep.totalDailySurveys || 0}</strong>
                       </div>
                       <div className="px-2.5 py-1.5 rounded-xl bg-white border border-gray-200">
-                        <span className="text-[10px] text-gray-400 block">Yevmiye</span>
-                        <strong className="text-amber-400 text-xs font-mono">₺{(rep.totalDailyWage || 0).toLocaleString('tr-TR')}</strong>
+                        <span className="text-xs text-gray-500 block">Yevmiye</span>
+                        <strong className="text-amber-600 text-xs font-mono">₺{(rep.totalDailyWage || 0).toLocaleString('tr-TR')}</strong>
                       </div>
                     </div>
 
@@ -507,7 +507,7 @@ export default function DailyReportsView() {
                         className="p-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 hover:text-gray-900 border border-gray-200 transition-all cursor-pointer"
                         title="Raporu Düzenle"
                       >
-                        <Edit3 className="w-4 h-4 text-sky-400" />
+                        <Edit3 className="w-4 h-4 text-sky-600" />
                       </button>
 
                       <button
@@ -516,7 +516,7 @@ export default function DailyReportsView() {
                             deleteDailyReport(rep.id);
                           }
                         }}
-                        className="p-2 rounded-xl bg-gray-100 hover:bg-rose-950/40 text-gray-500 hover:text-rose-400 border border-gray-200 hover:border-rose-800/40 transition-all cursor-pointer"
+                        className="p-2 rounded-xl bg-gray-100 hover:bg-rose-950/40 text-gray-500 hover:text-rose-600 border border-gray-200 hover:border-rose-800/40 transition-all cursor-pointer"
                         title="Raporu Sil"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -540,7 +540,7 @@ export default function DailyReportsView() {
                     {/* General Field Notes */}
                     {rep.notes && (
                       <div className="p-3.5 rounded-xl bg-white border border-gray-200 text-xs">
-                        <span className="text-[10px] font-bold uppercase text-gray-500 tracking-wider block mb-1">
+                        <span className="text-xs font-bold uppercase text-gray-500 tracking-wider block mb-1">
                           Günün Saha Notları / Yapılan İşler:
                         </span>
                         <p className="text-gray-800 whitespace-pre-line leading-relaxed">{rep.notes}</p>
@@ -549,19 +549,41 @@ export default function DailyReportsView() {
 
                     {/* Workers Table */}
                     <div>
-                      <span className="text-[11px] font-bold uppercase text-gray-500 tracking-wider block mb-2">
+                      <span className="text-xs font-bold uppercase text-gray-500 tracking-wider block mb-2">
                         Sahada Çalışan Anketörler & Günlük Yevmiyeler ({rep.workers?.length || 0} Kişi):
                       </span>
                       
-                      <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white">
+                      {/* TELEFON: çalışan listesi */}
+                      <ul className="sm:hidden divide-y divide-gray-100 rounded-xl border border-gray-200 bg-white">
+                        {rep.workers && rep.workers.length > 0 ? (
+                          rep.workers.map((w, idx) => (
+                            <li key={w.id || idx} className="flex items-center justify-between gap-3 px-3 py-2.5">
+                              <div className="min-w-0">
+                                <p className="font-semibold text-gray-900 truncate">{w.personnelName}</p>
+                                <p className="text-sm text-gray-500 truncate">
+                                  {w.role || 'Anketör'}
+                                  {(w.surveysCompleted || 0) > 0 ? ` · ${w.surveysCompleted} anket` : ''}
+                                  {w.onBehalfOf ? ` · ${w.onBehalfOf} adına` : ''}
+                                  {w.notes ? ` · ${w.notes}` : ''}
+                                </p>
+                              </div>
+                              <span className="font-mono font-bold text-amber-700 shrink-0">₺{Number(w.dailyWage || 0).toLocaleString('tr-TR')}</span>
+                            </li>
+                          ))
+                        ) : (
+                          <li className="py-4 text-center text-sm text-gray-500">Personel detayı girilmemiş.</li>
+                        )}
+                      </ul>
+
+                      <div className="hidden sm:block overflow-x-auto rounded-xl border border-gray-200 bg-white">
                         <table className="w-full text-left text-xs text-gray-700">
-                          <thead className="bg-white text-gray-500 uppercase tracking-wider text-[10px] border-b border-gray-200">
+                          <thead className="bg-white text-gray-500 uppercase tracking-wider text-xs border-b border-gray-200">
                             <tr>
                               <th className="py-2.5 px-3">Çalışan Personel</th>
                               <th className="py-2.5 px-3">Adına Çalıştığı Kişi (Yedek/Yerine)</th>
                               <th className="py-2.5 px-3 text-center">Rol</th>
                               <th className="py-2.5 px-3 text-center">Yapılan Anket</th>
-                              <th className="py-2.5 px-3 text-right text-amber-400">Günlük Ücret (Yevmiye)</th>
+                              <th className="py-2.5 px-3 text-right text-amber-600">Günlük Ücret (Yevmiye)</th>
                               <th className="py-2.5 px-3">Açıklama / Not</th>
                             </tr>
                           </thead>
@@ -570,35 +592,35 @@ export default function DailyReportsView() {
                               rep.workers.map((w, idx) => (
                                 <tr key={w.id || idx} className="hover:bg-gray-100 transition-colors">
                                   <td className="py-2.5 px-3 font-bold text-gray-900 flex items-center gap-1.5">
-                                    <UserCheck className="w-3.5 h-3.5 text-emerald-400" />
+                                    <UserCheck className="w-3.5 h-3.5 text-emerald-600" />
                                     <span>{w.personnelName}</span>
                                   </td>
                                   <td className="py-2.5 px-3">
                                     {w.onBehalfOf ? (
-                                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 text-[11px] font-semibold">
+                                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-700 border border-indigo-500/20 text-xs font-semibold">
                                         👉 {w.onBehalfOf} adına
                                       </span>
                                     ) : (
-                                      <span className="text-gray-400 text-[11px]">Kendi adına</span>
+                                      <span className="text-gray-500 text-xs">Kendi adına</span>
                                     )}
                                   </td>
-                                  <td className="py-2.5 px-3 text-center text-gray-500 uppercase text-[10px]">
+                                  <td className="py-2.5 px-3 text-center text-gray-500 uppercase text-xs">
                                     {w.role || 'Anketör'}
                                   </td>
-                                  <td className="py-2.5 px-3 text-center font-mono font-bold text-sky-400">
+                                  <td className="py-2.5 px-3 text-center font-mono font-bold text-sky-600">
                                     {w.surveysCompleted || 0} Adet
                                   </td>
-                                  <td className="py-2.5 px-3 text-right font-mono font-bold text-amber-300">
+                                  <td className="py-2.5 px-3 text-right font-mono font-bold text-amber-700">
                                     ₺{Number(w.dailyWage || 0).toLocaleString('tr-TR')}
                                   </td>
-                                  <td className="py-2.5 px-3 text-gray-500 text-[11px]">
+                                  <td className="py-2.5 px-3 text-gray-500 text-xs">
                                     {w.notes || '-'}
                                   </td>
                                 </tr>
                               ))
                             ) : (
                               <tr>
-                                <td colSpan={6} className="py-4 text-center text-gray-400">
+                                <td colSpan={6} className="py-4 text-center text-gray-500">
                                   Personel detayı girilmemiş.
                                 </td>
                               </tr>
@@ -608,7 +630,7 @@ export default function DailyReportsView() {
                       </div>
                     </div>
 
-                    <div className="flex justify-between items-center text-[10px] text-gray-400 pt-1">
+                    <div className="flex justify-between items-center text-xs text-gray-500 pt-1">
                       <span>Raporu Oluşturan: <strong className="text-gray-700">{rep.createdByName || 'SPV'}</strong></span>
                       <span>Kayıt Tarihi: {new Date(rep.createdAt).toLocaleString('tr-TR')}</span>
                     </div>
@@ -628,7 +650,7 @@ export default function DailyReportsView() {
             {/* Header */}
             <div className="flex items-center justify-between pb-3 border-b border-gray-200">
               <div className="flex items-center gap-2">
-                <div className="p-2 rounded-xl bg-sky-500/15 text-sky-400 border border-sky-500/30">
+                <div className="p-2 rounded-xl bg-sky-500/15 text-sky-600 border border-sky-500/30">
                   <FileText className="w-5 h-5" />
                 </div>
                 <div>
@@ -654,7 +676,7 @@ export default function DailyReportsView() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-semibold text-gray-700 mb-1">
-                    İlgili Proje <span className="text-rose-400">*</span>
+                    İlgili Proje <span className="text-rose-600">*</span>
                   </label>
                   <select
                     value={formProjectId}
@@ -671,7 +693,7 @@ export default function DailyReportsView() {
 
                 <div>
                   <label className="block text-xs font-semibold text-gray-700 mb-1">
-                    Rapor Tarihi <span className="text-rose-400">*</span>
+                    Rapor Tarihi <span className="text-rose-600">*</span>
                   </label>
                   <input
                     type="date"
@@ -686,7 +708,7 @@ export default function DailyReportsView() {
               {/* Row 2: Saha Noktaları / Lokasyon */}
               <div>
                 <label className="block text-xs font-semibold text-gray-700 mb-1">
-                  Bugün Anket Yapılan Noktalar & Lokasyonlar <span className="text-rose-400">*</span>
+                  Bugün Anket Yapılan Noktalar & Lokasyonlar <span className="text-rose-600">*</span>
                 </label>
                 <input
                   type="text"
@@ -694,7 +716,7 @@ export default function DailyReportsView() {
                   value={formLocations}
                   onChange={(e) => setFormLocations(e.target.value)}
                   placeholder="Örn: Kadıköy Rıhtım, Moda Sahil, Altıyol Meydan, Beşiktaş Çarşı"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-gray-200 text-xs text-gray-900 placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-gray-200 text-xs text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-sky-500"
                 />
               </div>
 
@@ -736,7 +758,7 @@ export default function DailyReportsView() {
                     value={formStatusReason}
                     onChange={(e) => setFormStatusReason(e.target.value)}
                     placeholder="Örn: Yağış sebebiyle saha 13:00'te başlayabildi / İzin belgesi beklendiği için başlanamadı"
-                    className="w-full px-3 py-2 rounded-xl bg-white border border-gray-200 text-xs text-gray-900 placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+                    className="w-full px-3 py-2 rounded-xl bg-white border border-gray-200 text-xs text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-sky-500"
                   />
                 </div>
               </div>
@@ -746,12 +768,12 @@ export default function DailyReportsView() {
                 <div className="flex items-center justify-between">
                   <div>
                     <span className="text-xs font-bold text-gray-900 block">Çalışan Anketörler & Günlük Yevmiyeler</span>
-                    <span className="text-[11px] text-gray-500">Kimler sahaya çıktı, kimin adına çalıştı, günlük ücreti ne kadar</span>
+                    <span className="text-xs text-gray-500">Kimler sahaya çıktı, kimin adına çalıştı, günlük ücreti ne kadar</span>
                   </div>
                   <button
                     type="button"
                     onClick={handleAddWorkerRow}
-                    className="px-3 py-1.5 rounded-xl bg-sky-500/15 hover:bg-sky-500/25 text-sky-300 border border-sky-500/30 text-xs font-bold transition-all cursor-pointer flex items-center gap-1"
+                    className="px-3 py-1.5 rounded-xl bg-sky-500/15 hover:bg-sky-500/25 text-sky-700 border border-sky-500/30 text-xs font-bold transition-all cursor-pointer flex items-center gap-1"
                   >
                     <Plus className="w-3.5 h-3.5" />
                     <span>+ Anketör Ekle</span>
@@ -766,7 +788,7 @@ export default function DailyReportsView() {
                     >
                       {/* Worker Name */}
                       <div className="sm:col-span-4">
-                        <label className="block text-[10px] text-gray-500 mb-0.5">Çalışan Kişi Adı</label>
+                        <label className="block text-xs text-gray-500 mb-0.5">Çalışan Kişi Adı</label>
                         <input
                           type="text"
                           required
@@ -780,19 +802,19 @@ export default function DailyReportsView() {
 
                       {/* On Behalf Of */}
                       <div className="sm:col-span-3">
-                        <label className="block text-[10px] text-gray-500 mb-0.5">Şunun Adına Çalıştı (Opsiyonel)</label>
+                        <label className="block text-xs text-gray-500 mb-0.5">Şunun Adına Çalıştı (Opsiyonel)</label>
                         <input
                           type="text"
                           value={w.onBehalfOf || ''}
                           onChange={(e) => handleUpdateWorker(w.id, 'onBehalfOf', e.target.value)}
                           placeholder="Örn: Mehmet yerine"
-                          className="w-full px-2.5 py-1.5 rounded-xl bg-white border border-gray-200 text-xs text-indigo-300 placeholder-slate-600 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                          className="w-full px-2.5 py-1.5 rounded-xl bg-white border border-gray-200 text-xs text-indigo-700 placeholder-slate-600 focus:outline-none focus:ring-1 focus:ring-indigo-500"
                         />
                       </div>
 
                       {/* Daily Wage */}
                       <div className="sm:col-span-2">
-                        <label className="block text-[10px] text-amber-400 mb-0.5">Günlük Yevmiye (TL)</label>
+                        <label className="block text-xs text-amber-600 mb-0.5">Günlük Yevmiye (TL)</label>
                         <input
                           type="number"
                           required
@@ -801,20 +823,20 @@ export default function DailyReportsView() {
                           value={w.dailyWage}
                           onChange={(e) => handleUpdateWorker(w.id, 'dailyWage', Number(e.target.value))}
                           placeholder="1000"
-                          className="w-full px-2.5 py-1.5 rounded-xl bg-white border border-gray-200 text-xs text-amber-400 font-mono font-bold focus:outline-none focus:ring-1 focus:ring-amber-500"
+                          className="w-full px-2.5 py-1.5 rounded-xl bg-white border border-gray-200 text-xs text-amber-600 font-mono font-bold focus:outline-none focus:ring-1 focus:ring-amber-500"
                         />
                       </div>
 
                       {/* Surveys Done */}
                       <div className="sm:col-span-2">
-                        <label className="block text-[10px] text-sky-400 mb-0.5">Yaptığı Anket</label>
+                        <label className="block text-xs text-sky-600 mb-0.5">Yaptığı Anket</label>
                         <input
                           type="number"
                           min="0"
                           value={w.surveysCompleted || 0}
                           onChange={(e) => handleUpdateWorker(w.id, 'surveysCompleted', Number(e.target.value))}
                           placeholder="0"
-                          className="w-full px-2.5 py-1.5 rounded-xl bg-white border border-gray-200 text-xs text-sky-300 font-mono font-bold focus:outline-none focus:ring-1 focus:ring-sky-500"
+                          className="w-full px-2.5 py-1.5 rounded-xl bg-white border border-gray-200 text-xs text-sky-700 font-mono font-bold focus:outline-none focus:ring-1 focus:ring-sky-500"
                         />
                       </div>
 
@@ -824,7 +846,7 @@ export default function DailyReportsView() {
                           type="button"
                           disabled={formWorkers.length === 1}
                           onClick={() => handleRemoveWorkerRow(w.id)}
-                          className="p-1.5 text-gray-400 hover:text-rose-400 hover:bg-white rounded-lg disabled:opacity-20 cursor-pointer"
+                          className="p-1.5 text-gray-500 hover:text-rose-600 hover:bg-white rounded-lg disabled:opacity-20 cursor-pointer"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -844,10 +866,10 @@ export default function DailyReportsView() {
                 <div className="p-3 rounded-2xl bg-white border border-gray-200 border border-gray-200 flex items-center justify-between text-xs">
                   <span className="text-gray-500">
                     Toplam: <strong className="text-gray-900">{formWorkers.filter(w => w.personnelName.trim()).length}</strong> Personel •{' '}
-                    <strong className="text-sky-400">{formWorkers.reduce((sum, w) => sum + Number(w.surveysCompleted || 0), 0)}</strong> Anket
+                    <strong className="text-sky-600">{formWorkers.reduce((sum, w) => sum + Number(w.surveysCompleted || 0), 0)}</strong> Anket
                   </span>
                   <span className="font-mono text-xs">
-                    Toplam Yevmiye: <strong className="text-amber-400 font-bold text-sm">₺{formWorkers.reduce((sum, w) => sum + Number(w.dailyWage || 0), 0).toLocaleString('tr-TR')}</strong>
+                    Toplam Yevmiye: <strong className="text-amber-600 font-bold text-sm">₺{formWorkers.reduce((sum, w) => sum + Number(w.dailyWage || 0), 0).toLocaleString('tr-TR')}</strong>
                   </span>
                 </div>
               </div>
@@ -862,7 +884,7 @@ export default function DailyReportsView() {
                   value={formNotes}
                   onChange={(e) => setFormNotes(e.target.value)}
                   placeholder="Bugün sahada neler yapıldı, hava durumu nasıldı, karşılaşılan bir engel oldu mu..."
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-gray-200 text-xs text-gray-900 placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-gray-200 text-xs text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-sky-500"
                 />
               </div>
 
@@ -878,7 +900,7 @@ export default function DailyReportsView() {
 
                 <button
                   type="submit"
-                  className="px-6 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-gray-900 text-xs font-bold shadow-lg shadow-sky-500/20 transition-all cursor-pointer"
+                  className="px-6 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-white text-xs font-bold shadow-lg shadow-sky-500/20 transition-all cursor-pointer"
                 >
                   {editingReportId ? 'Rapor Değişikliklerini Kaydet' : 'Saha Günlük Raporunu Kaydet'}
                 </button>

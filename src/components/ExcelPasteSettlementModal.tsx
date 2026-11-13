@@ -184,7 +184,7 @@ Ankara	4147286	AYLA AKAT	6	0	6	₺320,00	₺1.920,00	`;
         {/* Header */}
         <div className="flex items-center justify-between pb-4 border-b border-gray-200">
           <div className="flex items-center gap-3">
-            <div className="p-3 rounded-2xl bg-emerald-500/15 text-emerald-400 border border-emerald-500/25">
+            <div className="p-3 rounded-2xl bg-emerald-500/15 text-emerald-600 border border-emerald-500/25">
               <ClipboardPaste className="w-6 h-6" />
             </div>
             <div>
@@ -245,7 +245,7 @@ Ankara	4147286	AYLA AKAT	6	0	6	₺320,00	₺1.920,00	`;
             <span className="font-semibold text-gray-700">
               Excel'den Kopyalanan Hücreleri Buraya Yapıştırın (Ctrl + V):
             </span>
-            <span className="text-[11px] text-gray-500 font-mono">
+            <span className="text-xs text-gray-500 font-mono">
               Format: IL • TC • ANKETÖR • TOPLAM • İPTAL • VERİLEN
             </span>
           </div>
@@ -255,11 +255,11 @@ Ankara	4147286	AYLA AKAT	6	0	6	₺320,00	₺1.920,00	`;
             value={rawText}
             onChange={handleTextChange}
             placeholder="Excel tablonuzu seçip kopyalayın (Ctrl+C) ve bu alana yapıştırın (Ctrl+V)..."
-            className="w-full p-3 rounded-2xl bg-white border border-gray-200 focus:border-emerald-500 font-mono text-xs text-emerald-300 placeholder-slate-600 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+            className="w-full p-3 rounded-2xl bg-white border border-gray-200 focus:border-emerald-500 font-mono text-xs text-emerald-700 placeholder-slate-600 focus:outline-none focus:ring-1 focus:ring-emerald-500"
           />
 
           {parseError && (
-            <div className="p-2.5 rounded-xl bg-rose-500/10 border border-rose-500/25 text-rose-400 text-xs flex items-center gap-2">
+            <div className="p-2.5 rounded-xl bg-rose-500/10 border border-rose-500/25 text-rose-600 text-xs flex items-center gap-2">
               <AlertCircle className="w-4 h-4 flex-shrink-0" />
               <span>{parseError}</span>
             </div>
@@ -271,28 +271,28 @@ Ankara	4147286	AYLA AKAT	6	0	6	₺320,00	₺1.920,00	`;
           <div className="flex-1 space-y-2 mb-4 overflow-hidden flex flex-col">
             <div className="flex justify-between items-center text-xs">
               <span className="font-bold text-gray-900 flex items-center gap-1.5">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                 <span>Ayrıştırılan Hakediş Önizlemesi ({parsedRows.length} Anketör Satırı)</span>
               </span>
-              <span className="text-[11px] text-gray-500">
-                Hedef Proje: <strong className="text-sky-400">{targetProject?.code}</strong>
+              <span className="text-xs text-gray-500">
+                Hedef Proje: <strong className="text-sky-600">{targetProject?.code}</strong>
               </span>
             </div>
 
             <div className="overflow-x-auto rounded-2xl border border-gray-200 bg-white flex-1 max-h-56">
               <table className="w-full text-left text-xs text-gray-700">
-                <thead className="bg-white text-gray-500 uppercase tracking-wider text-[10px] sticky top-0 border-b border-gray-200">
+                <thead className="bg-white text-gray-500 uppercase tracking-wider text-xs sticky top-0 border-b border-gray-200">
                   <tr>
                     <th className="py-2 px-3">İL</th>
                     <th className="py-2 px-3">TC</th>
                     <th className="py-2 px-3">ANKETÖR</th>
                     <th className="py-2 px-3 text-center">TOPLAM</th>
-                    <th className="py-2 px-3 text-center text-rose-400">İPTAL</th>
-                    <th className="py-2 px-3 text-center text-sky-400">GEÇERLİ</th>
+                    <th className="py-2 px-3 text-center text-rose-600">İPTAL</th>
+                    <th className="py-2 px-3 text-center text-sky-600">GEÇERLİ</th>
                     <th className="py-2 px-3 text-right">BİRİM FİYAT</th>
                     <th className="py-2 px-3 text-right">BRÜT TUTAR</th>
-                    <th className="py-2 px-3 text-right text-amber-400">KESİLEN AVANS</th>
-                    <th className="py-2 px-3 text-right text-emerald-400 font-bold">NET ÖDENECEK</th>
+                    <th className="py-2 px-3 text-right text-amber-600">KESİLEN AVANS</th>
+                    <th className="py-2 px-3 text-right text-emerald-600 font-bold">NET ÖDENECEK</th>
                     <th className="py-2 px-3">NOT</th>
                   </tr>
                 </thead>
@@ -306,20 +306,20 @@ Ankara	4147286	AYLA AKAT	6	0	6	₺320,00	₺1.920,00	`;
                     return (
                       <tr key={idx} className="hover:bg-gray-50">
                         <td className="py-2 px-3 text-gray-500">{row.city || 'Ankara'}</td>
-                        <td className="py-2 px-3 font-mono text-[11px] text-gray-500">{row.identityNumber || '-'}</td>
+                        <td className="py-2 px-3 font-mono text-xs text-gray-500">{row.identityNumber || '-'}</td>
                         <td className="py-2 px-3 font-bold text-gray-900">{row.personnelName}</td>
                         <td className="py-2 px-3 text-center font-mono">{row.totalSurveys}</td>
-                        <td className="py-2 px-3 text-center font-mono text-rose-400">{row.invalidSurveys}</td>
-                        <td className="py-2 px-3 text-center font-mono font-bold text-sky-300 bg-sky-500/5">{valid}</td>
+                        <td className="py-2 px-3 text-center font-mono text-rose-600">{row.invalidSurveys}</td>
+                        <td className="py-2 px-3 text-center font-mono font-bold text-sky-700 bg-sky-500/5">{valid}</td>
                         <td className="py-2 px-3 text-right font-mono">₺{row.unitPrice}</td>
                         <td className="py-2 px-3 text-right font-mono text-gray-700">₺{gross.toLocaleString('tr-TR')}</td>
-                        <td className="py-2 px-3 text-right font-mono text-amber-400">
+                        <td className="py-2 px-3 text-right font-mono text-amber-600">
                           {adv > 0 ? `-₺${adv.toLocaleString('tr-TR')}` : '₺0'}
                         </td>
-                        <td className="py-2 px-3 text-right font-mono font-black text-emerald-400 bg-emerald-500/5">
+                        <td className="py-2 px-3 text-right font-mono font-black text-emerald-600 bg-emerald-500/5">
                           ₺{net.toLocaleString('tr-TR')}
                         </td>
-                        <td className="py-2 px-3 text-gray-400 text-[11px]">{row.notes || '-'}</td>
+                        <td className="py-2 px-3 text-gray-500 text-xs">{row.notes || '-'}</td>
                       </tr>
                     );
                   })}
@@ -345,8 +345,8 @@ Ankara	4147286	AYLA AKAT	6	0	6	₺320,00	₺1.920,00	`;
             onClick={handleCommitImport}
             className={`py-2.5 px-6 rounded-xl font-bold text-xs flex items-center gap-2 shadow-lg transition-all cursor-pointer ${
               parsedRows.length > 0
-                ? 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-gray-900 shadow-emerald-600/25'
-                : 'bg-gray-100 text-gray-400 cursor-not-allowed border border-gray-200'
+                ? 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white shadow-emerald-600/25'
+                : 'bg-gray-100 text-gray-500 cursor-not-allowed border border-gray-200'
             }`}
           >
             <span>Hakedişleri Projeye Aktar & Hesapla ({parsedRows.length} Satır)</span>

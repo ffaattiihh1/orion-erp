@@ -75,15 +75,15 @@ export default function AdvancesView() {
     if (confirmDeleteId === a.id) {
       return (
         <span className="inline-flex items-center gap-1">
-          <button onClick={() => { deleteAdvance(a.id); setConfirmDeleteId(null); }} className="px-2 py-1 rounded-lg bg-red-600 text-white text-[11px] font-bold cursor-pointer">Sil</button>
-          <button onClick={() => setConfirmDeleteId(null)} className="px-2 py-1 rounded-lg bg-gray-100 text-gray-600 text-[11px] cursor-pointer">Vazgeç</button>
+          <button onClick={() => { deleteAdvance(a.id); setConfirmDeleteId(null); }} className="px-2 py-1 rounded-lg bg-red-600 text-white text-xs font-bold cursor-pointer">Sil</button>
+          <button onClick={() => setConfirmDeleteId(null)} className="px-2 py-1 rounded-lg bg-gray-100 text-gray-600 text-xs cursor-pointer">Vazgeç</button>
         </span>
       );
     }
     return (
       <span className="inline-flex items-center gap-1">
-        <button onClick={() => setModal({ open: true, editing: a })} className="p-1.5 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 cursor-pointer" aria-label="Düzenle"><Pencil className="w-3.5 h-3.5" /></button>
-        <button onClick={() => setConfirmDeleteId(a.id)} className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 cursor-pointer" aria-label="Sil"><Trash2 className="w-3.5 h-3.5" /></button>
+        <button onClick={() => setModal({ open: true, editing: a })} className="p-1.5 rounded-lg text-gray-500 hover:text-blue-600 hover:bg-blue-50 cursor-pointer" aria-label="Düzenle"><Pencil className="w-3.5 h-3.5" /></button>
+        <button onClick={() => setConfirmDeleteId(a.id)} className="p-1.5 rounded-lg text-gray-500 hover:text-red-600 hover:bg-red-50 cursor-pointer" aria-label="Sil"><Trash2 className="w-3.5 h-3.5" /></button>
       </span>
     );
   };
@@ -133,7 +133,7 @@ export default function AdvancesView() {
         </div>
         <div className="flex gap-2">
           <div className="relative flex-1 sm:w-64">
-            <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-gray-500 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -158,22 +158,22 @@ export default function AdvancesView() {
       {tab === 'balances' ? (
         <div className="rounded-2xl bg-white border border-gray-200 divide-y divide-gray-100 overflow-hidden">
           {visibleLedgers.length === 0 && (
-            <p className="py-10 text-center text-sm text-gray-400">Henüz kayıt yok.</p>
+            <p className="py-10 text-center text-sm text-gray-500">Henüz kayıt yok.</p>
           )}
           {visibleLedgers.map(l => {
             const open = expanded === l.key;
             return (
               <div key={l.key}>
                 <button onClick={() => setExpanded(open ? null : l.key)} className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-gray-50 cursor-pointer">
-                  {open ? <ChevronDown className="w-4 h-4 text-gray-400 shrink-0" /> : <ChevronRight className="w-4 h-4 text-gray-400 shrink-0" />}
+                  {open ? <ChevronDown className="w-4 h-4 text-gray-500 shrink-0" /> : <ChevronRight className="w-4 h-4 text-gray-500 shrink-0" />}
                   <div className="flex-1 min-w-0">
                     <p className="font-bold text-gray-900 truncate">{l.name}</p>
                     <p className="text-xs text-gray-500">Hak edilen {fmt(l.earned)} · Verilen {fmt(l.given)}</p>
                   </div>
                   <div className="text-right shrink-0">
-                    {l.balance > 0 && <><p className="font-black font-mono text-emerald-600">{fmt(l.balance)}</p><p className="text-[11px] text-emerald-700">ödenecek</p></>}
-                    {l.balance < 0 && <><p className="font-black font-mono text-amber-600">{fmt(-l.balance)}</p><p className="text-[11px] text-amber-700">kişide avans</p></>}
-                    {l.balance === 0 && <p className="text-xs text-gray-400">hesap kapalı</p>}
+                    {l.balance > 0 && <><p className="font-black font-mono text-emerald-600">{fmt(l.balance)}</p><p className="text-xs text-emerald-700">ödenecek</p></>}
+                    {l.balance < 0 && <><p className="font-black font-mono text-amber-600">{fmt(-l.balance)}</p><p className="text-xs text-amber-700">kişide avans</p></>}
+                    {l.balance === 0 && <p className="text-xs text-gray-500">hesap kapalı</p>}
                   </div>
                 </button>
                 {open && (
@@ -186,8 +186,8 @@ export default function AdvancesView() {
                     <ul className="space-y-1.5">
                       {l.movements.map(m => (
                         <li key={m.id} className="flex items-center gap-2 bg-white rounded-xl border border-gray-100 px-3 py-2 text-sm">
-                          <span className="text-xs text-gray-400 w-20 shrink-0">{m.date ? new Date(m.date).toLocaleDateString('tr-TR') : '-'}</span>
-                          <span className="text-[11px] font-mono font-bold text-sky-700 shrink-0">{projectCode(m.projectId, m.advance?.projectCode)}</span>
+                          <span className="text-xs text-gray-500 w-20 shrink-0">{m.date ? new Date(m.date).toLocaleDateString('tr-TR') : '-'}</span>
+                          <span className="text-xs font-mono font-bold text-sky-700 shrink-0">{projectCode(m.projectId, m.advance?.projectCode)}</span>
                           <span className="flex-1 min-w-0 truncate text-gray-700">{m.label}</span>
                           <span className={`font-mono font-bold shrink-0 ${m.amount >= 0 ? 'text-emerald-600' : 'text-amber-600'}`}>{m.amount >= 0 ? '+' : '−'}{fmt(Math.abs(m.amount))}</span>
                           {m.advance && <AdvanceActions a={m.advance} />}
@@ -199,7 +199,7 @@ export default function AdvancesView() {
               </div>
             );
           })}
-          <p className="px-4 py-3 text-[11px] text-gray-400 bg-gray-50">
+          <p className="px-4 py-3 text-xs text-gray-500 bg-gray-50">
             Hak edilen = hakedişler (brüt) + TK yevmiyeleri. Verilen = avanslar + ödenmiş hakedişler. Saha raporlarındaki günlük yevmiyeler bu hesaba dahil değildir.
           </p>
         </div>
@@ -210,7 +210,7 @@ export default function AdvancesView() {
             <span>Toplam <strong className="font-mono text-amber-600">{fmt(filteredSum)}</strong></span>
           </div>
           <ul className="divide-y divide-gray-100">
-            {filteredAdvances.length === 0 && <li className="py-10 text-center text-sm text-gray-400">Kayıt bulunamadı.</li>}
+            {filteredAdvances.length === 0 && <li className="py-10 text-center text-sm text-gray-500">Kayıt bulunamadı.</li>}
             {filteredAdvances.map(a => (
               <li key={a.id} className="flex items-center gap-3 px-4 py-3 text-sm">
                 <div className="flex-1 min-w-0">
