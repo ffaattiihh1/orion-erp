@@ -222,10 +222,10 @@ Caner Öztürk\t65498732104\t0505 222 33 44\tAntalya\t180`;
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded">
+                <span className="text-xs font-bold uppercase tracking-wider text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded">
                   Excel Entegrasyonu
                 </span>
-                <span className="text-xs text-gray-400">Yönetim &gt; Kullanıcı / Personel Ekleme</span>
+                <span className="text-xs text-gray-500">Yönetim &gt; Kullanıcı / Personel Ekleme</span>
               </div>
               <h2 className="text-base font-bold text-gray-900 mt-0.5">
                 Kullanıcıları / Personelleri İçeri Aktar
@@ -235,7 +235,7 @@ Caner Öztürk\t65498732104\t0505 222 33 44\tAntalya\t180`;
 
           <button 
             onClick={onClose}
-            className="p-2 text-gray-400 hover:text-gray-700 rounded-lg hover:bg-gray-100 transition-colors"
+            className="p-2 text-gray-500 hover:text-gray-700 rounded-lg hover:bg-gray-100 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -254,15 +254,15 @@ Caner Öztürk\t65498732104\t0505 222 33 44\tAntalya\t180`;
                   Kullanıcıları İçeri Aktar
                 </p>
                 <p className="text-xs text-gray-500 mt-2 leading-relaxed">
-                  Excel dosyanızdaki sütunları seçip kopyalayın (<kbd className="px-1.5 py-0.5 bg-white border border-gray-300 rounded text-[11px] font-mono">Ctrl+C</kbd>) ve sağdaki kutucuğa yapıştırın (<kbd className="px-1.5 py-0.5 bg-white border border-gray-300 rounded text-[11px] font-mono">Ctrl+V</kbd>).
+                  Excel dosyanızdaki sütunları seçip kopyalayın (<kbd className="px-1.5 py-0.5 bg-white border border-gray-300 rounded text-xs font-mono">Ctrl+C</kbd>) ve sağdaki kutucuğa yapıştırın (<kbd className="px-1.5 py-0.5 bg-white border border-gray-300 rounded text-xs font-mono">Ctrl+V</kbd>).
                 </p>
 
-                <div className="mt-3 p-2.5 rounded-lg bg-white border border-gray-200 text-[11px] text-gray-600 space-y-1">
+                <div className="mt-3 p-2.5 rounded-lg bg-white border border-gray-200 text-xs text-gray-600 space-y-1">
                   <p className="font-semibold text-gray-800">Desteklenen Sütun Sırası:</p>
-                  <p className="text-emerald-700 font-mono text-[10px]">
+                  <p className="text-emerald-700 font-mono text-xs">
                     1. Ad Soyad | 2. TC Kimlik | 3. Telefon | 4. Şehir | 5. Ücret
                   </p>
-                  <p className="text-gray-400 text-[10px] mt-1">
+                  <p className="text-gray-500 text-xs mt-1">
                     * Başlık satırı olsa da sistem otomatik tanır ve atlar.
                   </p>
                 </div>
@@ -289,7 +289,7 @@ Caner Öztürk\t65498732104\t0505 222 33 44\tAntalya\t180`;
                   <button
                     type="button"
                     onClick={handleFillSample}
-                    className="flex items-center gap-1 text-[11px] text-blue-600 hover:text-blue-800 font-medium cursor-pointer"
+                    className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 font-medium cursor-pointer"
                   >
                     <Sparkles className="w-3 h-3" />
                     <span>Örnek Doldur</span>
@@ -298,7 +298,7 @@ Caner Öztürk\t65498732104\t0505 222 33 44\tAntalya\t180`;
                     <button
                       type="button"
                       onClick={handleClear}
-                      className="flex items-center gap-1 text-[11px] text-red-600 hover:text-red-800 font-medium cursor-pointer ml-2"
+                      className="flex items-center gap-1 text-xs text-red-600 hover:text-red-800 font-medium cursor-pointer ml-2"
                     >
                       <Trash2 className="w-3 h-3" />
                       <span>Temizle</span>
@@ -312,7 +312,7 @@ Caner Öztürk\t65498732104\t0505 222 33 44\tAntalya\t180`;
                 onChange={handleTextChange}
                 rows={7}
                 placeholder="Excel'den kopyaladığınız satırları buraya yapıştırın... (Örn: Ahmet Yılmaz	12345678901	05321234567)"
-                className="w-full p-3 font-mono text-xs text-gray-900 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all placeholder:text-gray-400"
+                className="w-full p-3 font-mono text-xs text-gray-900 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all placeholder:text-gray-500"
               />
 
               {parseError && (
@@ -335,7 +335,7 @@ Caner Öztürk\t65498732104\t0505 222 33 44\tAntalya\t180`;
                     Önizleme ({parsedRows.length} Personel Algılandı)
                   </span>
                 </div>
-                <span className="text-[11px] text-gray-400">
+                <span className="text-xs text-gray-500">
                   * Bilgiler doğrulanıp sisteme ortak havuz olarak eklenecektir.
                 </span>
               </div>
@@ -355,7 +355,7 @@ Caner Öztürk\t65498732104\t0505 222 33 44\tAntalya\t180`;
                   <tbody className="divide-y divide-gray-100 bg-white text-gray-700">
                     {parsedRows.map((r, idx) => (
                       <tr key={idx} className="hover:bg-gray-50">
-                        <td className="py-1.5 px-3 font-mono text-[10px] text-gray-400">{idx + 1}</td>
+                        <td className="py-1.5 px-3 font-mono text-xs text-gray-500">{idx + 1}</td>
                         <td className="py-1.5 px-3 font-semibold text-gray-900">{r.fullName}</td>
                         <td className="py-1.5 px-3 font-mono text-gray-600">
                           {r.identityNumber || <span className="text-gray-300">-</span>}

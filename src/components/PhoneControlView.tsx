@@ -166,7 +166,7 @@ export default function PhoneControlView() {
     const r = rate || 0;
     if (r >= 90) {
       return (
-        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-500/15 text-emerald-600 border border-emerald-500/30">
           <CheckCircle2 className="w-3 h-3" />
           <span>%{r} Onay (Yüksek Kalite)</span>
         </span>
@@ -174,14 +174,14 @@ export default function PhoneControlView() {
     }
     if (r >= 75) {
       return (
-        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30">
+        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-500/15 text-amber-700 border border-amber-500/30">
           <AlertCircle className="w-3 h-3" />
           <span>%{r} Onay (Standart)</span>
         </span>
       );
     }
     return (
-      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-500/15 text-rose-400 border border-rose-500/30">
+      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-500/15 text-rose-600 border border-rose-500/30">
         <XCircle className="w-3 h-3" />
         <span>%{r} Onay (Düşük / İnceleme)</span>
       </span>
@@ -215,7 +215,7 @@ export default function PhoneControlView() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <div className="p-2 rounded-xl bg-indigo-500/15 text-indigo-400 border border-indigo-500/30">
+            <div className="p-2 rounded-xl bg-indigo-500/15 text-indigo-600 border border-indigo-500/30">
               <PhoneCall className="w-5 h-5" />
             </div>
             <div>
@@ -232,13 +232,13 @@ export default function PhoneControlView() {
             onClick={handleExportExcel}
             className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs font-bold transition-all border border-gray-200 cursor-pointer"
           >
-            <FileSpreadsheet className="w-4 h-4 text-emerald-400" />
+            <FileSpreadsheet className="w-4 h-4 text-emerald-600" />
             <span>Excel'e Aktar</span>
           </button>
 
           <button
             onClick={handleOpenCreateModal}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-500 hover:bg-indigo-400 text-gray-900 text-xs font-bold shadow-lg shadow-indigo-500/20 transition-all cursor-pointer"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-500 hover:bg-indigo-400 text-white text-xs font-bold shadow-lg shadow-indigo-500/20 transition-all cursor-pointer"
           >
             <Plus className="w-4 h-4" />
             <span>+ Yeni TK Arama Kaydı Gir</span>
@@ -249,35 +249,35 @@ export default function PhoneControlView() {
       {/* KPI Ribbon */}
       <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
         <div className="p-4 rounded-2xl bg-white border border-gray-200">
-          <span className="text-[10px] uppercase font-bold text-gray-500 tracking-wider block">Toplam Aranan</span>
+          <span className="text-xs uppercase font-bold text-gray-500 tracking-wider block">Toplam Aranan</span>
           <span className="text-xl font-black font-mono text-gray-900 mt-1 block">
-            {totalCallsDone} <span className="text-xs font-normal text-gray-400">Kişi / Anket</span>
+            {totalCallsDone} <span className="text-xs font-normal text-gray-500">Kişi / Anket</span>
           </span>
-          <span className="text-[10px] text-gray-400 block mt-0.5">{filteredRecords.length} TK Çalışma Kaydı</span>
+          <span className="text-xs text-gray-500 block mt-0.5">{filteredRecords.length} TK Çalışma Kaydı</span>
         </div>
 
         <div className="p-4 rounded-2xl bg-white border border-gray-200">
-          <span className="text-[10px] uppercase font-bold text-gray-500 tracking-wider block">Okey / Onay Alınan</span>
+          <span className="text-xs uppercase font-bold text-gray-500 tracking-wider block">Okey / Onay Alınan</span>
           <span className="text-xl font-black font-mono text-emerald-600 mt-1 block">
-            {totalApprovedDone} <span className="text-xs font-normal text-gray-400">Onay</span>
+            {totalApprovedDone} <span className="text-xs font-normal text-gray-500">Onay</span>
           </span>
-          <span className="text-[10px] text-emerald-600 block mt-0.5">Geçerli teyitli anket</span>
+          <span className="text-xs text-emerald-600 block mt-0.5">Geçerli teyitli anket</span>
         </div>
 
         <div className="p-4 rounded-2xl bg-white border border-gray-200">
-          <span className="text-[10px] uppercase font-bold text-gray-500 tracking-wider block">Genel Onay Başarısı</span>
+          <span className="text-xs uppercase font-bold text-gray-500 tracking-wider block">Genel Onay Başarısı</span>
           <span className="text-xl font-black font-mono text-sky-600 mt-1 block">
             %{overallApprovalRate}
           </span>
-          <span className="text-[10px] text-sky-600 block mt-0.5">Teyit Başarı Oranı</span>
+          <span className="text-xs text-sky-600 block mt-0.5">Teyit Başarı Oranı</span>
         </div>
 
         <div className="p-4 rounded-2xl bg-white border border-gray-200">
-          <span className="text-[10px] uppercase font-bold text-gray-500 tracking-wider block">Toplam TK Maliyeti</span>
+          <span className="text-xs uppercase font-bold text-gray-500 tracking-wider block">Toplam TK Maliyeti</span>
           <span className="text-xl font-black font-mono text-amber-600 mt-1 block">
             ₺{totalTkCost.toLocaleString('tr-TR')}
           </span>
-          <span className="text-[10px] text-amber-600 block mt-0.5">TK günlük yevmiye toplamı</span>
+          <span className="text-xs text-amber-600 block mt-0.5">TK günlük yevmiye toplamı</span>
         </div>
       </div>
 
@@ -310,11 +310,62 @@ export default function PhoneControlView() {
         </div>
       </div>
 
-      {/* Table of TK Records */}
-      <div className="rounded-2xl bg-white border border-gray-200 overflow-hidden shadow-sm">
+      {/* TELEFON: kart görünümü */}
+      <div className="sm:hidden space-y-2.5">
+        {filteredRecords.length === 0 ? (
+          <p className="py-10 text-center text-sm text-gray-500 bg-white rounded-2xl border border-gray-200">Kayıt bulunamadı.</p>
+        ) : (
+          filteredRecords.map((rec) => (
+            <div key={rec.id} className="bg-white rounded-2xl border border-gray-200 p-4">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="font-bold text-gray-900 text-base leading-tight">{rec.controllerName}</p>
+                  <p className="text-sm text-gray-500 mt-0.5">{new Date(rec.controlDate).toLocaleDateString('tr-TR')} · {rec.projectCode}</p>
+                </div>
+                <p className="text-lg font-black font-mono text-amber-700 shrink-0">₺{Number(rec.dailyWage || 0).toLocaleString('tr-TR')}</p>
+              </div>
+              <div className="mt-3 grid grid-cols-3 gap-2 text-center">
+                <div className="rounded-xl bg-gray-50 py-2">
+                  <p className="text-base font-bold text-gray-900">{rec.totalCalled}</p>
+                  <p className="text-xs text-gray-500">arandı</p>
+                </div>
+                <div className="rounded-xl bg-emerald-50 py-2">
+                  <p className="text-base font-bold text-emerald-700">{rec.totalApproved}</p>
+                  <p className="text-xs text-gray-500">okey</p>
+                </div>
+                <div className="rounded-xl bg-gray-50 py-2 flex flex-col items-center justify-center">
+                  {getApprovalRateBadge(rec.approvalRate)}
+                </div>
+              </div>
+              {rec.notes && <p className="mt-2 text-sm text-gray-600">{rec.notes}</p>}
+              <div className="mt-3 flex justify-end gap-2">
+                <button
+                  onClick={() => handleOpenEditModal(rec)}
+                  className="px-4 py-2 rounded-xl border border-gray-300 text-sm font-semibold text-gray-700 cursor-pointer"
+                >
+                  Düzenle
+                </button>
+                <button
+                  onClick={() => {
+                    if (confirm(`${rec.controllerName} kişisine ait bu TK kaydını silmek istediğinize emin misiniz?`)) {
+                      deletePhoneControlRecord(rec.id);
+                    }
+                  }}
+                  className="px-4 py-2 rounded-xl border border-rose-200 text-sm font-semibold text-rose-600 cursor-pointer"
+                >
+                  Sil
+                </button>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* MASAÜSTÜ: tablo */}
+      <div className="hidden sm:block rounded-2xl bg-white border border-gray-200 overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs text-gray-700">
-            <thead className="bg-gray-50 text-gray-500 uppercase tracking-wider text-[10px] border-b border-gray-200">
+            <thead className="bg-gray-50 text-gray-500 uppercase tracking-wider text-xs border-b border-gray-200">
               <tr>
                 <th className="py-3 px-4">Kontrol Tarihi</th>
                 <th className="py-3 px-4">TK Kontrolcüsü</th>
@@ -329,8 +380,8 @@ export default function PhoneControlView() {
             <tbody className="divide-y divide-gray-200 font-medium">
               {filteredRecords.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="py-12 text-center text-gray-400">
-                    <PhoneCall className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                  <td colSpan={8} className="py-12 text-center text-gray-500">
+                    <PhoneCall className="w-8 h-8 text-gray-500 mx-auto mb-2" />
                     Henüz kayıtlı günlük telefon kontrol (TK) verisi bulunamadı.
                   </td>
                 </tr>
@@ -342,7 +393,7 @@ export default function PhoneControlView() {
                     </td>
 
                     <td className="py-3.5 px-4 font-bold text-gray-900 whitespace-nowrap flex items-center gap-1.5">
-                      <div className="w-6 h-6 rounded-lg bg-indigo-100 border border-indigo-200 flex items-center justify-center text-indigo-700 text-[11px] font-bold">
+                      <div className="w-6 h-6 rounded-lg bg-indigo-100 border border-indigo-200 flex items-center justify-center text-indigo-700 text-xs font-bold">
                         TK
                       </div>
                       <span>{rec.controllerName}</span>
@@ -406,7 +457,7 @@ export default function PhoneControlView() {
             {/* Header */}
             <div className="flex items-center justify-between pb-3 border-b border-gray-200">
               <div className="flex items-center gap-2">
-                <div className="p-2 rounded-xl bg-indigo-500/15 text-indigo-400 border border-indigo-500/30">
+                <div className="p-2 rounded-xl bg-indigo-500/15 text-indigo-600 border border-indigo-500/30">
                   <PhoneCall className="w-5 h-5" />
                 </div>
                 <div>
@@ -431,7 +482,7 @@ export default function PhoneControlView() {
               {/* Row 1: Kontrol Tarihi (Günlük TK) */}
               <div>
                 <label className="block text-xs font-semibold text-gray-700 mb-1">
-                  Kontrol Tarihi <span className="text-rose-400">*</span>
+                  Kontrol Tarihi <span className="text-rose-600">*</span>
                 </label>
                 <input
                   type="date"
@@ -446,10 +497,10 @@ export default function PhoneControlView() {
               <div>
                 <div className="flex items-center justify-between mb-1">
                   <label className="block text-xs font-semibold text-gray-700">
-                    TK Kontrolcüsü Adı Soyadı <span className="text-rose-400">*</span>
+                    TK Kontrolcüsü Adı Soyadı <span className="text-rose-600">*</span>
                   </label>
                   {personnel.filter(p => p.defaultRole === 'telefon_kontrolcu').length > 0 && (
-                    <span className="text-[10px] text-indigo-400 font-medium">Kayıtlı TK personellerinden seçin:</span>
+                    <span className="text-xs text-indigo-600 font-medium">Kayıtlı TK personellerinden seçin:</span>
                   )}
                 </div>
 
@@ -466,15 +517,15 @@ export default function PhoneControlView() {
                           onClick={() => handleSelectPersonnelController(p)}
                           className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-all cursor-pointer flex items-center gap-1 ${
                             formControllerName === p.fullName
-                              ? 'bg-indigo-500 text-gray-900 font-bold shadow-sm'
+                              ? 'bg-indigo-500 text-white font-bold shadow-sm'
                               : p.defaultRole === 'telefon_kontrolcu'
-                                ? 'bg-indigo-950/60 text-indigo-300 hover:bg-indigo-900 border border-indigo-800/60'
+                                ? 'bg-indigo-950/60 text-indigo-700 hover:bg-indigo-900 border border-indigo-800/60'
                                 : 'bg-white text-gray-500 hover:bg-gray-100 border border-gray-200'
                           }`}
                         >
                           <span>{p.fullName}</span>
                           {p.defaultRole === 'telefon_kontrolcu' && (
-                            <span className="text-[9px] px-1 rounded bg-indigo-500/30 text-indigo-200">TK</span>
+                            <span className="text-xs px-1 rounded bg-indigo-500/30 text-indigo-200">TK</span>
                           )}
                         </button>
                       ))}
@@ -488,7 +539,7 @@ export default function PhoneControlView() {
                   onChange={(e) => setFormControllerName(e.target.value)}
                   placeholder="Örn: Merve Kaya (TK)"
                   list="tk-personnel-list"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-gray-200 text-xs text-gray-900 placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-gray-200 text-xs text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-indigo-500"
                 />
                 <datalist id="tk-personnel-list">
                   {personnel.map(p => (
@@ -501,9 +552,9 @@ export default function PhoneControlView() {
               <div className="p-3.5 rounded-2xl bg-white border border-gray-200 space-y-2.5">
                 <div className="flex items-center justify-between">
                   <label className="text-xs font-semibold text-amber-500">
-                    TK'cı Günlük Sabit Ücreti (TL) <span className="text-rose-400">*</span>
+                    TK'cı Günlük Sabit Ücreti (TL) <span className="text-rose-600">*</span>
                   </label>
-                  <span className="text-[10px] text-gray-500">Kimine 1000, kimine 1500 seçilebilir</span>
+                  <span className="text-xs text-gray-500">Kimine 1000, kimine 1500 seçilebilir</span>
                 </div>
 
                 {/* Quick Presets */}
@@ -515,7 +566,7 @@ export default function PhoneControlView() {
                       onClick={() => setFormDailyWage(preset)}
                       className={`px-3 py-1 rounded-xl text-xs font-bold transition-all cursor-pointer font-mono ${
                         formDailyWage === preset
-                          ? 'bg-amber-500 text-gray-900 shadow-md'
+                          ? 'bg-amber-500 text-white shadow-md'
                           : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
                       }`}
                     >
@@ -541,8 +592,8 @@ export default function PhoneControlView() {
               {/* Row 4: Arama İstatistikleri (Sadece Aranan ve Okey Onay) */}
               <div className="grid grid-cols-2 gap-3">
                 <div className="p-3.5 rounded-xl bg-gray-50 border border-gray-200">
-                  <label className="block text-[11px] uppercase font-bold text-gray-600 mb-1">
-                    ARANAN ADET <span className="text-rose-400">*</span>
+                  <label className="block text-xs uppercase font-bold text-gray-600 mb-1">
+                    ARANAN ADET <span className="text-rose-600">*</span>
                   </label>
                   <input
                     type="number"
@@ -556,8 +607,8 @@ export default function PhoneControlView() {
                 </div>
 
                 <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200">
-                  <label className="block text-[11px] uppercase font-bold text-emerald-700 mb-1">
-                    OKEY (ONAY) <span className="text-rose-400">*</span>
+                  <label className="block text-xs uppercase font-bold text-emerald-700 mb-1">
+                    OKEY (ONAY) <span className="text-rose-600">*</span>
                   </label>
                   <input
                     type="number"

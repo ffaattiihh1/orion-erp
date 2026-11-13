@@ -187,21 +187,21 @@ export default function InvoicesView() {
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="p-4 rounded-xl bg-white border border-gray-200">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-500">Kesilen Toplam Fatura</p>
+          <p className="text-xs font-semibold uppercase tracking-wider text-gray-500">Kesilen Toplam Fatura</p>
           <p className="text-xl font-bold font-mono text-gray-900 mt-1">₺{totalInvoiced.toLocaleString('tr-TR')}</p>
-          <p className="text-[11px] text-gray-400 mt-0.5">Müşterilere düzenlenen e-faturalar</p>
+          <p className="text-xs text-gray-500 mt-0.5">Müşterilere düzenlenen e-faturalar</p>
         </div>
 
         <div className="p-4 rounded-xl bg-white border border-gray-200">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-500">Tahsil Edilen Tutar</p>
+          <p className="text-xs font-semibold uppercase tracking-wider text-gray-500">Tahsil Edilen Tutar</p>
           <p className="text-xl font-bold font-mono text-emerald-600 mt-1">₺{totalCollected.toLocaleString('tr-TR')}</p>
-          <p className="text-[11px] text-gray-400 mt-0.5">Banka hesabına intikal eden tahsilatlar</p>
+          <p className="text-xs text-gray-500 mt-0.5">Banka hesabına intikal eden tahsilatlar</p>
         </div>
 
         <div className="p-4 rounded-xl bg-white border border-gray-200">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-500">Bekleyen Tahsilat (Vade)</p>
+          <p className="text-xs font-semibold uppercase tracking-wider text-gray-500">Bekleyen Tahsilat (Vade)</p>
           <p className="text-xl font-bold font-mono text-amber-600 mt-1">₺{pendingCollection.toLocaleString('tr-TR')}</p>
-          <p className="text-[11px] text-gray-400 mt-0.5">Vadesi beklenen cari alacaklar</p>
+          <p className="text-xs text-gray-500 mt-0.5">Vadesi beklenen cari alacaklar</p>
         </div>
       </div>
 
@@ -251,7 +251,7 @@ export default function InvoicesView() {
       <div className="rounded-2xl bg-white border border-gray-200 overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs text-gray-700">
-            <thead className="bg-gray-50 text-gray-500 uppercase tracking-wider text-[11px] border-b border-gray-200">
+            <thead className="bg-gray-50 text-gray-500 uppercase tracking-wider text-xs border-b border-gray-200">
               <tr>
                 <th className="py-3 px-4 font-semibold">Proje Kodu</th>
                 <th className="py-3 px-4 font-semibold">Ana Müşteri</th>
@@ -265,8 +265,8 @@ export default function InvoicesView() {
             <tbody className="divide-y divide-gray-200">
               {clientInvoices.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="py-12 text-center text-gray-400">
-                    <FileText className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                  <td colSpan={7} className="py-12 text-center text-gray-500">
+                    <FileText className="w-8 h-8 text-gray-500 mx-auto mb-2" />
                     Henüz fatura kaydı bulunmamaktadır.
                   </td>
                 </tr>
@@ -287,7 +287,7 @@ export default function InvoicesView() {
                         className="cursor-pointer hover:underline text-gray-700"
                         title="Faturayı düzenlemek için tıklayın"
                       >
-                        {inv.invoiceNumber || <span className="text-gray-400 italic">(Fatura No Gir)</span>}
+                        {inv.invoiceNumber || <span className="text-gray-500 italic">(Fatura No Gir)</span>}
                       </span>
                     </td>
 
@@ -370,7 +370,7 @@ export default function InvoicesView() {
               </h3>
               <button 
                 onClick={() => setIsEditModalOpen(false)}
-                className="p-1 text-gray-400 hover:text-gray-700 rounded-lg hover:bg-gray-100"
+                className="p-1 text-gray-500 hover:text-gray-700 rounded-lg hover:bg-gray-100"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -480,7 +480,7 @@ export default function InvoicesView() {
               </h3>
               <button 
                 onClick={() => setIsAddModalOpen(false)}
-                className="p-1 text-gray-400 hover:text-gray-700 rounded-lg hover:bg-gray-100"
+                className="p-1 text-gray-500 hover:text-gray-700 rounded-lg hover:bg-gray-100"
               >
                 <X className="w-5 h-5" />
               </button>

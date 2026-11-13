@@ -17,11 +17,10 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#090d16",
+  themeColor: "#ffffff",
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
+  // Yakınlaştırma açık: küçük yazıyı parmakla büyütebilmek erişilebilirlik için şart
 };
 
 export default function RootLayout({
@@ -30,12 +29,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="tr" className="h-full bg-slate-950 text-slate-100 antialiased">
+    <html lang="tr" className="h-full bg-gray-50 text-gray-900 antialiased">
       <head>
         <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
       </head>
-      <body className="min-h-full flex flex-col font-sans bg-slate-950 text-slate-100 selection:bg-sky-500 selection:text-white">
+      <body className="min-h-full flex flex-col font-sans bg-gray-50 text-gray-900 selection:bg-blue-200 selection:text-gray-900">
         <AppProvider>
           {children}
         </AppProvider>

@@ -59,20 +59,20 @@ export default function FeasibilitySimulatorModal({ isOpen, onClose }: Feasibili
     if (marginPercent >= 30) {
       return {
         label: 'Mükemmel Kârlılık (%30+)',
-        color: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30',
+        color: 'text-emerald-600 bg-emerald-500/10 border-emerald-500/30',
         icon: CheckCircle2
       };
     }
     if (marginPercent >= 18) {
       return {
         label: 'Standart / Dengeli Marj',
-        color: 'text-sky-400 bg-sky-500/10 border-sky-500/30',
+        color: 'text-sky-600 bg-sky-500/10 border-sky-500/30',
         icon: TrendingUp
       };
     }
     return {
       label: 'Düşük Kâr / Riskli Teklif',
-      color: 'text-rose-400 bg-rose-500/10 border-rose-500/30',
+      color: 'text-rose-600 bg-rose-500/10 border-rose-500/30',
       icon: AlertTriangle
     };
   };
@@ -119,7 +119,7 @@ export default function FeasibilitySimulatorModal({ isOpen, onClose }: Feasibili
         {/* Header */}
         <div className="flex items-center justify-between pb-4 border-b border-gray-200">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-sky-500/10 text-sky-400 border border-sky-500/20">
+            <div className="p-2.5 rounded-xl bg-sky-500/10 text-sky-600 border border-sky-500/20">
               <Calculator className="w-6 h-6" />
             </div>
             <div>
@@ -156,8 +156,8 @@ export default function FeasibilitySimulatorModal({ isOpen, onClose }: Feasibili
                       : 'bg-white border-gray-200 text-gray-500 hover:border-gray-200'
                   }`}
                 >
-                  <p className="text-xs font-bold text-sky-300">İstanbul Ekip</p>
-                  <p className="text-[11px] text-gray-500 mt-1">Avanslar, SPV günlüğü, fişli masraflar ve operasyon.</p>
+                  <p className="text-xs font-bold text-sky-700">İstanbul Ekip</p>
+                  <p className="text-xs text-gray-500 mt-1">Avanslar, SPV günlüğü, fişli masraflar ve operasyon.</p>
                 </button>
 
                 <button
@@ -169,8 +169,8 @@ export default function FeasibilitySimulatorModal({ isOpen, onClose }: Feasibili
                       : 'bg-white border-gray-200 text-gray-500 hover:border-gray-200'
                   }`}
                 >
-                  <p className="text-xs font-bold text-indigo-300">İller</p>
-                  <p className="text-[11px] text-gray-500 mt-1">İller / Dış ekip tek birim fiyat. Masraf detayı tutulmaz.</p>
+                  <p className="text-xs font-bold text-indigo-700">İller</p>
+                  <p className="text-xs text-gray-500 mt-1">İller / Dış ekip tek birim fiyat. Masraf detayı tutulmaz.</p>
                 </button>
               </div>
             </div>
@@ -203,7 +203,7 @@ export default function FeasibilitySimulatorModal({ isOpen, onClose }: Feasibili
 
             {/* Revenue Drivers */}
             <div className="p-3.5 rounded-xl bg-gray-50 border border-gray-200 space-y-3">
-              <span className="text-xs font-semibold text-emerald-400 uppercase tracking-wider block">
+              <span className="text-xs font-semibold text-emerald-600 uppercase tracking-wider block">
                 Gelir Parametreleri (Müşteri)
               </span>
               <div className="grid grid-cols-2 gap-3">
@@ -233,7 +233,7 @@ export default function FeasibilitySimulatorModal({ isOpen, onClose }: Feasibili
             {/* Cost Drivers - Conditional Based on Model */}
             {businessModel === 'model_a_macro' ? (
               <div className="p-3.5 rounded-xl bg-indigo-950/20 border border-indigo-900/40 space-y-3">
-                <span className="text-xs font-semibold text-indigo-300 uppercase tracking-wider block">
+                <span className="text-xs font-semibold text-indigo-700 uppercase tracking-wider block">
                   İller Parametreleri
                 </span>
                 <div className="grid grid-cols-2 gap-3">
@@ -260,7 +260,7 @@ export default function FeasibilitySimulatorModal({ isOpen, onClose }: Feasibili
               </div>
             ) : (
               <div className="p-3.5 rounded-xl bg-gray-50 border border-gray-200 space-y-3">
-                <span className="text-xs font-semibold text-sky-400 uppercase tracking-wider block">
+                <span className="text-xs font-semibold text-sky-600 uppercase tracking-wider block">
                   İstanbul Ekip & Sabit Gider Dağıtımı
                 </span>
                 <div className="grid grid-cols-2 gap-3">
@@ -325,7 +325,7 @@ export default function FeasibilitySimulatorModal({ isOpen, onClose }: Feasibili
               {/* Big KPI Metrics */}
               <div className="space-y-3">
                 <div className="p-3.5 rounded-xl bg-gray-50 border border-gray-200">
-                  <p className="text-[11px] text-gray-500">Hedeflenen Toplam Ciro</p>
+                  <p className="text-xs text-gray-500">Hedeflenen Toplam Ciro</p>
                   <p className="text-2xl font-black text-gray-900 font-mono">
                     ₺{totalRevenue.toLocaleString('tr-TR')}
                   </p>
@@ -338,22 +338,22 @@ export default function FeasibilitySimulatorModal({ isOpen, onClose }: Feasibili
                   </div>
                   {businessModel === 'model_b_micro' && (
                     <>
-                      <div className="flex justify-between text-[11px] text-gray-400">
+                      <div className="flex justify-between text-xs text-gray-500">
                         <span>• Anketör Hakedişleri:</span>
                         <span className="font-mono">₺{personnelCost.toLocaleString('tr-TR')}</span>
                       </div>
-                      <div className="flex justify-between text-[11px] text-gray-400">
+                      <div className="flex justify-between text-xs text-gray-500">
                         <span>• SPV & Sabit Gider ({projectDays} Gün):</span>
                         <span className="font-mono">₺{overheadCost.toLocaleString('tr-TR')}</span>
                       </div>
-                      <div className="flex justify-between text-[11px] text-gray-400">
+                      <div className="flex justify-between text-xs text-gray-500">
                         <span>• Tahmini Fiş Masrafları:</span>
                         <span className="font-mono">₺{otherEstimatedExpenses.toLocaleString('tr-TR')}</span>
                       </div>
                     </>
                   )}
                   {businessModel === 'model_a_macro' && (
-                    <div className="flex justify-between text-[11px] text-gray-400">
+                    <div className="flex justify-between text-xs text-gray-500">
                       <span>• İller Toplam Hakedişi:</span>
                       <span className="font-mono">₺{personnelCost.toLocaleString('tr-TR')}</span>
                     </div>
@@ -364,13 +364,13 @@ export default function FeasibilitySimulatorModal({ isOpen, onClose }: Feasibili
                   <div className="flex items-baseline justify-between">
                     <div>
                       <p className="text-xs font-semibold text-gray-500">Tahmini Net Kâr</p>
-                      <p className={`text-2xl font-black font-mono ${netProfit >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                      <p className={`text-2xl font-black font-mono ${netProfit >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
                         ₺{netProfit.toLocaleString('tr-TR')}
                       </p>
                     </div>
                     <div className="text-right">
                       <p className="text-xs font-semibold text-gray-500">Kâr Marjı</p>
-                      <p className={`text-2xl font-black font-mono ${netProfit >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                      <p className={`text-2xl font-black font-mono ${netProfit >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
                         %{marginPercent.toFixed(1)}
                       </p>
                     </div>
@@ -399,7 +399,7 @@ export default function FeasibilitySimulatorModal({ isOpen, onClose }: Feasibili
               <button
                 type="button"
                 onClick={handleCreateActiveProject}
-                className="flex-2 py-2.5 px-4 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-xs font-bold text-gray-900 shadow-lg shadow-sky-500/20 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                className="flex-2 py-2.5 px-4 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-xs font-bold text-white shadow-lg shadow-sky-500/20 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
               >
                 <span>Projeyi Aktif Et</span>
                 <ArrowRight className="w-4 h-4" />

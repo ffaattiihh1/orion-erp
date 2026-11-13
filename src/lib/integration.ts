@@ -1,6 +1,7 @@
 // SERVER-ONLY: dış sistemlerden (iControl) gelen projelerin güvenli eklenmesi
 import crypto from 'crypto';
 import type { Project } from '@/types';
+import { getDb } from '@/lib/auth';
 
 export const ICONTROL_ID_PREFIX = 'icontrol-';
 export const ALLOWED_INTEGRATION_ORIGINS = ['https://icontrol.ipsos.com.tr'];
@@ -133,4 +134,56 @@ export function preserveIntegrationProjects(
     p?.source === 'icontrol' && p.id && !incomingIds.has(p.id) && !deletedIds.has(p.id)
   );
   return missing.length ? [...missing, ...incoming] : incoming;
+}
+
+/** Gelen listeyi doğrular, karar verir ve (dryRun değilse) yeni projeleri yazar. */
+export async function runProjectImport(rawList: unknown, dryRun: boolean): Promise<
+  { ok: true; created: string[]; skipped: { code: string; reason: string }[] } | { ok: false; error: string }
+> {
+  if (!Array.isArray(rawList) || rawList.length === 0 || rawList.length > 200) {
+    return { ok: false, error: 'projects 1-200 arası bir liste olmalı' };
+  }
+  const incoming: IncomingProject[] = rawList
+    .filter((p): p is IncomingProject => !!p && typeof (p as IncomingProject).code === 'string')
+    .map(p => ({
+      code: String(p.code).slice(0, 64),
+      title: typeof p.title === 'string' ? p.title : undefined,
+      clientName: typeof p.clientName === 'string' ? p.clientName : undefined,
+      plannedSurveys: Number(p.plannedSurveys) || 0,
+      startDate: typeof p.startDate === 'string' ? p.startDate : undefined,
+      endDate: typeof p.endDate === 'string' ? p.endDate : undefined,
+    }));
+
+  const sql = getDb();
+  const rows = (await sql`
+    SELECT key, value FROM app_data WHERE key = ANY(${['projects', 'deleted_ids']})
+  `) as { key: string; value: unknown }[];
+  const stored = rows.find(r => r.key === 'projects')?.value;
+  const deleted = rows.find(r => r.key === 'deleted_ids')?.value;
+  const existing: Project[] = Array.isArray(stored) ? (stored as Project[]) : [];
+  const deletedIds = new Set<string>(Array.isArray(deleted) ? (deleted as string[]) : []);
+
+  const decisions = decideImports(incoming, existing, deletedIds);
+  const toCreate = decisions.flatMap(d => (d.action === 'create' ? [d.project] : []));
+
+  if (!dryRun && toCreate.length > 0) {
+    // Yazmadan hemen önce tekrar oku: arada eklenmiş/silinmiş projeler korunur
+    const fresh = (await sql`SELECT value FROM app_data WHERE key = 'projects'`) as { value: unknown }[];
+    const current: Project[] = Array.isArray(fresh[0]?.value) ? (fresh[0].value as Project[]) : [];
+    const currentIds = new Set(current.map(p => p.id));
+    const finalAdd = toCreate.filter(p => !currentIds.has(p.id));
+    if (finalAdd.length > 0) {
+      await sql`
+        INSERT INTO app_data (key, value, updated_at)
+        VALUES ('projects', ${JSON.stringify([...finalAdd, ...current])}::jsonb, NOW())
+        ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = NOW()
+      `;
+    }
+  }
+
+  return {
+    ok: true,
+    created: decisions.filter(d => d.action === 'create').map(d => d.code),
+    skipped: decisions.flatMap(d => (d.action === 'skip' ? [{ code: d.code, reason: d.reason }] : [])),
+  };
 }

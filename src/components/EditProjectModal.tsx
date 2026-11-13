@@ -156,13 +156,13 @@ export default function EditProjectModal({
         {/* Header */}
         <div className="flex justify-between items-center pb-3 border-b border-gray-200">
           <div className="flex items-center gap-2">
-            <div className="p-2 rounded-xl bg-sky-500/15 text-sky-400 border border-sky-500/30">
+            <div className="p-2 rounded-xl bg-sky-500/15 text-sky-600 border border-sky-500/30">
               <Briefcase className="w-5 h-5" />
             </div>
             <div>
               <h3 className="text-base font-bold text-gray-900 tracking-tight">Projeyi Düzenle</h3>
               <p className="text-xs text-gray-500">
-                <span className="font-mono font-bold text-sky-400">{project.code}</span> - Bilgileri ve birim fiyatları güncelleyin
+                <span className="font-mono font-bold text-sky-600">{project.code}</span> - Bilgileri ve birim fiyatları güncelleyin
               </p>
             </div>
           </div>
@@ -186,7 +186,7 @@ export default function EditProjectModal({
                 required
                 value={code}
                 onChange={(e) => setCode(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl bg-white border border-gray-200 font-mono text-sky-400 font-bold focus:outline-none focus:ring-1 focus:ring-sky-500"
+                className="w-full px-3 py-2 rounded-xl bg-white border border-gray-200 font-mono text-sky-600 font-bold focus:outline-none focus:ring-1 focus:ring-sky-500"
               />
             </div>
             <div>
@@ -247,7 +247,7 @@ export default function EditProjectModal({
           {/* Row 4: Target Surveys & Pricing */}
           <div className="p-3.5 rounded-2xl bg-gray-50 border border-gray-200 space-y-3">
             <span className="font-bold text-gray-900 flex items-center gap-1.5">
-              <Banknote className="w-4 h-4 text-emerald-400" />
+              <Banknote className="w-4 h-4 text-emerald-600" />
               <span>Fiyatlandırma & Hedef Sayısı</span>
             </span>
 
@@ -265,36 +265,36 @@ export default function EditProjectModal({
               </div>
 
               <div>
-                <label className="block font-semibold text-sky-400 mb-1">Anketör Fiyatı (TL)</label>
+                <label className="block font-semibold text-sky-600 mb-1">Anketör Fiyatı (TL)</label>
                 <input
                   type="number"
                   min="0"
                   value={defaultPersonnelRate}
                   onChange={(e) => setDefaultPersonnelRate(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-white border border-gray-200 font-mono text-sky-400 font-bold"
+                  className="w-full px-3 py-2 rounded-xl bg-white border border-gray-200 font-mono text-sky-600 font-bold"
                 />
               </div>
 
               <div>
-                <label className="block font-semibold text-indigo-300 mb-1">Gözlemci Fiyatı (TL)</label>
+                <label className="block font-semibold text-indigo-700 mb-1">Gözlemci Fiyatı (TL)</label>
                 <input
                   type="number"
                   min="0"
                   value={observerUnitPrice}
                   onChange={(e) => setObserverUnitPrice(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-white border border-gray-200 font-mono text-indigo-300 font-bold"
+                  className="w-full px-3 py-2 rounded-xl bg-white border border-gray-200 font-mono text-indigo-700 font-bold"
                 />
               </div>
 
               {isAdmin && (
                 <div className="col-span-2 sm:col-span-3 pt-1">
-                  <label className="block font-semibold text-emerald-400 mb-1">Müşteri Birim Fiyatı (Bize Geliş - TL)</label>
+                  <label className="block font-semibold text-emerald-600 mb-1">Müşteri Birim Fiyatı (Bize Geliş - TL)</label>
                   <input
                     type="number"
                     min="0"
                     value={clientUnitPrice}
                     onChange={(e) => setClientUnitPrice(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-white border border-gray-200 font-mono text-emerald-400 font-bold"
+                    className="w-full px-3 py-2 rounded-xl bg-white border border-gray-200 font-mono text-emerald-600 font-bold"
                   />
                 </div>
               )}
@@ -305,13 +305,13 @@ export default function EditProjectModal({
           <div className="p-3.5 rounded-2xl bg-gray-50 border border-gray-200 space-y-3">
             <div className="flex items-center justify-between">
               <span className="font-bold text-gray-900 flex items-center gap-1.5">
-                <MapPin className="w-4 h-4 text-sky-400" />
+                <MapPin className="w-4 h-4 text-sky-600" />
                 <span>Çalışılacak İller & İl Fiyatları</span>
               </span>
               <button
                 type="button"
                 onClick={handleAddCityRow}
-                className="flex items-center gap-1 text-[11px] px-2.5 py-1 rounded-lg bg-sky-500/15 hover:bg-sky-500/25 text-sky-400 font-bold border border-sky-500/30 transition-all cursor-pointer"
+                className="flex items-center gap-1 text-xs px-2.5 py-1 rounded-lg bg-sky-500/15 hover:bg-sky-500/25 text-sky-600 font-bold border border-sky-500/30 transition-all cursor-pointer"
               >
                 <Plus className="w-3 h-3" />
                 <span>+ İl Ekle</span>
@@ -336,15 +336,15 @@ export default function EditProjectModal({
                       placeholder="Fiyat (TL)"
                       value={cp.unitPrice}
                       onChange={(e) => handleCityChange(idx, 'unitPrice', e.target.value)}
-                      className="w-full px-3 py-1.5 pl-6 rounded-xl bg-white border border-gray-200 text-emerald-400 font-mono font-bold"
+                      className="w-full px-3 py-1.5 pl-6 rounded-xl bg-white border border-gray-200 text-emerald-600 font-mono font-bold"
                     />
-                    <span className="text-[11px] text-gray-400 absolute left-2 top-2">₺</span>
+                    <span className="text-xs text-gray-500 absolute left-2 top-2">₺</span>
                   </div>
                   {cityPricingList.length > 1 && (
                     <button
                       type="button"
                       onClick={() => handleRemoveCityRow(idx)}
-                      className="p-1.5 text-gray-400 hover:text-rose-400 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
+                      className="p-1.5 text-gray-500 hover:text-rose-600 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
@@ -388,7 +388,7 @@ export default function EditProjectModal({
             </button>
             <button
               type="submit"
-              className="flex items-center gap-1.5 px-5 py-2 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-gray-900 font-bold shadow-lg shadow-sky-500/20 transition-all cursor-pointer"
+              className="flex items-center gap-1.5 px-5 py-2 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-bold shadow-lg shadow-sky-500/20 transition-all cursor-pointer"
             >
               <Save className="w-4 h-4" />
               <span>{saveSuccess ? 'Kaydedildi!' : 'Değişiklikleri Kaydet'}</span>

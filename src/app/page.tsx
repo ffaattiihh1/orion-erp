@@ -68,8 +68,8 @@ export default function HomePage() {
           <div>
             <div className="mb-6 flex justify-between items-center">
               <div>
-                <h1 className="text-xl font-bold text-white">Fizibilite & Simülasyon Merkezi</h1>
-                <p className="text-xs text-slate-400">Yeni teklif fizibilitesi oluşturun veya kârlılık projeksiyonu hesaplayın</p>
+                <h1 className="text-xl font-bold text-gray-900">Fizibilite & Simülasyon Merkezi</h1>
+                <p className="text-xs text-gray-500">Yeni teklif fizibilitesi oluşturun veya kârlılık projeksiyonu hesaplayın</p>
               </div>
               <button
                 onClick={() => setIsFeasibilityOpen(true)}
