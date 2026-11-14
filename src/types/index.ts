@@ -268,7 +268,7 @@ export interface TabletHistoryItem {
 
 export interface Tablet {
   id: string;
-  code: string;            // Şirket içi kod / etiket, örn. "TB-07" (tabletin arkasına yapıştırılan)
+  code: string;            // Şirket içi kod / etiket, örn. "ON-T07" (tabletin arkasına yapıştırılan)
   brand?: string;          // Samsung, Lenovo...
   model?: string;
   imei?: string;
@@ -281,8 +281,28 @@ export interface Tablet {
   assignedProjectId?: string;
   assignedAt?: string;
   notes?: string;
+  mdmDeviceName?: string;  // Bağlı MDM cihazı: enterprises/.../devices/...
   history: TabletHistoryItem[];
   createdAt: string;
   updatedAt?: string;
+}
+
+// ---------------- TABLET MDM (Google Android Management API) ----------------
+export interface MdmDevice {
+  name: string;            // enterprises/.../devices/...
+  label?: string;          // Kayıtta verilen ad (ON-T01)
+  state: string;           // ACTIVE | DISABLED | LOST | PROVISIONING ...
+  brand?: string;
+  model?: string;
+  serialNumber?: string;
+  imei?: string;
+  androidVersion?: string;
+  securityPatchLevel?: string;
+  enrolledAt?: string;
+  lastSeenAt?: string;
+  batteryLevel?: number;
+  batteryAt?: string;
+  policyCompliant: boolean;
+  nonCompliance: string[];
 }
 
