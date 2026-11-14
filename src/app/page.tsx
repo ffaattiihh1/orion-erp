@@ -14,13 +14,17 @@ import InvoicesView from '@/components/InvoicesView';
 import DailyReportsView from '@/components/DailyReportsView';
 import PhoneControlView from '@/components/PhoneControlView';
 import TabletsView from '@/components/TabletsView';
+import MdmView from '@/components/MdmView';
 import FeasibilitySimulatorModal from '@/components/FeasibilitySimulatorModal';
 import QuickAdvanceModal from '@/components/QuickAdvanceModal';
 import { Banknote } from 'lucide-react';
 
 export default function HomePage() {
   const { currentUser, isAuthReady } = useApp();
-  const [activeTab, setActiveTab] = useState<string>('dashboard');
+  // ?tab=mdm gibi dönüş bağlantıları (Google MDM kaydı) doğrudan ilgili sekmeyi açar
+  const [activeTab, setActiveTab] = useState<string>(() =>
+    (typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('tab')) || 'dashboard'
+  );
   const [isFeasibilityOpen, setIsFeasibilityOpen] = useState<boolean>(false);
   const [isQuickAdvanceOpen, setIsQuickAdvanceOpen] = useState<boolean>(false);
 
@@ -65,6 +69,7 @@ export default function HomePage() {
 
         {/* Manager/Admin Only Tabs */}
         {currentUser.role === 'admin' && activeTab === 'invoices' && <InvoicesView />}
+        {currentUser.role === 'admin' && activeTab === 'mdm' && <MdmView />}
 
         {currentUser.role === 'admin' && activeTab === 'feasibility' && (
           <div>

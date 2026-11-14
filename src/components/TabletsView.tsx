@@ -3,8 +3,9 @@
 import React, { useMemo, useState } from 'react';
 import { useApp, normalizeTurkishText } from '@/context/AppContext';
 import type { Tablet, TabletStatus } from '@/types';
-import { TabletSmartphone, Plus, Search, X, UserPlus, Undo2, Pencil, Trash2, Copy, AlertTriangle, History, FileSpreadsheet } from 'lucide-react';
+import { TabletSmartphone, Plus, Search, X, UserPlus, Undo2, Pencil, Trash2, Copy, AlertTriangle, History, FileSpreadsheet, Printer, ShieldCheck } from 'lucide-react';
 import { exportToExcel } from '@/lib/excel-export';
+import { nextTabletLabel } from '@/lib/mdm-apps';
 
 const STATUS: Record<TabletStatus, { label: string; cls: string }> = {
   zimmetli: { label: 'Zimmetli', cls: 'bg-blue-50 text-blue-700 border-blue-200' },
@@ -194,11 +195,7 @@ function ReturnButton({ tablet }: { tablet: Tablet }) {
 
 function EditTabletModal({ tablet, onClose }: { tablet?: Tablet; onClose: () => void }) {
   const { tablets, saveTablet } = useApp();
-  const nextCode = useMemo(() => {
-    const nums = tablets.map(t => Number((t.code.match(/(\d+)\s*$/) || [])[1])).filter(n => !isNaN(n));
-    const n = (nums.length ? Math.max(...nums) : 0) + 1;
-    return `TB-${String(n).padStart(2, '0')}`;
-  }, [tablets]);
+  const nextCode = useMemo(() => nextTabletLabel(tablets.map(t => t.code)), [tablets]);
 
   const [f, setF] = useState({
     code: tablet?.code || nextCode,
@@ -220,7 +217,7 @@ function EditTabletModal({ tablet, onClose }: { tablet?: Tablet; onClose: () => 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    if (!f.code.trim()) return setError('Tablet kodu gerekli (tabletin üzerine yazılan etiket, örn. TB-07).');
+    if (!f.code.trim()) return setError('Tablet kodu gerekli (tabletin üzerine yazılan etiket, örn. ON-T07).');
     if (dupCode) return setError(`${f.code} kodu zaten kullanılıyor.`);
     if (imeiDigits && imeiDigits.length !== 15) return setError('IMEI 15 haneli olmalı (*#06# ile görülür). Wi-Fi tablette IMEI yoksa boş bırakın.');
     if (dupImei) return setError(`Bu IMEI zaten ${dupImei.code} tabletinde kayıtlı.`);
@@ -318,6 +315,7 @@ function DetailModal({ tablet, isAdmin, onClose, onEdit, onAssign }: { tablet: T
     navigator.clipboard?.writeText(v).then(() => { setCopied(label); setTimeout(() => setCopied(null), 1500); }).catch(() => {});
   };
   const proj = projects.find(p => p.id === tablet.assignedProjectId);
+  const lastReturn = tablet.history.find(h => h.action === 'iade');
 
   return (
     <Sheet title={tablet.code} onClose={onClose}>
@@ -328,11 +326,25 @@ function DetailModal({ tablet, isAdmin, onClose, onEdit, onAssign }: { tablet: T
         </div>
 
         {tablet.status === 'zimmetli' && (
-          <div className="p-3 rounded-xl bg-blue-50 border border-blue-100 text-sm">
-            <p className="text-gray-900"><strong>{tablet.assignedPersonName}</strong></p>
-            <p className="text-gray-600">{fmtDate(tablet.assignedAt)}’den beri{proj ? ` · ${proj.code}` : ''}</p>
+          <div className="p-3 rounded-xl bg-blue-50 border border-blue-100 text-sm flex items-start justify-between gap-2">
+            <div>
+              <p className="text-gray-900"><strong>{tablet.assignedPersonName}</strong></p>
+              <p className="text-gray-600">Teslim: {fmtDate(tablet.assignedAt)}{proj ? ` · ${proj.code}` : ''}</p>
+            </div>
+            <button onClick={() => printHandoverForm(tablet, proj ? `${proj.code} — ${proj.title}` : undefined)} className="shrink-0 flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-white border border-blue-200 text-blue-700 text-xs font-bold cursor-pointer">
+              <Printer className="w-3.5 h-3.5" /> Tutanak
+            </button>
           </div>
         )}
+        {tablet.status !== 'zimmetli' && lastReturn && (
+          <p className="text-sm text-gray-600">Son iade: <strong>{lastReturn.personName}</strong> · {fmtDate(lastReturn.at)}</p>
+        )}
+        <p className="text-sm flex items-center gap-1.5">
+          <ShieldCheck className={`w-4 h-4 ${tablet.mdmDeviceName ? 'text-emerald-600' : 'text-gray-400'}`} />
+          {tablet.mdmDeviceName
+            ? <span className="text-emerald-700">MDM’e bağlı (uzaktan kilit / kayıp modu açık)</span>
+            : <span className="text-gray-500">MDM’e bağlı değil{isAdmin ? ' — Tablet MDM ekranından bağlayın' : ''}</span>}
+        </p>
 
         <div>
           <InfoRow label="Marka / Model" value={[tablet.brand, tablet.model].filter(Boolean).join(' ')} />
@@ -365,6 +377,7 @@ function DetailModal({ tablet, isAdmin, onClose, onEdit, onAssign }: { tablet: T
 
         {tablet.status === 'kayip' && (
           <p className="p-3 rounded-xl bg-red-50 border border-red-100 text-sm text-red-800">
+            {tablet.mdmDeviceName && <>Yönetici <strong>Tablet MDM</strong> ekranından “Kayıp modu”nu başlatsın (tablet kilitlenir, ekranda telefonunuz görünür). Konum için </>}
             Hemen <strong>google.com/android/find</strong> adresinden {tablet.googleAccount ? <strong>{tablet.googleAccount}</strong> : 'cihazdaki Google hesabıyla'} giriş yapıp tableti kilitleyin. IMEI ile operatöre ve karakola bildirim yapabilirsiniz.
           </p>
         )}
@@ -403,6 +416,52 @@ function DetailModal({ tablet, isAdmin, onClose, onEdit, onAssign }: { tablet: T
       </div>
     </Sheet>
   );
+}
+
+const esc = (s?: string) => (s || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!));
+
+/** Zimmet teslim tutanağı (KVKK konum maddesi dahil) — yeni pencerede yazdırılır */
+function printHandoverForm(t: Tablet, projectText?: string) {
+  const w = window.open('', '_blank', 'width=800,height=1000');
+  if (!w) return;
+  const row = (k: string, v?: string) => `<tr><th>${k}</th><td>${esc(v) || '—'}</td></tr>`;
+  w.document.write(`<!doctype html><html lang="tr"><head><meta charset="utf-8"><title>Zimmet Tutanağı ${esc(t.code)}</title>
+<style>
+  body{font-family:Arial,Helvetica,sans-serif;color:#111;margin:32px;font-size:13px;line-height:1.5}
+  h1{font-size:18px;text-align:center;margin:0 0 4px} .sub{text-align:center;color:#555;margin-bottom:20px}
+  table{width:100%;border-collapse:collapse;margin:12px 0} th,td{border:1px solid #999;padding:6px 8px;text-align:left;vertical-align:top}
+  th{width:35%;background:#f3f3f3} h2{font-size:14px;margin:18px 0 6px} ol{padding-left:18px} li{margin-bottom:4px}
+  .sign{display:flex;gap:24px;margin-top:36px} .sign div{flex:1;border-top:1px solid #333;padding-top:6px;text-align:center}
+  @media print{body{margin:16mm}}
+</style></head><body>
+<h1>ORION ARAŞTIRMA — TABLET ZİMMET TESLİM TUTANAĞI</h1>
+<div class="sub">Tarih: ${new Date().toLocaleDateString('tr-TR')}</div>
+<table>
+${row('Tablet kodu', t.code)}${row('Marka / Model', [t.brand, t.model].filter(Boolean).join(' '))}
+${row('Seri no', t.serialNumber)}${row('IMEI', t.imei)}
+${row('Teslim alan', t.assignedPersonName)}${row('Teslim tarihi', t.assignedAt ? new Date(t.assignedAt).toLocaleDateString('tr-TR') : '')}
+${row('Proje', projectText)}${row('Teslim edilen aksesuarlar / not', t.notes)}
+</table>
+<h2>Kullanım Şartları</h2>
+<ol>
+  <li>Tablet şirket malıdır; yalnızca şirket işleri (anket uygulaması) için kullanılır, başkasına verilemez.</li>
+  <li>Tablet, iş bitiminde veya talep edildiğinde eksiksiz ve çalışır durumda iade edilir.</li>
+  <li>Kayıp, çalıntı veya arıza derhal (en geç 24 saat içinde) şirkete bildirilir.</li>
+  <li>Kusur veya ihmal sonucu oluşan hasar ve kayıplardan teslim alan sorumludur.</li>
+</ol>
+<h2>KVKK Aydınlatma — Cihaz Yönetimi ve Konum</h2>
+<ol>
+  <li>Tablet, Orion Araştırma tarafından mobil cihaz yönetimi (MDM) ile yönetilmektedir. Cihazın konum servisi kapatılamaz.</li>
+  <li>Şirket; cihazın son bağlantı zamanı, pil durumu, yazılım sürümü ve seri numarası gibi <b>cihaza ait</b> bilgileri görebilir. Kişisel mesaj, fotoğraf veya dosyalarınıza erişmez.</li>
+  <li>Cihazın <b>konumu</b>, yalnızca cihaz kayıp/çalıntı bildirildiğinde veya iade edilmediğinde cihazın bulunması amacıyla görüntülenir; sürekli takip yapılmaz.</li>
+  <li>Bu veriler 6698 sayılı KVKK m.5/2-f (veri sorumlusunun meşru menfaati: şirket varlığının korunması) kapsamında işlenir, zimmet süresi ve sonrasında en fazla 1 yıl saklanır, yasal zorunluluk dışında üçüncü kişilerle paylaşılmaz.</li>
+  <li>KVKK m.11 kapsamındaki haklarınız (bilgi talep etme, düzeltme, silme, itiraz vb.) için Orion Araştırma’ya yazılı başvurabilirsiniz.</li>
+</ol>
+<p>Yukarıdaki cihazı eksiksiz teslim aldığımı, kullanım şartlarını ve KVKK aydınlatma metnini okuyup anladığımı beyan ederim.</p>
+<div class="sign"><div>Teslim Eden<br>Ad Soyad / İmza</div><div>Teslim Alan<br>${esc(t.assignedPersonName)}<br>İmza</div></div>
+<script>window.onload=function(){window.print()}</script>
+</body></html>`);
+  w.document.close();
 }
 
 function InfoRow({ label, value, mono, copyable, onCopy }: { label: string; value?: string; mono?: boolean; copyable?: boolean; onCopy?: (label: string, v?: string) => void }) {

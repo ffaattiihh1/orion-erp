@@ -23,7 +23,8 @@ import {
   LayoutDashboard,
   Menu,
   ChevronDown,
-  TabletSmartphone
+  TabletSmartphone,
+  ShieldCheck
 } from 'lucide-react';
 
 interface NavbarProps {
@@ -60,6 +61,7 @@ export default function Navbar({ activeTab, setActiveTab }: NavbarProps) {
     { id: 'expenses',      label: 'Masraf',       icon: Receipt,         roles: ['admin', 'spv'] },
     { id: 'advances',      label: 'Avans',        icon: Banknote,        roles: ['admin', 'spv'] },
     { id: 'tablets',       label: 'Tablet Zimmet', icon: TabletSmartphone, roles: ['admin', 'spv'] },
+    { id: 'mdm',           label: 'Tablet MDM',   icon: ShieldCheck,     roles: ['admin'] },
     { id: 'invoices',      label: 'Fatura',       icon: FileText,        roles: ['admin'] },
   ];
 
