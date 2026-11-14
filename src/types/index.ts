@@ -281,28 +281,30 @@ export interface Tablet {
   assignedProjectId?: string;
   assignedAt?: string;
   notes?: string;
-  mdmDeviceName?: string;  // Bağlı MDM cihazı: enterprises/.../devices/...
+  mdmDeviceId?: string;    // Bağlı ManageEngine MDM cihaz kimliği (elle bağlandıysa)
   history: TabletHistoryItem[];
   createdAt: string;
   updatedAt?: string;
 }
 
-// ---------------- TABLET MDM (Google Android Management API) ----------------
+// ---------------- TABLET MDM (ManageEngine MDM Plus Cloud) ----------------
+export interface MdmLocation {
+  lat: number;
+  lng: number;
+  at?: string;             // ISO: konumun alındığı an
+}
+
 export interface MdmDevice {
-  name: string;            // enterprises/.../devices/...
-  label?: string;          // Kayıtta verilen ad (ON-T01)
-  state: string;           // ACTIVE | DISABLED | LOST | PROVISIONING ...
-  brand?: string;
+  id: string;              // ManageEngine device_id
+  name: string;            // Paneldeki cihaz adı (ON-T10)
   model?: string;
   serialNumber?: string;
   imei?: string;
-  androidVersion?: string;
-  securityPatchLevel?: string;
+  osVersion?: string;
+  lostMode: boolean;
   enrolledAt?: string;
   lastSeenAt?: string;
   batteryLevel?: number;
-  batteryAt?: string;
-  policyCompliant: boolean;
-  nonCompliance: string[];
+  location?: MdmLocation;
 }
 

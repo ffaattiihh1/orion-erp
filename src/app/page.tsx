@@ -21,7 +21,7 @@ import { Banknote } from 'lucide-react';
 
 export default function HomePage() {
   const { currentUser, isAuthReady } = useApp();
-  // ?tab=mdm gibi dönüş bağlantıları (Google MDM kaydı) doğrudan ilgili sekmeyi açar
+  // ?tab=mdm gibi bağlantılar doğrudan ilgili sekmeyi açar
   const [activeTab, setActiveTab] = useState<string>(() =>
     (typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('tab')) || 'dashboard'
   );
