@@ -13,10 +13,12 @@ const fmt = (n: number) => '₺' + Math.round(n).toLocaleString('tr-TR');
 export default function AdvancesView() {
   const { advances, projects, personnel, settlements, phoneControlRecords, currentUser, deleteAdvance } = useApp();
   const [tab, setTab] = useState<'balances' | 'movements'>('balances');
+  // Saha (anketör) ve TK hesapları ayrı tutulur
+  const [group, setGroup] = useState<'saha' | 'tk'>('saha');
   const [projectFilter, setProjectFilter] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [expanded, setExpanded] = useState<string | null>(null);
-  const [modal, setModal] = useState<{ open: boolean; editing?: Advance | null; personName?: string }>({ open: false });
+  const [modal, setModal] = useState<{ open: boolean; editing?: Advance | null; personName?: string; projectId?: string }>({ open: false });
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
   const isAdmin = currentUser?.role === 'admin';
@@ -27,8 +29,12 @@ export default function AdvancesView() {
 
   // ---- Kişi bazında cari hesap ----
   const ledgers = useMemo(
-    () => computeLedgers({ personnel, settlements, phoneControlRecords, advances }, normalizeTurkishText),
-    [personnel, settlements, phoneControlRecords, advances]
+    () => group === 'tk'
+      // TK: yevmiyeler + yalnızca "Günlük TK" cebine yazılan ödemeler
+      ? computeLedgers({ personnel, settlements: [], phoneControlRecords, advances: advances.filter(a => a.projectId === GENERAL_TK_ID) }, normalizeTurkishText)
+      // Saha: hakedişler + TK cebi dışındaki avanslar
+      : computeLedgers({ personnel, settlements, phoneControlRecords: [], advances: advances.filter(a => a.projectId !== GENERAL_TK_ID) }, normalizeTurkishText),
+    [personnel, settlements, phoneControlRecords, advances, group]
   );
 
   const term = normalizeTurkishText(searchTerm);
@@ -56,7 +62,7 @@ export default function AdvancesView() {
         'Verilen Avans/Ödeme (TL)': Math.round(l.given),
         'Bakiye (TL)': Math.round(l.balance),
         'Durum': l.balance > 0 ? 'Ödenecek' : l.balance < 0 ? 'Kişide avans' : 'Kapalı',
-      })), 'Orion_Kisi_Bakiyeleri', 'Bakiyeler');
+      })), group === 'tk' ? 'Orion_TK_Bakiyeleri' : 'Orion_Saha_Bakiyeleri', 'Bakiyeler');
     } else {
       exportToExcel(filteredAdvances.map(a => ({
         'Tarih': new Date(a.issuedAt).toLocaleDateString('tr-TR'),
@@ -107,6 +113,15 @@ export default function AdvancesView() {
         >
           <Plus className="w-4 h-4" /> Avans / Ödeme Yaz
         </button>
+      </div>
+
+      {/* Saha / TK ayrımı */}
+      <div className="grid grid-cols-2 gap-1 p-1 rounded-xl bg-gray-100">
+        {([['saha', 'Saha (anketör)'], ['tk', 'TK kontrolcü']] as const).map(([k, label]) => (
+          <button key={k} onClick={() => { setGroup(k); setExpanded(null); }} className={`py-2.5 rounded-lg text-sm font-bold cursor-pointer ${group === k ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500'}`}>
+            {label}
+          </button>
+        ))}
       </div>
 
       {/* Özet */}
@@ -179,7 +194,7 @@ export default function AdvancesView() {
                 {open && (
                   <div className="bg-gray-50 px-4 pb-4 pt-1">
                     <div className="flex justify-end mb-2">
-                      <button onClick={() => setModal({ open: true, personName: l.name })} className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-amber-500 text-white text-xs font-bold cursor-pointer">
+                      <button onClick={() => setModal({ open: true, personName: l.name, projectId: group === 'tk' ? GENERAL_TK_ID : undefined })} className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-amber-500 text-white text-xs font-bold cursor-pointer">
                         <Plus className="w-3.5 h-3.5" /> Bu kişiye avans/ödeme yaz
                       </button>
                     </div>
@@ -200,7 +215,9 @@ export default function AdvancesView() {
             );
           })}
           <p className="px-4 py-3 text-xs text-gray-500 bg-gray-50">
-            Hak edilen = hakedişler (brüt) + TK yevmiyeleri. Verilen = avanslar + ödenmiş hakedişler. Saha raporlarındaki günlük yevmiyeler bu hesaba dahil değildir.
+            {group === 'tk'
+              ? 'TK: hak edilen = TK günlük yevmiyeleri, verilen = "Günlük TK" cebine yazılan ödemeler.'
+              : 'Saha: hak edilen = hakedişler (brüt), verilen = avanslar (TK hariç) + ödenmiş hakedişler. Saha raporu yevmiyeleri dahil değildir.'}
           </p>
         </div>
       ) : (
@@ -232,6 +249,7 @@ export default function AdvancesView() {
         isOpen={modal.open}
         editing={modal.editing}
         presetPersonName={modal.personName}
+        presetProjectId={modal.projectId}
         onClose={() => setModal({ open: false })}
       />
     </div>

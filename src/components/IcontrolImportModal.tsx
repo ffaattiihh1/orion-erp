@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { X, Download, CheckCircle2, AlertTriangle } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 import { parseIcontrolPaste, type PastedProject } from '@/lib/icontrol-paste';
+import ProjectStatusSync from '@/components/ProjectStatusSync';
 
 interface Props {
   isOpen: boolean;
@@ -100,7 +101,7 @@ export default function IcontrolImportModal({ isOpen, onClose }: Props) {
           ) : !preview ? (
             <>
               <ol className="text-sm text-gray-700 space-y-1 list-decimal pl-5">
-                <li>iControl&apos;de <strong>Projelerim</strong> sayfasını açın (Aktif sekmesi).</li>
+                <li>iControl&apos;de <strong>Projelerim</strong> sayfasını açın (<strong>Aktif</strong> sekmesi — biten projeleri ayırmak için önemli).</li>
                 <li>Sayfada <strong>Ctrl+A</strong>, sonra <strong>Ctrl+C</strong> yapın.</li>
                 <li>Aşağıdaki kutuya <strong>Ctrl+V</strong> ile yapıştırın.</li>
               </ol>
@@ -160,6 +161,7 @@ export default function IcontrolImportModal({ isOpen, onClose }: Props) {
                   {busy ? 'Ekleniyor…' : `${preview.created.length} projeyi ekle`}
                 </button>
               </div>
+              <ProjectStatusSync activeCodes={parsed.map(p => p.code)} />
             </>
           )}
         </div>

@@ -24,6 +24,12 @@ import {
 } from 'lucide-react';
 import { exportToExcel } from '@/lib/excel-export';
 import { PhoneControlRecord } from '@/types';
+import QuickAdvanceModal, { GENERAL_TK_ID, localDateStr } from '@/components/QuickAdvanceModal';
+import { normalizeTurkishText } from '@/context/AppContext';
+
+/** Günlük TK hedefi: kontrolcü başına günde 40 OK */
+export const TK_DAILY_TARGET = 40;
+const TK_NEAR = Math.round(TK_DAILY_TARGET * 0.8); // 32
 
 export default function PhoneControlView() {
   const { 
@@ -31,6 +37,7 @@ export default function PhoneControlView() {
     phoneControlRecords, 
     projects, 
     personnel, 
+    advances,
     addPhoneControlRecord, 
     updatePhoneControlRecord, 
     deletePhoneControlRecord 
@@ -39,6 +46,7 @@ export default function PhoneControlView() {
   const [selectedProjectId, setSelectedProjectId] = useState<string>('all');
   const [selectedController, setSelectedController] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState<string>('');
+  const [payFor, setPayFor] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [editingRecordId, setEditingRecordId] = useState<string | null>(null);
 
@@ -159,34 +167,43 @@ export default function PhoneControlView() {
   const totalApprovedDone = filteredRecords.reduce((sum, r) => sum + Number(r.totalApproved || 0), 0);
   const totalRejectedDone = filteredRecords.reduce((sum, r) => sum + Number(r.totalRejected || 0), 0);
   const totalTkCost = filteredRecords.reduce((sum, r) => sum + Number(r.dailyWage || 0), 0);
-  const overallApprovalRate = totalCallsDone > 0 ? Math.round((totalApprovedDone / totalCallsDone) * 100) : 0;
 
-  // Rate Badge Style
-  const getApprovalRateBadge = (rate?: number) => {
-    const r = rate || 0;
-    if (r >= 90) {
-      return (
-        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-500/15 text-emerald-600 border border-emerald-500/30">
-          <CheckCircle2 className="w-3 h-3" />
-          <span>%{r} Onay (Yüksek Kalite)</span>
-        </span>
-      );
-    }
-    if (r >= 75) {
-      return (
-        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-500/15 text-amber-700 border border-amber-500/30">
-          <AlertCircle className="w-3 h-3" />
-          <span>%{r} Onay (Standart)</span>
-        </span>
-      );
-    }
+  // Günlük 40 OK hedefine göre rozet (arama başına dönüş oranı ikincil bilgi)
+  const getTargetBadge = (approved?: number, called?: number) => {
+    const ok = Number(approved || 0);
+    const conv = called && Number(called) > 0 ? Math.round((ok / Number(called)) * 100) : null;
+    const tone = ok >= TK_DAILY_TARGET
+      ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+      : ok >= TK_NEAR ? 'bg-amber-50 text-amber-800 border-amber-200' : 'bg-rose-50 text-rose-700 border-rose-200';
+    const text = ok >= TK_DAILY_TARGET ? 'Hedef ✓' : ok >= TK_NEAR ? `Yakın · ${TK_DAILY_TARGET - ok} eksik` : `Düşük · ${TK_DAILY_TARGET - ok} eksik`;
     return (
-      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-500/15 text-rose-600 border border-rose-500/30">
-        <XCircle className="w-3 h-3" />
-        <span>%{r} Onay (Düşük / İnceleme)</span>
+      <span className="inline-flex flex-col items-center">
+        <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold border ${tone}`}>
+          {ok >= TK_DAILY_TARGET ? <CheckCircle2 className="w-3 h-3" /> : ok >= TK_NEAR ? <AlertCircle className="w-3 h-3" /> : <XCircle className="w-3 h-3" />}
+          <span>{ok}/{TK_DAILY_TARGET} {text}</span>
+        </span>
+        {conv !== null && <span className="text-xs text-gray-500 mt-0.5">arama dönüşü %{conv}</span>}
       </span>
     );
   };
+
+  // Kontrolcü bazında performans ve hesap (TK ödemeleri saha avanslarından ayrı: "Günlük TK" cebi)
+  const today = localDateStr();
+  const weekAgo = localDateStr(new Date(new Date(today + 'T12:00:00').getTime() - 6 * 86400000));
+  const controllerStats = uniqueControllers.map(name => {
+    const recs = phoneControlRecords.filter(r => r.controllerName === name);
+    const days = recs.length;
+    const ok = recs.reduce((s, r) => s + Number(r.totalApproved || 0), 0);
+    const hitDays = recs.filter(r => Number(r.totalApproved || 0) >= TK_DAILY_TARGET).length;
+    const week = recs.filter(r => r.controlDate >= weekAgo && r.controlDate <= today);
+    const weekOk = week.reduce((s, r) => s + Number(r.totalApproved || 0), 0);
+    const todayOk = recs.filter(r => r.controlDate === today).reduce((s, r) => s + Number(r.totalApproved || 0), 0);
+    const earned = recs.reduce((s, r) => s + Number(r.dailyWage || 0), 0);
+    const paid = advances
+      .filter(a => a.projectId === GENERAL_TK_ID && normalizeTurkishText(a.personnelName) === normalizeTurkishText(name))
+      .reduce((s, a) => s + Number(a.amount || 0), 0);
+    return { name, days, ok, avg: days ? Math.round(ok / days) : 0, hitDays, weekDays: week.length, weekOk, todayOk, hasToday: recs.some(r => r.controlDate === today), earned, paid, balance: earned - paid };
+  }).sort((a, b) => b.days - a.days);
 
   // Excel Export
   const handleExportExcel = () => {
@@ -265,11 +282,12 @@ export default function PhoneControlView() {
         </div>
 
         <div className="p-4 rounded-2xl bg-white border border-gray-200">
-          <span className="text-xs uppercase font-bold text-gray-500 tracking-wider block">Genel Onay Başarısı</span>
-          <span className="text-xl font-black font-mono text-sky-600 mt-1 block">
-            %{overallApprovalRate}
+          <span className="text-xs uppercase font-bold text-gray-500 tracking-wider block">Günlük Hedef ({TK_DAILY_TARGET} OK)</span>
+          <span className="text-xl font-black font-mono text-gray-900 mt-1 block">
+            {filteredRecords.filter(r => Number(r.totalApproved || 0) >= TK_DAILY_TARGET).length}
+            <span className="text-sm font-normal text-gray-500"> / {filteredRecords.length} gün tuttu</span>
           </span>
-          <span className="text-xs text-sky-600 block mt-0.5">Teyit Başarı Oranı</span>
+          <span className="text-xs text-gray-600 block mt-0.5">Ortalama {filteredRecords.length ? Math.round(totalApprovedDone / filteredRecords.length) : 0} OK / gün</span>
         </div>
 
         <div className="p-4 rounded-2xl bg-white border border-gray-200">
@@ -280,6 +298,56 @@ export default function PhoneControlView() {
           <span className="text-xs text-amber-600 block mt-0.5">TK günlük yevmiye toplamı</span>
         </div>
       </div>
+
+      {/* Kontrolcü bazında hedef ve hesap */}
+      {controllerStats.length > 0 && (
+        <div className="space-y-2">
+          <h2 className="text-base font-bold text-gray-900">Kontrolcüler · hedef ve ödeme</h2>
+          <div className="grid gap-2.5 sm:grid-cols-2">
+            {controllerStats.map(c => (
+              <div key={c.name} className="bg-white rounded-2xl border border-gray-200 p-4">
+                <div className="flex items-start justify-between gap-2">
+                  <p className="font-bold text-gray-900">{c.name}</p>
+                  {c.hasToday ? (
+                    <span className={`text-xs font-bold px-2 py-1 rounded-full border ${c.todayOk >= TK_DAILY_TARGET ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-amber-50 text-amber-800 border-amber-200'}`}>
+                      Bugün {c.todayOk}/{TK_DAILY_TARGET}{c.todayOk < TK_DAILY_TARGET ? ` · ${TK_DAILY_TARGET - c.todayOk} eksik` : ' ✓'}
+                    </span>
+                  ) : <span className="text-xs text-gray-500">Bugün kayıt yok</span>}
+                </div>
+                <div className="mt-3 grid grid-cols-3 gap-2 text-center">
+                  <div className="rounded-xl bg-gray-50 py-2">
+                    <p className="text-base font-bold text-gray-900">{c.avg}</p>
+                    <p className="text-xs text-gray-500">ort. OK/gün</p>
+                  </div>
+                  <div className="rounded-xl bg-gray-50 py-2">
+                    <p className="text-base font-bold text-gray-900">{c.hitDays}/{c.days}</p>
+                    <p className="text-xs text-gray-500">hedef tutan gün</p>
+                  </div>
+                  <div className="rounded-xl bg-gray-50 py-2">
+                    <p className={`text-base font-bold ${c.weekOk >= c.weekDays * TK_DAILY_TARGET ? 'text-emerald-700' : 'text-amber-700'}`}>{c.weekOk}/{c.weekDays * TK_DAILY_TARGET}</p>
+                    <p className="text-xs text-gray-500">son 7 gün</p>
+                  </div>
+                </div>
+                <div className="mt-3 flex items-center justify-between gap-2 text-sm">
+                  <span className="text-gray-600">
+                    Yevmiye ₺{c.earned.toLocaleString('tr-TR')} · Ödenen ₺{c.paid.toLocaleString('tr-TR')}
+                    <br />
+                    <strong className={c.balance > 0 ? 'text-emerald-700' : c.balance < 0 ? 'text-amber-700' : 'text-gray-500'}>
+                      {c.balance > 0 ? `Ödenecek ₺${c.balance.toLocaleString('tr-TR')}` : c.balance < 0 ? `Fazla ödeme ₺${(-c.balance).toLocaleString('tr-TR')}` : 'Hesap kapalı'}
+                    </strong>
+                  </span>
+                  <button onClick={() => setPayFor(c.name)} className="shrink-0 px-3 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-sm font-bold cursor-pointer">
+                    Ödeme yaz
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+          <p className="text-xs text-gray-500">TK ödemeleri &ldquo;Günlük TK&rdquo; cebine yazılır ve saha (anketör) avanslarından ayrı tutulur.</p>
+        </div>
+      )}
+
+      <QuickAdvanceModal isOpen={payFor !== null} presetProjectId={GENERAL_TK_ID} presetPersonName={payFor || undefined} onClose={() => setPayFor(null)} />
 
       {/* Filter & Search Bar */}
       <div className="p-4 rounded-2xl bg-white border border-gray-200 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
@@ -334,7 +402,7 @@ export default function PhoneControlView() {
                   <p className="text-xs text-gray-500">okey</p>
                 </div>
                 <div className="rounded-xl bg-gray-50 py-2 flex flex-col items-center justify-center">
-                  {getApprovalRateBadge(rec.approvalRate)}
+                  {getTargetBadge(rec.totalApproved, rec.totalCalled)}
                 </div>
               </div>
               {rec.notes && <p className="mt-2 text-sm text-gray-600">{rec.notes}</p>}
@@ -412,7 +480,7 @@ export default function PhoneControlView() {
                     </td>
 
                     <td className="py-3.5 px-4 text-center whitespace-nowrap">
-                      {getApprovalRateBadge(rec.approvalRate)}
+                      {getTargetBadge(rec.totalApproved, rec.totalCalled)}
                     </td>
 
                     <td className="py-3.5 px-4 text-gray-600 text-xs max-w-[200px] truncate" title={rec.notes}>
@@ -623,16 +691,16 @@ export default function PhoneControlView() {
               </div>
 
               {/* Live Quality Preview Ribbon */}
-              {Number(formTotalCalled) > 0 && (
+              {(Number(formTotalCalled) > 0 || Number(formTotalApproved) > 0) && (
                 <div className="p-3 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-between text-xs">
                   <span className="text-gray-600 font-medium">
-                    Hesaplanan Başarı Oranı:
+                    Günlük hedefe göre:
                   </span>
                   <div className="flex items-center gap-2">
                     <span className="font-mono text-xs font-bold text-gray-800">
                       {formTotalApproved} / {formTotalCalled}
                     </span>
-                    {getApprovalRateBadge(Math.round((Number(formTotalApproved || 0) / Number(formTotalCalled || 1)) * 100))}
+                    {getTargetBadge(Number(formTotalApproved || 0), Number(formTotalCalled || 0))}
                   </div>
                 </div>
               )}
