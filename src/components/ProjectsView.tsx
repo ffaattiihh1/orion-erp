@@ -46,7 +46,8 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
   } = useApp();
 
   const [filterModel, setFilterModel] = useState<string>('all');
-  const [filterStatus, setFilterStatus] = useState<string>('all');
+  // Varsayılan: sadece devam eden projeler (biten/iptal edilenler gizli)
+  const [filterStatus, setFilterStatus] = useState<string>('open');
   const [filterPeriod, setFilterPeriod] = useState<string>('all');
   const [filterArchive, setFilterArchive] = useState<string>('active');
 
@@ -103,7 +104,9 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
     if (filterModel !== 'all' && p.businessModel !== filterModel) return false;
 
     // Status filter
-    if (filterStatus !== 'all' && p.status !== filterStatus) return false;
+    if (filterStatus === 'open') {
+      if (p.status === 'completed' || p.status === 'cancelled') return false;
+    } else if (filterStatus !== 'all' && p.status !== filterStatus) return false;
 
     // Period filter (Based on startDate or createdAt)
     if (filterPeriod !== 'all') {
@@ -293,6 +296,7 @@ export default function ProjectsView({ onOpenFeasibility }: ProjectsViewProps) {
               onChange={(e) => setFilterStatus(e.target.value)}
               className="w-full px-2.5 py-1.5 rounded-xl bg-white border border-gray-200 text-xs text-gray-800 font-medium cursor-pointer"
             >
+              <option value="open">Devam Edenler</option>
               <option value="all">Tüm Durumlar</option>
               <option value="active">Aktif</option>
               {isAdmin && <option value="feasibility">Fizibilite / Taslak</option>}

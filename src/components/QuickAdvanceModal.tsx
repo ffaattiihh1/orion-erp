@@ -53,7 +53,7 @@ function QuickAdvanceForm({ onClose, presetProjectId, presetPersonName, editing 
 
   const projectOptions = useMemo(() =>
     projects
-      .filter(p => !p.isArchived || p.id === projectId)
+      .filter(p => (!p.isArchived && p.status !== 'completed' && p.status !== 'cancelled') || p.id === projectId)
       .sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || '')),
     [projects, projectId]
   );

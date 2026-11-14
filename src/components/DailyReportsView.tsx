@@ -38,6 +38,22 @@ export default function DailyReportsView() {
   } = useApp();
 
   const [selectedProjectId, setSelectedProjectId] = useState<string>('all');
+
+  // Proje bazında özet: raporu olan her proje (raporu olan proje = devam eden saha)
+  const projectSummaries = Array.from(new Set(dailyReports.map(r => r.projectId))).map(pid => {
+    const reps = dailyReports.filter(r => r.projectId === pid);
+    const proj = projects.find(p => p.id === pid);
+    const last = reps.reduce((m, r) => (r.reportDate > m ? r.reportDate : m), '');
+    return {
+      id: pid,
+      code: proj?.code || reps[0]?.projectCode || '—',
+      title: proj?.title || reps[0]?.projectTitle || '',
+      days: new Set(reps.map(r => r.reportDate)).size,
+      last,
+      surveys: reps.reduce((s, r) => s + Number(r.totalDailySurveys || 0), 0),
+      wage: reps.reduce((s, r) => s + Number(r.totalDailyWage || 0), 0),
+    };
+  }).sort((a, b) => b.last.localeCompare(a.last));
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -375,6 +391,48 @@ export default function DailyReportsView() {
         </div>
       </div>
 
+      {/* Proje bazında görünüm */}
+      {projectSummaries.length > 0 && (
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <h2 className="text-base font-bold text-gray-900">Projeler</h2>
+            {selectedProjectId !== 'all' && (
+              <button onClick={() => setSelectedProjectId('all')} className="text-sm font-semibold text-blue-600 cursor-pointer">Tüm projeleri göster</button>
+            )}
+          </div>
+          <div className="flex gap-2.5 overflow-x-auto pb-1 sm:grid sm:grid-cols-2 lg:grid-cols-3 sm:overflow-visible">
+            {projectSummaries.map(p => {
+              const active = selectedProjectId === p.id;
+              return (
+                <button
+                  key={p.id}
+                  onClick={() => setSelectedProjectId(active ? 'all' : p.id)}
+                  className={`shrink-0 w-64 sm:w-auto text-left p-4 rounded-2xl border cursor-pointer transition-all ${active ? 'bg-blue-50 border-blue-300 ring-2 ring-blue-100' : 'bg-white border-gray-200 hover:border-blue-200'}`}
+                >
+                  <p className="font-mono font-bold text-gray-900">{p.code}</p>
+                  <p className="text-sm text-gray-600 truncate">{p.title}</p>
+                  <div className="mt-2.5 grid grid-cols-3 gap-1.5 text-center">
+                    <div className="rounded-lg bg-white/70 border border-gray-100 py-1.5">
+                      <p className="text-sm font-bold text-gray-900">{p.days}</p>
+                      <p className="text-xs text-gray-500">gün</p>
+                    </div>
+                    <div className="rounded-lg bg-white/70 border border-gray-100 py-1.5">
+                      <p className="text-sm font-bold text-gray-900">{p.surveys}</p>
+                      <p className="text-xs text-gray-500">anket</p>
+                    </div>
+                    <div className="rounded-lg bg-white/70 border border-gray-100 py-1.5">
+                      <p className="text-sm font-bold text-amber-700">₺{p.wage.toLocaleString('tr-TR')}</p>
+                      <p className="text-xs text-gray-500">yevmiye</p>
+                    </div>
+                  </div>
+                  <p className="mt-2 text-xs text-gray-500">Son rapor: {p.last ? new Date(p.last).toLocaleDateString('tr-TR') : '-'}</p>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {/* Filter & Search Bar */}
       <div className="p-4 rounded-2xl bg-white border border-gray-200 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
         <div className="flex flex-wrap items-center gap-2.5">
@@ -384,10 +442,12 @@ export default function DailyReportsView() {
             onChange={(e) => setSelectedProjectId(e.target.value)}
             className="px-3 py-2 rounded-xl bg-white border border-gray-200 text-xs text-gray-800 font-medium focus:outline-none focus:ring-1 focus:ring-sky-500"
           >
-            <option value="all">Tüm Projeler ({projects.length})</option>
-            {projects.map(p => (
-              <option key={p.id} value={p.id}>{p.code} - {p.title || p.clientName}</option>
-            ))}
+            <option value="all">Tüm Projeler</option>
+            {projects
+              .filter(p => p.status !== 'completed' && p.status !== 'cancelled' || projectSummaries.some(x => x.id === p.id))
+              .map(p => (
+                <option key={p.id} value={p.id}>{p.code} - {p.title || p.clientName}</option>
+              ))}
           </select>
 
           {/* Status Filter */}

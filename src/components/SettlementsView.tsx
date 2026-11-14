@@ -28,12 +28,20 @@ export default function SettlementsView() {
     projects, 
     personnel, 
     toggleSettlementPaid, 
+    deleteSettlements,
     closeSurveysAndCalculateSettlement, 
     getPersonnelNetAdvance 
   } = useApp();
 
   const [selectedProjectId, setSelectedProjectId] = useState<string>(projects[0]?.id || 'all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const toggleSelected = (id: string) => setSelectedIds(prev => {
+    const n = new Set(prev);
+    if (n.has(id)) n.delete(id); else n.add(id);
+    return n;
+  });
   
   // Modals
   const [isNewSettlementModalOpen, setIsNewSettlementModalOpen] = useState(false);
@@ -283,6 +291,48 @@ export default function SettlementsView() {
         </div>
       </div>
 
+      {/* SEÇİM VE SİLME */}
+      {filteredSettlements.length > 0 && (
+        <div className="flex flex-wrap items-center gap-2 p-3 rounded-2xl bg-white border border-gray-200">
+          <button
+            onClick={() => {
+              const visibleIds = filteredSettlements.map(s => s.id);
+              const allSelected = visibleIds.every(id => selectedIds.has(id));
+              setSelectedIds(allSelected ? new Set() : new Set(visibleIds));
+              setConfirmDelete(false);
+            }}
+            className="px-3 py-2 rounded-xl border border-gray-300 text-sm font-semibold text-gray-700 cursor-pointer"
+          >
+            {filteredSettlements.every(s => selectedIds.has(s.id)) ? 'Seçimi kaldır' : `Listedeki tümünü seç (${filteredSettlements.length})`}
+          </button>
+          {filteredSettlements.some(s => selectedIds.has(s.id)) && !confirmDelete && (
+            <button onClick={() => setConfirmDelete(true)} className="px-3 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-sm font-bold cursor-pointer">
+              Seçilen {filteredSettlements.filter(s => selectedIds.has(s.id)).length} hakedişi sil
+            </button>
+          )}
+          {confirmDelete && (() => {
+            const chosen = filteredSettlements.filter(s => selectedIds.has(s.id));
+            const paidCount = chosen.filter(s => s.isPaid).length;
+            return (
+              <div className="w-full flex flex-col sm:flex-row sm:items-center gap-2 p-3 rounded-xl bg-red-50 border border-red-200">
+                <p className="flex-1 text-sm text-red-800">
+                  <strong>{chosen.length} hakediş</strong> kalıcı olarak silinecek{paidCount > 0 ? `; bunların ${paidCount} tanesi ÖDENDİ işaretli` : ''}. Avans kayıtlarına dokunulmaz.
+                </p>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => { deleteSettlements(chosen.map(s => s.id)); setSelectedIds(new Set()); setConfirmDelete(false); }}
+                    className="px-4 py-2 rounded-xl bg-red-600 text-white text-sm font-bold cursor-pointer"
+                  >
+                    Evet, sil
+                  </button>
+                  <button onClick={() => setConfirmDelete(false)} className="px-4 py-2 rounded-xl bg-white border border-gray-300 text-sm text-gray-700 cursor-pointer">Vazgeç</button>
+                </div>
+              </div>
+            );
+          })()}
+        </div>
+      )}
+
       {/* TELEFON: kart görünümü */}
       <div className="sm:hidden space-y-2.5">
         {filteredSettlements.length === 0 ? (
@@ -291,9 +341,10 @@ export default function SettlementsView() {
           filteredSettlements.map((s) => {
             const proj = projects.find(p => p.id === s.projectId);
             return (
-              <div key={s.id} className="bg-white rounded-2xl border border-gray-200 p-4">
+              <div key={s.id} className={`bg-white rounded-2xl border p-4 ${selectedIds.has(s.id) ? 'border-red-300 ring-2 ring-red-100' : 'border-gray-200'}`}>
                 <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
+                  <input type="checkbox" checked={selectedIds.has(s.id)} onChange={() => { toggleSelected(s.id); setConfirmDelete(false); }} className="mt-1 w-5 h-5 shrink-0" aria-label="Seç" />
+                  <div className="min-w-0 flex-1">
                     <p className="font-bold text-gray-900 text-base leading-tight">{s.personnelName}</p>
                     <p className="text-sm text-gray-500 mt-0.5">
                       <span className="font-mono font-semibold text-sky-700">{proj?.code}</span>
@@ -346,6 +397,7 @@ export default function SettlementsView() {
           <table className="w-full text-left text-xs text-gray-700">
             <thead className="bg-white text-gray-500 uppercase tracking-wider text-xs border-b border-gray-200">
               <tr>
+                <th className="py-3.5 pl-4 pr-1"><span className="sr-only">Seç</span></th>
                 <th className="py-3.5 px-4 font-bold">İL</th>
                 <th className="py-3.5 px-4 font-bold">TC</th>
                 <th className="py-3.5 px-4 font-bold">ANKETÖR</th>
@@ -365,7 +417,7 @@ export default function SettlementsView() {
             <tbody className="divide-y divide-gray-200/80">
               {filteredSettlements.length === 0 ? (
                 <tr>
-                  <td colSpan={14} className="py-12 text-center text-gray-500">
+                  <td colSpan={15} className="py-12 text-center text-gray-500">
                     <p className="text-sm font-semibold">Bu projede kayıtlı hakediş bulunamadı.</p>
                     <p className="text-xs text-gray-500 mt-1">
                       Yukarıdaki <strong>"Excel'den Kopyala-Yapıştır"</strong> butonuna tıklayarak Excel tablonuzu doğrudan aktarabilirsiniz.
@@ -377,7 +429,10 @@ export default function SettlementsView() {
                   const proj = projects.find(p => p.id === s.projectId);
 
                   return (
-                    <tr key={s.id} className="hover:bg-gray-100 transition-colors">
+                    <tr key={s.id} className={`transition-colors ${selectedIds.has(s.id) ? 'bg-red-50' : 'hover:bg-gray-100'}`}>
+                      <td className="py-3 pl-4 pr-1">
+                        <input type="checkbox" checked={selectedIds.has(s.id)} onChange={() => { toggleSelected(s.id); setConfirmDelete(false); }} className="w-4 h-4" aria-label="Seç" />
+                      </td>
                       {/* IL */}
                       <td className="py-3 px-4 font-semibold text-gray-700">
                         {s.city || 'Ankara'}

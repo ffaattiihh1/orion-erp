@@ -167,6 +167,8 @@ interface AppContextType {
   importSettlementsFromExcel: (projectId: string, rows: ExcelImportRow[]) => { importedCount: number };
   
   toggleSettlementPaid: (settlementId: string) => void;
+  /** Hakedişleri siler (tek veya toplu); diğer cihazlardan geri gelmez */
+  deleteSettlements: (ids: string[]) => void;
   
   updateInvoiceStatus: (
     invoiceId: string, 
@@ -1359,6 +1361,26 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     return { importedCount: count };
   };
 
+  const deleteSettlements = (ids: string[]) => {
+    if (ids.length === 0) return;
+    const idSet = new Set(ids);
+    // Silinen kimlikleri tek seferde kaydet (her biri için ayrı istek atma)
+    if (typeof window !== 'undefined') {
+      const current = getDeletedIds();
+      ids.forEach(id => current.add(id));
+      const arr = Array.from(current);
+      try { localStorage.setItem('orion_deleted_ids', JSON.stringify(arr)); } catch {}
+      pushToServer({ deleted_ids: arr });
+    }
+    const remaining = settlements.filter(s => !idSet.has(s.id));
+    const affectedProjects = new Set(settlements.filter(s => idSet.has(s.id)).map(s => s.projectId));
+    setSettlements(remaining);
+    // Projelerin tamamlanan anket sayısını kalan hakedişlere göre güncelle
+    setProjects(prev => prev.map(p => affectedProjects.has(p.id)
+      ? { ...p, completedSurveys: remaining.filter(s => s.projectId === p.id).reduce((sum, s) => sum + Number(s.validSurveys || 0), 0) }
+      : p));
+  };
+
   const toggleSettlementPaid = (settlementId: string) => {
     setSettlements(prev => prev.map(s => {
       if (s.id !== settlementId) return s;
@@ -1481,6 +1503,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       closeSurveysAndCalculateSettlement,
       importSettlementsFromExcel,
       toggleSettlementPaid,
+      deleteSettlements,
       updateInvoiceStatus,
       addClientInvoice,
       updateClientInvoice,

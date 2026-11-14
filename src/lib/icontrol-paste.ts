@@ -54,3 +54,14 @@ export function parseIcontrolPaste(text: string): PastedProject[] {
   }
   return out;
 }
+
+/** "RMSR2480_1_EK" / "RMSR2480 Exit" → "RMSR2480" (sunucudaki ile aynı kural) */
+export function baseProjectCode(code?: string): string {
+  if (!code) return '';
+  const m = code.toUpperCase().match(/[A-Z]{2,6}\d{3,6}/);
+  return m ? m[0] : code.trim().toUpperCase();
+}
+
+export function normalizeExternalCode(code: string): string {
+  return code.trim().toUpperCase().replace(/\s+/g, '_');
+}
