@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useApp, normalizeTurkishText } from '@/context/AppContext';
-import type { Tablet, TabletStatus } from '@/types';
-import { TabletSmartphone, Plus, Search, X, UserPlus, Undo2, Pencil, Trash2, Copy, AlertTriangle, History, FileSpreadsheet, Printer, ShieldCheck } from 'lucide-react';
+import type { MdmDevice, Tablet, TabletStatus } from '@/types';
+import { TabletSmartphone, Plus, Search, X, UserPlus, Undo2, Pencil, Trash2, Copy, AlertTriangle, History, FileSpreadsheet, Printer, ShieldCheck, MapPin } from 'lucide-react';
 import { exportToExcel } from '@/lib/excel-export';
-import { nextTabletLabel } from '@/lib/mdm-apps';
+import { nextTabletLabel } from '@/lib/tablet-code';
+import { fetchMdmDevices, deviceForTablet, ago, mapsUrl } from '@/lib/mdm-client';
 
 const STATUS: Record<TabletStatus, { label: string; cls: string }> = {
   zimmetli: { label: 'Zimmetli', cls: 'bg-blue-50 text-blue-700 border-blue-200' },
@@ -339,12 +340,7 @@ function DetailModal({ tablet, isAdmin, onClose, onEdit, onAssign }: { tablet: T
         {tablet.status !== 'zimmetli' && lastReturn && (
           <p className="text-sm text-gray-600">Son iade: <strong>{lastReturn.personName}</strong> · {fmtDate(lastReturn.at)}</p>
         )}
-        <p className="text-sm flex items-center gap-1.5">
-          <ShieldCheck className={`w-4 h-4 ${tablet.mdmDeviceName ? 'text-emerald-600' : 'text-gray-400'}`} />
-          {tablet.mdmDeviceName
-            ? <span className="text-emerald-700">MDM’e bağlı (uzaktan kilit / kayıp modu açık)</span>
-            : <span className="text-gray-500">MDM’e bağlı değil{isAdmin ? ' — Tablet MDM ekranından bağlayın' : ''}</span>}
-        </p>
+        {isAdmin && <MdmInfo tablet={tablet} />}
 
         <div>
           <InfoRow label="Marka / Model" value={[tablet.brand, tablet.model].filter(Boolean).join(' ')} />
@@ -377,8 +373,8 @@ function DetailModal({ tablet, isAdmin, onClose, onEdit, onAssign }: { tablet: T
 
         {tablet.status === 'kayip' && (
           <p className="p-3 rounded-xl bg-red-50 border border-red-100 text-sm text-red-800">
-            {tablet.mdmDeviceName && <>Yönetici <strong>Tablet MDM</strong> ekranından “Kayıp modu”nu başlatsın (tablet kilitlenir, ekranda telefonunuz görünür). Konum için </>}
-            Hemen <strong>google.com/android/find</strong> adresinden {tablet.googleAccount ? <strong>{tablet.googleAccount}</strong> : 'cihazdaki Google hesabıyla'} giriş yapıp tableti kilitleyin. IMEI ile operatöre ve karakola bildirim yapabilirsiniz.
+            Yönetici <strong>Tablet MDM</strong> ekranından “Kayıp modu”nu başlatsın: tablet kilitlenir, ekranda telefonunuz görünür ve konum gelmeye devam eder.
+            Ayrıca <strong>google.com/android/find</strong> adresinden {tablet.googleAccount ? <strong>{tablet.googleAccount}</strong> : 'cihazdaki Google hesabıyla'} bakabilirsiniz. IMEI ile operatöre ve karakola bildirim yapabilirsiniz.
           </p>
         )}
 
@@ -462,6 +458,44 @@ ${row('Proje', projectText)}${row('Teslim edilen aksesuarlar / not', t.notes)}
 <script>window.onload=function(){window.print()}</script>
 </body></html>`);
   w.document.close();
+}
+
+/** Yönetici için: ManageEngine'den son bağlantı, pil ve konum */
+function MdmInfo({ tablet }: { tablet: Tablet }) {
+  const [state, setState] = useState<{ device?: MdmDevice; error?: string } | null>(null);
+
+  useEffect(() => {
+    let alive = true;
+    fetchMdmDevices()
+      .then(r => { if (alive) setState({ device: deviceForTablet(tablet, r.devices) }); })
+      .catch(e => { if (alive) setState({ error: e instanceof Error ? e.message : 'MDM bilgisi alınamadı' }); });
+    return () => { alive = false; };
+  }, [tablet]);
+
+  if (!state) return <p className="text-sm text-gray-400 flex items-center gap-1.5"><ShieldCheck className="w-4 h-4" /> MDM bilgisi yükleniyor…</p>;
+  if (state.error) return <p className="text-sm text-gray-500 flex items-center gap-1.5"><ShieldCheck className="w-4 h-4 text-gray-400" /> MDM: {state.error}</p>;
+  const d = state.device;
+  if (!d) return <p className="text-sm text-gray-500 flex items-center gap-1.5"><ShieldCheck className="w-4 h-4 text-gray-400" /> MDM’de bu kodla tablet yok — Tablet MDM ekranında ad verin ya da bağlayın.</p>;
+
+  const seen = ago(d.lastSeenAt);
+  return (
+    <div className={`p-3 rounded-xl border text-sm space-y-1 ${d.lostMode ? 'bg-red-50 border-red-200' : 'bg-emerald-50 border-emerald-100'}`}>
+      <p className="flex items-center gap-1.5 font-semibold text-gray-900">
+        <ShieldCheck className="w-4 h-4 text-emerald-600" /> MDM: {d.name}{d.lostMode && <span className="text-red-700"> · Kayıp modu açık</span>}
+      </p>
+      <p className={seen.hours > 24 ? 'text-amber-700 font-semibold' : 'text-gray-700'}>
+        Son bağlantı: {seen.text}{typeof d.batteryLevel === 'number' ? ` · Pil %${d.batteryLevel}` : ''}
+      </p>
+      <p className="flex items-center gap-1.5 text-gray-700">
+        <MapPin className="w-4 h-4 text-gray-400" />
+        {d.location ? (
+          <a href={mapsUrl(d.location.lat, d.location.lng)} target="_blank" rel="noreferrer" className="text-indigo-600 font-semibold underline">
+            Son konumu haritada aç{d.location.at ? ` (${ago(d.location.at).text})` : ''}
+          </a>
+        ) : 'Konum bilgisi yok'}
+      </p>
+    </div>
+  );
 }
 
 function InfoRow({ label, value, mono, copyable, onCopy }: { label: string; value?: string; mono?: boolean; copyable?: boolean; onCopy?: (label: string, v?: string) => void }) {
